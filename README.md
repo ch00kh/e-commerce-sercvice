@@ -8,3 +8,4 @@
 ### [[요구사항 분석] FlowChart](docs/requirements-analysis/flowchart.md)
 ### [[요구사항 분석] ERD](docs/requirements-analysis/erd.md)
 ### [[요구사항 분석] API 명세](docs/requirements-analysis/api-spec.md)
+### [[요구사항 분석] SWAGGER API](docs/images/swagger-screenshot.png)
