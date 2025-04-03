@@ -111,7 +111,12 @@ sequenceDiagram
   Order ->>+ Payment: 결제 정보 저장
   Payment -->>- Order: 결제 정보 반환
   
-  Order -->>- USER: 주문 생성 정보 응답
+  alt 수동 결제
+    Order -->> USER: 주문 생성 정보 응답
+  else 자동 결제
+    Order -->> Payment: 결제 서비스 호출
+  end
+  deactivate Order
   deactivate USER
 ```
 
@@ -125,6 +130,8 @@ sequenceDiagram
   participant Order
   participant Balance
   participant DataPlatform
+  
+  activate USER
   USER ->>+ Payment: 결제 요청
   Payment ->>+ Order: 주문 정보 조회
   Order -->>- Payment: 주문 정보 반환
@@ -142,6 +149,7 @@ sequenceDiagram
   Order -->>- Payment: 주문 상태 확정 완료
   Payment -->> DataPlatform: 주문 정보 전송(비동기 처리)
   Payment -->>- USER: 결제 완료 응답
+  deactivate USER
 ```
 
 ---
