@@ -5,11 +5,11 @@ erDiagram
   balance_history ||--o| issued_coupon: "0..1:1"
   user ||--o{ issued_coupon: "1:N"
   coupon ||--o{ issued_coupon: "1:N"
-  product ||--|{ product_details: "1:N"
+  product ||--|{ product_option: "1:N"
   user ||--o{ order: "1:N"
   order ||--|{ order_item: "1:N"
   order ||--o| issued_coupon: "0..1:1"
-  product_details ||--|{ order_item: "1:N"
+  product_option ||--|{ order_item: "1:N"
   payment ||--||order : "1:1"
 
   user {
@@ -63,7 +63,7 @@ erDiagram
     datetime modified_at "수정일시"
   }
 
-  product_details {
+  product_option {
     bigint id PK
     bigint product_id FK
     varchar option_value "옵션"
@@ -90,7 +90,7 @@ erDiagram
   order_item {
     bigint id PK
     bigint order_id FK
-    bigint product_detail_id FK
+    bigint product_option_id FK
     bigint unit_price "상품 금액"
     bigint quantity "상품 수량"
     datetime created_at "생성일시"

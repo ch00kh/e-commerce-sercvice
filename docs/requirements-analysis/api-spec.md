@@ -137,7 +137,7 @@
     "productId": 1001,
     "items": [
       {
-        "product_detail_id": 101,
+        "product_option_id": 101,
         "quantity": 2
       }
     ],
