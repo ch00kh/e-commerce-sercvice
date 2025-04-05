@@ -21,11 +21,11 @@
   ```
 - Response Header
 
-  | code | message                    | 
-  |------|----------------------------|
-  | 200  | OK                         |
-  | 400  | BAD_REQUEST                |
-  | 500  | INTERNATIONAL_SERVER_ERROR |
+  | code | message               | 
+  |------|-----------------------|
+  | 200  | OK                    |
+  | 400  | BAD_REQUEST           |
+  | 500  | INTERNAL_SERVER_ERROR |
 - Response Body
   ```json
   {
@@ -40,11 +40,11 @@
 - METHOD : `GET`
 - Response Header
 
-  | code | message                    |
-  |------|----------------------------|
-  | 200  | OK                         |
-  | 404  | NOT_FOUND                  |
-  | 500  | INTERNATIONAL_SERVER_ERROR |
+  | code | message               |
+  |------|-----------------------|
+  | 200  | OK                    |
+  | 404  | NOT_FOUND             |
+  | 500  | INTERNAL_SERVER_ERROR |
 - Response Body
   ```json
   {
@@ -215,10 +215,10 @@
 - Request Body
 - Response Header
 
-  | code | message                    |
-  |------|----------------------------|
-  | 200  | OK                         |
-  | 500  | INTERNATIONAL_SERVER_ERROR |
+  | code | message               |
+  |------|-----------------------|
+  | 200  | OK                    |
+  | 500  | INTERNAL_SERVER_ERROR |
 - Response Body
   ```json
   [
