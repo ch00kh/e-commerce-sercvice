@@ -23,7 +23,7 @@ class PaymentControllerE2ETest {
     }
 
     @Test
-    @DisplayName("[E2E] 결제 처리 성공")
+    @DisplayName("[성공] 결제 처리")
     public void processPaymentE2ESuccess() {
         String requestBody = """
                 {

@@ -29,10 +29,10 @@ class ProductControllerE2ETest {
 
         given()
             .when()
-                .get("/api/product") // 엔드포인트 경로에 맞게 수정하세요
+                .get("/api/product")
             .then()
                 .statusCode(200)
-                .body("size()", equalTo(2)) // 목록 크기 검증
+                .body("size()", equalTo(2))
 
                 .body("[0].productId", equalTo(1002))
                 .body("[0].brand", equalTo("총각쓰떡"))
@@ -58,7 +58,7 @@ class ProductControllerE2ETest {
     }
 
     @Test
-    @DisplayName("[성공] 상품 정보 조")
+    @DisplayName("[성공] 상품 정보 조회")
     void findTest() {
 
         given()

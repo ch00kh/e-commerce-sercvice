@@ -79,7 +79,6 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(3))
 
-                // 첫 번째 상품 검증
                 .andExpect(jsonPath("$[0].productId").value(1001))
                 .andExpect(jsonPath("$[0].brand").value("총각쓰떡"))
                 .andExpect(jsonPath("$[0].name").value("백설기"))
@@ -89,7 +88,6 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$[0].option.price").value(5500))
                 .andExpect(jsonPath("$[0].option.stock").value(100))
 
-                // 두 번째 상품 검증
                 .andExpect(jsonPath("$[1].productId").value(1001))
                 .andExpect(jsonPath("$[1].brand").value("총각쓰떡"))
                 .andExpect(jsonPath("$[1].name").value("백설기"))
@@ -99,7 +97,6 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$[1].option.price").value(5900))
                 .andExpect(jsonPath("$[1].option.stock").value(99))
 
-                // 세 번째 상품 검증
                 .andExpect(jsonPath("$[2].productId").value(1001))
                 .andExpect(jsonPath("$[2].brand").value("총각쓰떡"))
                 .andExpect(jsonPath("$[2].name").value("백일떡"))
