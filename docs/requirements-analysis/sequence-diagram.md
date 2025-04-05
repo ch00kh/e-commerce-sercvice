@@ -91,6 +91,7 @@ sequenceDiagram
     opt 유효하지 않은 쿠폰인 경우
       Coupon -->> USER: 유효하지 않은 쿠폰 예외 발생
     end
+    Coupon ->> Coupon: 쿠폰 사용 처리
     Coupon -->>- Order: 쿠폰 정보 반환
     activate Order
     Order ->> Order: 쿠폰 할인 적용
@@ -103,11 +104,7 @@ sequenceDiagram
     Order -->> USER: 재고 부족 예외 발생
   end
   Order ->>+ Product: 재고 차감 처리
-  Product -->>- Order: 재고 차감 완료 
-  opt 쿠폰을 사용하는 경우
-    Order ->>+ Coupon: 쿠폰 사용 요청
-    Coupon -->>- Order: 쿠폰 사용 처리
-  end
+  Product -->>- Order: 재고 차감 완료
   Order ->>+ Payment: 결제 정보 저장
   Payment -->>- Order: 결제 정보 반환
   
