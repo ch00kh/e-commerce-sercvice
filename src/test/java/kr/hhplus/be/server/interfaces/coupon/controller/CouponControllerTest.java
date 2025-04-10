@@ -1,7 +1,7 @@
-package kr.hhplus.be.server.api.payment.controller;
+package kr.hhplus.be.server.interfaces.coupon.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.hhplus.be.server.api.payment.dto.PaymentRequest;
+import kr.hhplus.be.server.interfaces.coupon.dto.CouponRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,27 +13,31 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PaymentController.class)
-class PaymentControllerTest {
+
+@WebMvcTest(CouponController.class)
+class CouponControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("[성공] 결제 처리")
-    void processPaymentSuccess() throws Exception {
+    @DisplayName("[성공] 선착순 쿠폰 발급")
+    void issueTest() throws Exception {
 
-        PaymentRequest paymentRequest = new PaymentRequest(1001L, 10001L);
-        String requestBody = objectMapper.writeValueAsString(paymentRequest);
+        CouponRequest mockRequest = CouponRequest.builder()
+                .couponId(1001L)
+                .build();
 
-        mockMvc.perform(post("/api/payment")
+        String requestJson = objectMapper.writeValueAsString(mockRequest);
+
+        mockMvc.perform(post("/api/coupon/{id}", 1001L)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .content(requestJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.orderId").value(10001))
-                .andExpect(jsonPath("$.status").value("COMPLETE"));
+                .andExpect(jsonPath("$.couponId").value(1001L))
+                .andExpect(jsonPath("$.status").value("ISSUED"));
     }
 }
