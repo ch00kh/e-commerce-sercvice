@@ -11,4 +11,15 @@ public record CouponCommand() {
             Long couponId
     ) {}
 
+    public record Issue(
+            Long userId,
+            Long couponId
+    ) {
+    }
+
+    public record Save(
+            Long userId,
+            Long couponId,
+            Long discountPrice
+    ) {}
 }

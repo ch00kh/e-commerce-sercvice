@@ -9,6 +9,7 @@ import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static kr.hhplus.be.server.domain.coupon.dto.CouponInfo.CouponAggregate;
 
@@ -19,7 +20,9 @@ public class CouponService {
     private final CouponRepository couponRepository;
     private final IssuedCouponRepository issuedCouponRepository;
 
-    public CouponAggregate useCoupon(CouponCommand.Use command) {
+
+    @Transactional
+    public CouponAggregate use(CouponCommand.Use command) {
 
         Coupon coupon = couponRepository.findById(command.couponId())
                 .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
@@ -30,5 +33,28 @@ public class CouponService {
         issuedCoupon.use();
 
         return CouponAggregate.from(coupon, issuedCoupon);
+    }
+
+    @Transactional
+    public Coupon issue(CouponCommand.Issue command) {
+
+        Coupon coupon = couponRepository.findById(command.couponId())
+                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+
+        if (coupon.getQuantity() <= 0) {
+            throw new GlobalException(ErrorCode.BAD_REQUEST);
+        }
+
+        return coupon;
+    }
+
+    @Transactional
+    public IssuedCoupon save(CouponCommand.Save command) {
+
+        issuedCouponRepository.findByUserIdAndCouponId(command.userId(), command.couponId())
+                .ifPresent(coupon -> {throw new GlobalException(ErrorCode.BAD_REQUEST);});
+
+        return issuedCouponRepository.save(new IssuedCoupon(command.userId(), command.couponId()));
+
     }
 }

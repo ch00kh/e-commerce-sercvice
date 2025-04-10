@@ -23,6 +23,13 @@ public class IssuedCoupon extends BaseCreatedTimeEntity {
     private LocalDateTime usedAt;
     private LocalDateTime expiredAt;
 
+    public IssuedCoupon(Long userId, Long couponId) {
+        this.userId = userId;
+        this.couponId = couponId;
+        this.status = CouponStatus.ISSUED;
+        this.expiredAt = LocalDateTime.now().plusDays(90);
+    }
+
     public void use() {
         if (this.status != CouponStatus.ISSUED) {
             throw new GlobalException(ErrorCode.BAD_REQUEST);

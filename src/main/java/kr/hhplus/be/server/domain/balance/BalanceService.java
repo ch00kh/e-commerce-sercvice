@@ -46,6 +46,7 @@ public class BalanceService {
         return balance;
     }
 
+    @Transactional
     public Balance reduceBalance(BalanceCommand.Reduce command) {
 
         Balance balance = balanceRepository.findByUserId(command.userId())

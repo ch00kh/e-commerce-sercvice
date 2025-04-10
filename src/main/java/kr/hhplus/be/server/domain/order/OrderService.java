@@ -84,6 +84,7 @@ public class OrderService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public Order findById(OrderCommand.Find command) {
 
         Order order = orderRepository.findById(command.orderId())
@@ -96,6 +97,7 @@ public class OrderService {
         return order;
     }
 
+    @Transactional
     public Order pay(OrderCommand.Find command) {
 
         Order order = orderRepository.findById(command.orderId())
@@ -105,6 +107,6 @@ public class OrderService {
     }
 
     public void sendOrder(OrderCommand.Send build) {
-        // 주문 정보 전송 비돟기 처리 
+        // 주문 정보 전송 비돟기 처리
     }
 }

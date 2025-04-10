@@ -12,6 +12,7 @@ import kr.hhplus.be.server.domain.payment.dto.PaymentCommand;
 import kr.hhplus.be.server.domain.payment.entity.Payment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -21,21 +22,22 @@ public class PaymentFacade {
     private final OrderService orderService;
     private final BalanceService balanceService;
 
+    @Transactional
     public PaymentResult.Pay pay(PaymentCriteria.Pay criteria) {
 
-        // 결제 찾기 //
+        // 결제 찾기
         Payment payment = paymentService.findPayment(criteria.toCommand());
 
-        // 주문 찾기 //
+        // 주문 찾기
         Order order = orderService.findById(new OrderCommand.Find(payment.getOrderId()));
 
         // 결제금액 차감
         balanceService.reduceBalance(new BalanceCommand.Reduce(order.getUserId(), order.getPaymentAmount()));
 
-        // 결제 완료 //
+        // 결제 완료
         Payment pay = paymentService.pay(new PaymentCommand.Pay(criteria.paymentId(), order.getPaymentAmount()));
 
-        // 주문 상태 변경 //
+        // 주문 상태 변경
         order = orderService.pay(new OrderCommand.Find(payment.getOrderId()));
 
         // 주문 정보 전송

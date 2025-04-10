@@ -14,5 +14,5 @@ public class Coupon extends BaseTimeEntity {
 
     private Long id;
     private Long discountPrice;
-    private Long quantity;
+    private Integer quantity;
 }

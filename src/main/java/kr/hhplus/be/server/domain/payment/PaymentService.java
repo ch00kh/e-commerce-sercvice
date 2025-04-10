@@ -26,6 +26,7 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
+    @Transactional(readOnly = true)
     public Payment findPayment(PaymentCommand.Find command) {
 
         Payment payment = paymentRepository.findById(command.paymentId())
@@ -34,6 +35,7 @@ public class PaymentService {
         return payment;
     }
 
+    @Transactional
     public Payment pay(PaymentCommand.Pay command) {
 
         Payment payment = paymentRepository.findById(command.paymentId())

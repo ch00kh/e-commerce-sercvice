@@ -53,7 +53,7 @@ public class OrderFacade {
 
         // 쿠폰 사용 시 검증, 사용 처리, 적용
         if (criteria.couponId() != null) {
-            CouponInfo.CouponAggregate couponInfo = couponService.useCoupon(new CouponCommand.Use(criteria.userId(), criteria.couponId()));
+            CouponInfo.CouponAggregate couponInfo = couponService.use(new CouponCommand.Use(criteria.userId(), criteria.couponId()));
             order = orderService.useCoupon(OrderCommand.UseCoupon.toCommand(order.orderId(), couponInfo.couponId(), couponInfo.discountPrice()));
         }
 

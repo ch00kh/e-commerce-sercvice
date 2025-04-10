@@ -16,6 +16,7 @@ public class BalanceFacade {
     private final BalanceService balanceService;
     private final UserService userService;
 
+    @Transactional(readOnly = true)
     public BalanceResult.UserBalance findBalance(BalanceCriteria.Find criteria) {
 
         userService.findByUserId(UserCriteria.Find.toCommand(criteria.userId()));
