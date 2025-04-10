@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.api.balance.controller;
+package kr.hhplus.be.server.interfaces.balance.controller;
 
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -7,14 +7,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.hhplus.be.server.api.balance.dto.BalanceRequest;
-import kr.hhplus.be.server.api.balance.dto.BalanceResponse;
+import kr.hhplus.be.server.interfaces.balance.dto.BalanceRequest;
+import kr.hhplus.be.server.interfaces.balance.dto.BalanceResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@Tag(name = "Balance API", description = "잔고 관련 API 입니다.")
-public interface BalanceSpecification {
+@Tag(name = "UserBalance API", description = "잔고 관련 API 입니다.")
+public interface IBalanceController {
 
     @Operation(summary = "잔액 충전 API", description = "사용자의 잔액을 충전합니다.")
     @ApiResponses(value = {
@@ -28,7 +28,7 @@ public interface BalanceSpecification {
                     mediaType = "application/json",
                     schema = @Schema(example = "{\"code\":500,\"message\":\"INTERNAL_SERVER_ERROR\"}")))
     })
-    ResponseEntity<BalanceResponse> charge(@PathVariable Long id, @RequestBody BalanceRequest request);
+    ResponseEntity<BalanceResponse.UserBalance> charge(@PathVariable Long userId, @RequestBody BalanceRequest.Charge request);
 
     @Operation(summary = "잔액 조회 API", description = "사용자의 잔고를 조회합니다.")
     @ApiResponses(value = {
@@ -42,6 +42,6 @@ public interface BalanceSpecification {
                     mediaType = "application/json",
                     schema = @Schema(example = "{\"code\":500,\"message\":\"INTERNAL_SERVER_ERROR\"}")))
     })
-    ResponseEntity<BalanceResponse> find(@PathVariable Long id);
+    ResponseEntity<BalanceResponse.UserBalance> findBalance(@PathVariable Long id);
 
 }
