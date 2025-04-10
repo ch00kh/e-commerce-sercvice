@@ -184,7 +184,7 @@ class ProductServiceTest {
         }
 
         @Test
-        @DisplayName("[성공] 모든 상품 재고 여유(경계값) -> CheckStock isEnough 값 검증 true")
+        @DisplayName("[성공/실패] 모든 상품 재고 여유(경계값) -> CheckStock isEnough 값 검증 true")
         void reduceStock_ok_BoundaryCheck() {
             // Arrange
             List<OrderCommand.OrderItem> orderItems = List.of(
@@ -216,7 +216,7 @@ class ProductServiceTest {
         }
 
         @Test
-        @DisplayName("[성공] 일부 상품 재고 부족 -> 예외는 아니지만, CheckStock 검증")
+        @DisplayName("[실패] 일부 상품 재고 부족 -> 예외는 아니지만, CheckStock 검증")
         void reduceStock_ok_anyStockIsNotEnough() {
             // Arrange
             List<OrderCommand.OrderItem> orderItems = List.of(
