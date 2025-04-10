@@ -4,6 +4,7 @@ import kr.hhplus.be.server.domain.order.dto.OrderInfo;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.order.entity.OrderItem;
+import kr.hhplus.be.server.domain.order.entity.OrderStatus;
 import kr.hhplus.be.server.domain.order.repository.OrderItemRepository;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
 import kr.hhplus.be.server.global.exception.ErrorCode;
@@ -81,5 +82,29 @@ public class OrderService {
                 .discountAmount(order.getDiscountAmount())
                 .paymentAmount(order.getPaymentAmount())
                 .build();
+    }
+
+    public Order findById(OrderCommand.Find command) {
+
+        Order order = orderRepository.findById(command.orderId())
+                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+
+        if (order.getStatus() != OrderStatus.PAYED){
+            throw new GlobalException(ErrorCode.BAD_REQUEST);
+        }
+
+        return order;
+    }
+
+    public Order pay(OrderCommand.Find command) {
+
+        Order order = orderRepository.findById(command.orderId())
+                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+
+        return order.pay();
+    }
+
+    public void sendOrder(OrderCommand.Send build) {
+        // 주문 정보 전송 비돟기 처리 
     }
 }

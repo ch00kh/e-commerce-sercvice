@@ -42,4 +42,9 @@ public class Order extends BaseTimeEntity {
             paymentAmount = totalAmount - discountAmount;
         }
     }
+
+    public Order pay() {
+        this.status = OrderStatus.PAYED;
+        return this;
+    }
 }

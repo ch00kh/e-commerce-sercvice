@@ -24,4 +24,12 @@ public class Balance extends BaseTimeEntity {
         }
         this.balance += amount;
     }
+
+    public Balance reduce(Long amount) {
+        if (this.balance < amount) {
+            throw new GlobalException(ErrorCode.BAD_REQUEST);
+        }
+        this.balance -= amount;
+        return this;
+    }
 }

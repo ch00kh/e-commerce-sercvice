@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.order.dto;
 
+import kr.hhplus.be.server.domain.order.entity.OrderStatus;
 import lombok.Builder;
 
 import java.util.List;
@@ -39,4 +40,18 @@ public record OrderCommand() {
         }
     }
 
+    public record Find(
+            Long orderId
+    ) {}
+
+    @Builder
+    public record Send(
+            Long id,
+            Long userId,
+            Long issuedCouponId,
+            OrderStatus status,
+            Long paymentAmount,
+            Long totalAmount,
+            Long discountAmount
+    ) {}
 }

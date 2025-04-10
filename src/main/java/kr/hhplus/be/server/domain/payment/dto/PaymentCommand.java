@@ -5,9 +5,18 @@ import lombok.Builder;
 public record PaymentCommand() {
 
     @Builder
-    public record Pay(
+    public record Save(
             Long orderId,
             Long amount
     ) {}
 
+    public record Find(
+            Long paymentId
+    ) {}
+
+
+    public record Pay(
+            Long paymentId,
+            Long paymentAmount
+    ) {}
 }

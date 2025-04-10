@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Payment extends BaseTimeEntity {
 
     private Long id;
@@ -23,7 +24,13 @@ public class Payment extends BaseTimeEntity {
     public Payment(Long orderId, Long amount) {
         this.orderId = orderId;
         this.status = PaymentStatus.PENDING;
+    }
+
+    public Payment pay(Long amount) {
         this.paidAt = LocalDateTime.now();
+        this.amount = amount;
+        this.status = PaymentStatus.PAYED;
+        return this;
     }
 }
 

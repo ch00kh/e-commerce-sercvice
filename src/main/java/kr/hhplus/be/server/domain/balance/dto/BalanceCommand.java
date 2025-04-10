@@ -23,5 +23,9 @@ public record BalanceCommand() {
         }
     }
 
+    public record Reduce(
+            Long userId,
+            Long paymentAmount
+    ) {}
 }
 

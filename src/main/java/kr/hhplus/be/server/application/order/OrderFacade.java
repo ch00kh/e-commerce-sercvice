@@ -70,7 +70,7 @@ public class OrderFacade {
         });
 
         //  결제 정보 저장
-        paymentService.pay(new PaymentCommand.Pay(order.orderId(), order.paymentAmount()));
+        paymentService.save(new PaymentCommand.Save(order.orderId(), order.paymentAmount()));
 
         return OrderResult.Create.from(order);
     }

@@ -45,4 +45,12 @@ public class BalanceService {
 
         return balance;
     }
+
+    public Balance reduceBalance(BalanceCommand.Reduce command) {
+
+        Balance balance = balanceRepository.findByUserId(command.userId())
+                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+
+        return balance.reduce(command.paymentAmount());
+    }
 }
