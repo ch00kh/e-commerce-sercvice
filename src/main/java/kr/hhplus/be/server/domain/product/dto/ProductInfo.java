@@ -34,4 +34,16 @@ public record ProductInfo(){
             );
         }
     }
+
+    @Builder
+    public record CheckedStock(
+            Long optionId,
+            boolean isEnough,
+            Integer requestQuantity,
+            Integer remainingQuantity
+    ) {}
+
+    public record CheckedProductOrder(
+            List<CheckedStock> checkStocks
+    ) {}
 }

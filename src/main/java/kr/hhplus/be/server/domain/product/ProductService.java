@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product;
 
+import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.product.dto.ProductCommand;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.domain.product.entity.Product;
@@ -43,5 +44,24 @@ public class ProductService {
         List<ProductOption> productOptions = productOptionRepository.findByProductId(command.productId());
 
         return ProductInfo.ProductAggregate.from(product, productOptions);
+    }
+
+    @Transactional
+    public ProductInfo.CheckedProductOrder reduceStock(List<OrderCommand.OrderItem> command) {
+
+        return new ProductInfo.CheckedProductOrder (command.stream().map(i -> {
+            ProductOption productOptions = productOptionRepository.findById(i.productOptionId())
+                    .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+
+            Integer remainingStock = productOptions.reduceStock(i.quantity());
+
+            return ProductInfo.CheckedStock.builder()
+                    .optionId(productOptions.getId())
+                    .isEnough(remainingStock > 0)
+                    .requestQuantity(i.quantity())
+                    .remainingQuantity(remainingStock)
+                    .build();
+
+        }).toList());
     }
 }

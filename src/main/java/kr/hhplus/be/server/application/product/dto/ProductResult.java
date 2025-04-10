@@ -43,7 +43,7 @@ public record ProductResult() {
             Long optionId,
             String optionValue,
             Long price,
-            Long stock
+            Integer stock
     ) {
         public static Option from(ProductResult.Option option) {
             return Option.builder()
