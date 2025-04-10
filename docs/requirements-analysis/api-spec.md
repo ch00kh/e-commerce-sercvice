@@ -64,40 +64,42 @@
   | 500  | INTERNAL_SERVER_ERROR |
 - Response Body
   ```json
-  [
+  {
+    "products": [
       {
-          "productId": 1002,
-          "brand": "총각쓰떡",
-          "name": "백설기",
-          "options": [
-              {
-                  "productDetailId": 101,
-                  "optionValue": "백설기/10개",
-                  "price": 5500,
-                  "stock": 100
-              },
-              {
-                  "productDetailId": 102,
-                  "optionValue": "우유설기/10개",
-                  "price": 5900,
-                  "stock": 99
-              }
-          ]
+        "productId": 1,
+        "brand": "총각쓰떡",
+        "name": "백설기",
+        "options": [
+          {
+            "optionId": 101,
+            "optionValue": "백설기/10개",
+            "price": 5500,
+            "stock": 100
+          },
+          {
+            "optionId": 102,
+            "optionValue": "우유설기/10개",
+            "price": 5900,
+            "stock": 99
+          }
+        ]
       },
       {
-          "productId": 1002,
-          "brand": "총각쓰떡",
-          "name": "백일떡",
-          "options": [
-              {
-                  "productDetailId": 201,
-                  "optionValue": "백일떡/10개",
-                  "price": 13700,
-                  "stock": 200
-              }
-          ]
+        "productId": 2,
+        "brand": "총각쓰떡",
+        "name": "백일떡",
+        "options": [
+          {
+            "optionId": 111,
+            "optionValue": "백일떡/10개",
+            "price": 13700,
+            "stock": 50
+          }
+        ]
       }
-  ]
+    ]
+  }
   ```
 --- 
 ### 상품 정보 조회 API
@@ -113,17 +115,23 @@
 - Response Body
   ```json
   {
-      "productId": 1002,
-      "brand": "총각쓰떡",
-      "name": "백일떡",
-      "options": [
-          {
-              "productDetailId": 201,
-              "optionValue": "백일떡/10개",
-              "price": 13700,
-              "stock": 200
-          }
-      ]
+    "productId": 1,
+    "brand": "총각쓰떡",
+    "name": "백설기",
+    "options": [
+      {
+        "id": 101,
+        "optionValue": "백설기/10개",
+        "price": 5500,
+        "stock": 100
+      },
+      {
+        "id": 102,
+        "optionValue": "우유설기/10개",
+        "price": 5900,
+        "stock": 99
+      }
+    ]
   }
   ```
 --- 
@@ -187,7 +195,7 @@
   ```json
   {
     "orderId": 1001,
-    "status": "COMPLETE"
+    "status": "PAYED"
   }
   ```
 --- 
