@@ -38,13 +38,13 @@ class CouponServiceTest {
     @InjectMocks
     private CouponService couponService;
 
-    Long USER_ID;
-    Long COUPON_ID;
-    Long ISSUED_COUPON_ID;
+    private Long USER_ID;
+    private Long COUPON_ID;
+    private Long ISSUED_COUPON_ID;
 
-    Coupon COUPON;
-    IssuedCoupon ISSUED_COUPON;
-    CouponCommand.Use COMMAND;
+    private Coupon COUPON;
+    private IssuedCoupon ISSUED_COUPON;
+    private CouponCommand.Use COMMAND;
 
     @BeforeEach
     void setUp() {
@@ -83,7 +83,7 @@ class CouponServiceTest {
             // Act
             CouponInfo.CouponAggregate actualInfo = couponService.useCoupon(COMMAND);
 
-            // then
+            // Assert
             verify(couponRepository, times(1)).findById(COUPON_ID);
             verify(issuedCouponRepository, times(1)).findByUserIdAndCouponId(USER_ID, COUPON_ID);
 
@@ -137,14 +137,13 @@ class CouponServiceTest {
                     .expiredAt(LocalDateTime.now().plusDays(30))
                     .build();
 
-            // mock 객체의 동작 설정
             when(couponRepository.findById(COUPON_ID)).thenReturn(Optional.of(COUPON));
             when(issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID)).thenReturn(Optional.of(usedIssuedCoupon));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class, () -> couponService.useCoupon(COMMAND));
 
-            // then
+            // Assert
             verify(couponRepository, times(1)).findById(COUPON_ID);
             verify(issuedCouponRepository, times(1)).findByUserIdAndCouponId(USER_ID, COUPON_ID);
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.BAD_REQUEST);

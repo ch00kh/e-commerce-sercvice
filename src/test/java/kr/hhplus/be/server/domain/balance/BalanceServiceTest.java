@@ -149,4 +149,58 @@ class BalanceServiceTest {
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.BAD_REQUEST);
         }
     }
+
+    @Nested
+    @DisplayName("잔고 차감")
+    class reduce {
+
+        @Test
+        @DisplayName("[성공] 잔고 여유")
+        void reduce_ok() {
+
+            // Arrange
+            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(BALANCE));
+
+            // Act
+            Balance actual = balanceService.reduceBalance(new BalanceCommand.Reduce(USER_ID, 500L));
+
+            // Assert
+            assertThat(actual.getUserId()).isEqualTo(USER_ID);
+            assertThat(actual.getBalance()).isEqualTo(500L);
+
+            verify(balanceRepository).findByUserId(USER_ID);
+        }
+
+        @Test
+        @DisplayName("[실패] 잔고 부족 (잔고금액<결제금액) -> (BAD_REQUEST)")
+        void reduce_BadRequest() {
+
+            // Arrange
+            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(BALANCE));
+
+            // Act
+            GlobalException exception = assertThrows(GlobalException.class,
+                    () ->  balanceService.reduceBalance(new BalanceCommand.Reduce(USER_ID, 1500L)));
+
+            // Assert
+            verify(balanceRepository).findByUserId(USER_ID);
+            assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.BAD_REQUEST);
+        }
+
+        @Test
+        @DisplayName("[실패] 잔액 차감 -> 사용자 없음(NOT_FOUND)")
+        void reduceBalance_NotFound() {
+
+            // Arrange
+            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.empty());
+
+            // Act
+            GlobalException exception = assertThrows(GlobalException.class,
+                    () ->  balanceService.reduceBalance(new BalanceCommand.Reduce(USER_ID, 500L)));
+
+            // Assert
+            verify(balanceRepository).findByUserId(USER_ID);
+            assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
+        }
+    }
 }

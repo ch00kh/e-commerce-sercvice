@@ -7,6 +7,8 @@ import kr.hhplus.be.server.domain.order.entity.OrderItem;
 import kr.hhplus.be.server.domain.order.entity.OrderStatus;
 import kr.hhplus.be.server.domain.order.repository.OrderItemRepository;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
+import kr.hhplus.be.server.global.exception.ErrorCode;
+import kr.hhplus.be.server.global.exception.GlobalException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,6 +23,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -134,10 +137,10 @@ class OrderServiceTest {
 
             when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
 
-            // when
+            // Act
             OrderInfo.Create actualInfo = orderService.useCoupon(command);
 
-            // then
+            // Assert
             assertThat(actualInfo.issuedCouponId()).isEqualTo(COUPON_ID);
             assertThat(actualInfo.totalAmount()).isEqualTo(10000L);
             assertThat(actualInfo.discountAmount()).isEqualTo(3000L);
@@ -159,10 +162,10 @@ class OrderServiceTest {
 
             when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
 
-            // when
+            // Act
             OrderInfo.Create actualInfo = orderService.useCoupon(command);
 
-            // then
+            // Assert
             assertThat(actualInfo.issuedCouponId()).isEqualTo(COUPON_ID);
             assertThat(actualInfo.totalAmount()).isEqualTo(10000L);
             assertThat(actualInfo.discountAmount()).isEqualTo(10000L);
@@ -184,14 +187,109 @@ class OrderServiceTest {
 
             when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
 
-            // when
+            // Act
             OrderInfo.Create actualInfo = orderService.useCoupon(command);
 
-            // then
+            // Assert
             assertThat(actualInfo.issuedCouponId()).isEqualTo(COUPON_ID);
             assertThat(actualInfo.totalAmount()).isEqualTo(10000L);
             assertThat(actualInfo.discountAmount()).isEqualTo(10000L);
             assertThat(actualInfo.paymentAmount()).isEqualTo(0L);
         }
+    }
+
+    @Nested
+    @DisplayName("주문 조회")
+    class FindById {
+
+        @Test
+        @DisplayName("[성공] 주문 조회")
+        void findById_ok() {
+            // Arrange
+            Order order = Order.builder()
+                    .userId(USER_ID)
+                    .issuedCouponId(COUPON_ID)
+                    .totalAmount(10000L)
+                    .build();
+
+            order.pay();
+
+            // Act
+            when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
+
+            Order actual = orderService.findById(new OrderCommand.Find(ORDER_ID));
+
+            // Assert
+            verify(orderRepository,times(1)).findById(ORDER_ID);
+            assertThat(actual).isNotNull();
+            assertThat(actual.getUserId()).isEqualTo(USER_ID);
+            assertThat(actual.getIssuedCouponId()).isEqualTo(COUPON_ID);
+            assertThat(actual.getTotalAmount()).isEqualTo(10000L);
+            assertThat(actual.getStatus()).isEqualTo(OrderStatus.PAYED);
+        }
+
+        @Test
+        @DisplayName("[실패] 주문 조회 -> 주문 없음(NOT_FOUND)")
+        void findById_NotFound() {
+
+            // Arrange
+            when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.empty());
+
+            // Act
+            GlobalException exception = assertThrows(GlobalException.class,
+                    () -> orderService.findById(new OrderCommand.Find(ORDER_ID)));
+
+            // Assert
+            verify(orderRepository).findById(ORDER_ID);
+            assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
+        }
+    }
+
+    @Test
+    @DisplayName("[성공] 주문 결제")
+    void pay_ok() {
+
+        // Arrange
+        Order order = Order.builder()
+                .userId(USER_ID)
+                .issuedCouponId(COUPON_ID)
+                .totalAmount(10000L)
+                .build();
+        order.pay();
+
+        Order mockOrder = mock(Order.class);
+
+        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(mockOrder));
+        when(mockOrder.pay()).thenReturn(order);
+
+        // Act
+        Order actual = orderService.pay(new OrderCommand.Find(ORDER_ID));
+
+        // Assert
+        assertThat(actual).isNotNull();
+        assertThat(actual.getUserId()).isEqualTo(USER_ID);
+        assertThat(actual.getIssuedCouponId()).isEqualTo(COUPON_ID);
+        assertThat(actual.getTotalAmount()).isEqualTo(10000L);
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.PAYED);
+
+        verify(orderRepository).findById(ORDER_ID);
+        verify(mockOrder).pay();
+    }
+
+    @Test
+    @DisplayName("[실패] 주문 결제 -> 주문 없음(NOT_FOUND)")
+    void pay_NotFound() {
+
+        // Arrange
+        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.empty());
+
+        // Act
+        GlobalException exception = assertThrows(GlobalException.class,
+                () -> orderService.pay(new OrderCommand.Find(ORDER_ID)));
+
+        // Assert
+        verify(orderRepository).findById(ORDER_ID);
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
+
     }
 }
