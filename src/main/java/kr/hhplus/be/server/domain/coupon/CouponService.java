@@ -45,6 +45,8 @@ public class CouponService {
             throw new GlobalException(ErrorCode.BAD_REQUEST);
         }
 
+        coupon.issue();
+
         return coupon;
     }
 
@@ -52,9 +54,10 @@ public class CouponService {
     public IssuedCoupon save(CouponCommand.Save command) {
 
         issuedCouponRepository.findByUserIdAndCouponId(command.userId(), command.couponId())
-                .ifPresent(coupon -> {throw new GlobalException(ErrorCode.BAD_REQUEST);});
+                .ifPresent(coupon -> {
+                    throw new GlobalException(ErrorCode.BAD_REQUEST);
+                });
 
         return issuedCouponRepository.save(new IssuedCoupon(command.userId(), command.couponId()));
-
     }
 }

@@ -170,7 +170,7 @@ class CouponServiceTest {
 
             assertThat(actual.getId()).isEqualTo(COUPON_ID);
             assertThat(actual.getDiscountPrice()).isEqualTo(1000L);
-            assertThat(actual.getQuantity()).isEqualTo(100);
+            assertThat(actual.getQuantity()).isEqualTo(99);
         }
 
         @Test

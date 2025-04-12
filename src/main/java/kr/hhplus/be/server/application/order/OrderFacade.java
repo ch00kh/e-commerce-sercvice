@@ -31,6 +31,8 @@ public class OrderFacade {
     @Transactional
     public OrderResult.Create order(OrderCriteria.Order criteria) {
 
+        // lock
+
         // 상품 조회
         ProductInfo.ProductAggregate product = productService.findProduct(new ProductCommand.Find(criteria.userId()));
 
@@ -68,6 +70,8 @@ public class OrderFacade {
                 }
             });
         });
+
+        // lock
 
         //  결제 정보 저장
         paymentService.save(new PaymentCommand.Save(order.orderId(), order.paymentAmount()));

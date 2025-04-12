@@ -29,7 +29,6 @@ public class Order extends BaseTimeEntity {
         this.paymentAmount = totalAmount;
     }
 
-
     public void useCoupon(Long issuedCouponId, Long discountAmount) {
         this.issuedCouponId = issuedCouponId;
 
@@ -47,4 +46,5 @@ public class Order extends BaseTimeEntity {
         this.status = OrderStatus.PAYED;
         return this;
     }
+
 }

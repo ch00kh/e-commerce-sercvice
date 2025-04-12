@@ -15,4 +15,8 @@ public class Coupon extends BaseTimeEntity {
     private Long id;
     private Long discountPrice;
     private Integer quantity;
+
+    public Integer issue() {
+        return quantity--;
+    }
 }
