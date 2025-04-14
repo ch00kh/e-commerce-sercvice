@@ -20,4 +20,8 @@ public class UserService {
         return userRepository.findById(command.id())
                 .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
     }
+
+    public User create(UserCommand.Create command) {
+        return  userRepository.save(new User(command.name()));
+    }
 }

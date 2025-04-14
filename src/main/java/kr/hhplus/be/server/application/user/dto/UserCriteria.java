@@ -11,4 +11,13 @@ public record UserCriteria() {
             return new UserCommand.Find(id);
         }
     }
+
+    public record Create(
+            Long id,
+            String name
+    ) {
+        public UserCommand.Create toCommand() {
+            return new UserCommand.Create(id, name);
+        }
+    }
 }

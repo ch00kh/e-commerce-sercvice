@@ -1,19 +1,24 @@
 package kr.hhplus.be.server.domain.user.entity;
 
 
+import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.BaseTimeEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Entity
 @Getter
-@Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class User extends BaseTimeEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
-    private String email;
+
+    public User(String name) {
+        this.name = name;
+    }
 }

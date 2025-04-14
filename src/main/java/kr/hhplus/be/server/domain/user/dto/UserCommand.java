@@ -9,4 +9,9 @@ public record UserCommand() {
             return new Find(id);
         }
     }
+
+    public record Create(
+            Long id,
+            String name
+    ) {}
 }
