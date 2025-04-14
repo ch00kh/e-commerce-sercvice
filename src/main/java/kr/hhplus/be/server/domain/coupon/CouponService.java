@@ -20,8 +20,6 @@ public class CouponService {
     private final CouponRepository couponRepository;
     private final IssuedCouponRepository issuedCouponRepository;
 
-
-    @Transactional
     public CouponAggregate use(CouponCommand.Use command) {
 
         Coupon coupon = couponRepository.findById(command.couponId())
@@ -36,28 +34,21 @@ public class CouponService {
     }
 
     @Transactional
-    public Coupon issue(CouponCommand.Issue command) {
+    public IssuedCoupon issue(CouponCommand.Issue command) {
 
+        // 잔여 쿠폰 조회 및 쿠폰 수량 차감
         Coupon coupon = couponRepository.findById(command.couponId())
                 .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
 
-        if (coupon.getQuantity() <= 0) {
-            throw new GlobalException(ErrorCode.BAD_REQUEST);
-        }
-
         coupon.issue();
 
-        return coupon;
-    }
-
-    @Transactional
-    public IssuedCoupon save(CouponCommand.Save command) {
-
+        // 기발급 검증 및 쿠폰 저장
         issuedCouponRepository.findByUserIdAndCouponId(command.userId(), command.couponId())
-                .ifPresent(coupon -> {
-                    throw new GlobalException(ErrorCode.BAD_REQUEST);
+                .ifPresent(issuedCoupon -> {
+                    throw new GlobalException(ErrorCode.ALREADY_ISSUED_COUPON);
                 });
 
         return issuedCouponRepository.save(new IssuedCoupon(command.userId(), command.couponId()));
     }
+
 }

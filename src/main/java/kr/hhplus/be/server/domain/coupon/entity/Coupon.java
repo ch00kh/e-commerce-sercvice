@@ -1,22 +1,40 @@
 package kr.hhplus.be.server.domain.coupon.entity;
 
+import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.BaseTimeEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import kr.hhplus.be.server.global.exception.ErrorCode;
+import kr.hhplus.be.server.global.exception.GlobalException;
+import lombok.*;
 
+@Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
+@AllArgsConstructor
 public class Coupon extends BaseTimeEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private Long discountPrice;
+
+    @Column(nullable = false)
     private Integer quantity;
 
-    public Integer issue() {
-        return quantity--;
+    public Coupon(Long discountPrice, Integer quantity) {
+        this.discountPrice = discountPrice;
+        this.quantity = quantity;
     }
+
+    public Coupon issue() {
+        if (this.quantity <= 0) {
+            throw new GlobalException(ErrorCode.OUT_OF_STOCK_COUPON);
+        }
+
+        quantity--;
+        return this;
+    }
+
 }
