@@ -15,7 +15,6 @@ erDiagram
   user {
     bigint id PK
     varchar name "사용자명"
-    varchar email "email"
     datetime created_at "생성일시"
     datetime modified_at "수정일시"
   }

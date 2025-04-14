@@ -14,19 +14,22 @@
 ```mermaid
 sequenceDiagram
   actor USER
-  participant Balance
+  participant BalanceFacade
+  participant BalanceService
   
   activate USER
-  USER ->>+ Balance: 잔액 충전 요청
+  USER ->>+ BalanceFacade: 잔액 충전 요청
+  BalanceFacade ->>+ BalanceService: 사용자 잔액 충전 요청
+  BalanceService ->> BalanceService: 사용자 잔액 조회
   opt 충전 금액이 양수가 아닌 경우
-    Balance -->> USER: 유효하지 않은 충전 금액 예외 발생
+    BalanceService -->> USER: 유효하지 않은 충전 금액 예외 발생(BAD_REQUEST)
   end
-  Balance ->> Balance: 잔고 조회, 충전
-  opt 잔고가 최대 금액을 초과한 경우
-    Balance -->> USER: 잔고 최대 금액 초과 예외 발생
+  BalanceService ->> BalanceService: 사용자 잔액 충전
+  opt 잔고가 최대 금액(10,000,000)을 초과한 경우
+    BalanceService -->> USER: 잔고 최대 금액 초과 예외 발생(BAD_REQUEST)
   end
-  Balance ->> Balance: 잔액 저장
-  Balance -->>- USER: 사용자 잔액 응답
+  BalanceService ->>- BalanceFacade: 사용자 잔액 응답
+  BalanceFacade ->>- USER: 사용자 잔액 응답
   deactivate USER
 ```
 
@@ -36,12 +39,14 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   actor USER
-  participant Balance
+  participant BalanceFacade
+  participant BalanceService
   
   activate USER
-  USER ->>+ Balance: 잔액 조회 요청
-  Balance ->> Balance: 잔액 조회
-  Balance ->>- USER: 조회한 잔액 응답
+  USER ->>+ BalanceFacade: 잔액 조회 요청
+  BalanceFacade ->>+ BalanceService: 사용자 잔액 조회
+  BalanceService ->>- BalanceFacade: 사용자 잔액 응답
+  BalanceFacade ->>- USER: 조회한 잔액 응답
   deactivate USER
 ```
 
@@ -155,24 +160,26 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   actor USER
+  participant CouponFacade
+  participant CouponService
   participant Coupon
-  participant Issued_Coupon
+  participant IssuedCoupon
   
   activate USER
-  USER ->>+ Coupon: 쿠폰 발급 요청
-  Coupon ->> Coupon: 잔여 쿠폰 조회
+  USER ->>+ CouponFacade: 쿠폰 발급 요청
+  CouponFacade ->>+ CouponService: 쿠폰 발급 요청
+  CouponService ->>+ Coupon: 잔여 쿠폰 조회
   opt 쿠폰이 소진된 경우
-    Coupon -->> USER: 쿠폰 소진 예외 발생
+    Coupon -->> USER: 쿠폰 소진 예외 발생()
   end
-  Coupon ->> Coupon: 쿠폰 생성
-  Coupon ->>+ Issued_Coupon: 쿠폰 저장
-  Issued_Coupon ->> Issued_Coupon: 기발급 쿠폰 조회
+  Coupon ->>- CouponService: 쿠폰 수량 감소
+  CouponService ->>+ IssuedCoupon: 기발급 쿠폰 조회
   opt 이미 발급된 쿠폰인 경우
-    Issued_Coupon ->> Coupon: 쿠폰 생성 취소
-    Coupon ->> USER: 기발급된 쿠폰 예외 발생
+    IssuedCoupon-->> USER: 기발급된 쿠폰 예외 발생() -> 쿠폰 생성 rollback
   end
-  Issued_Coupon ->>- Coupon: 쿠폰 저장 완료
-  Coupon -->- USER: 쿠폰발급 완료 응답
+  IssuedCoupon ->>- CouponService: 쿠폰 저장
+  CouponService ->>- CouponFacade: 쿠폰 발급 응답
+  CouponFacade ->>- USER: 쿠폰 발급 응답
   deactivate USER
 ```
 
