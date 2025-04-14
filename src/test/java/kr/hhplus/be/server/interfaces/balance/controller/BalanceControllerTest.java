@@ -12,10 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,7 +27,6 @@ class BalanceControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
     private BalanceFacade balanceFacade;
 
     private Long USER_ID;
@@ -47,7 +43,7 @@ class BalanceControllerTest {
         CRITERIA_FIND = new BalanceCriteria.Find(1L);
         RESULT = new BalanceResult.UserBalance(1L, 1L, 2000L);
         COMMAND = new BalanceCommand.Charge(1L, 1000L);
-        BALANCE = new Balance(1L, 1L, 1000L);
+        BALANCE = new Balance( 1L, 1000L);
     }
 
     @Nested

@@ -8,6 +8,14 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
 
+    INVALID_CHARGE_AMOUNT(HttpStatus.BAD_REQUEST.value(), "INVALID_CHARGE_AMOUNT"),
+    BALANCE_EXCEED_MAXIMUM(HttpStatus.BAD_REQUEST.value(), "BALANCE_EXCEED_MAXIMUM"),
+    INSUFFICIENT_BALANCE(HttpStatus.BAD_REQUEST.value(), "INSUFFICIENT_BALANCE"),
+
+    OUT_OF_STOCK_COUPON(HttpStatus.BAD_REQUEST.value(), "OUT_OF_STOCK_COUPON"),
+    ALREADY_ISSUED_COUPON(HttpStatus.BAD_REQUEST.value(), "ALREADY_ISSUED_COUPON"),
+    NOT_STATUS_ISSUED_COUPON(HttpStatus.BAD_REQUEST.value(), "ALREADY_USED_COUPON"),
+
     BAD_REQUEST(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.name()),
     NOT_FOUND(HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.name()),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.name()),

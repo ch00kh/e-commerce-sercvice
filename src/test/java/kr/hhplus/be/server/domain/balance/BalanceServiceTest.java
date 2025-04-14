@@ -38,12 +38,10 @@ class BalanceServiceTest {
     private BalanceService balanceService;
 
     Long USER_ID;
-    Balance BALANCE;
 
     @BeforeEach
     void setUp() {
         USER_ID = 1L;
-        BALANCE = new Balance(1L, USER_ID, 1000L);
     }
 
     @Nested
@@ -55,24 +53,24 @@ class BalanceServiceTest {
         void findBalance_ok() {
 
             // Arrange
+            Balance balance = new Balance(USER_ID, 1000L);
             BalanceCommand.Find command = new BalanceCommand.Find(USER_ID);
 
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(BALANCE));
+            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(balance));
 
             // Act
-            Balance actualBalance = balanceService.findBalance(command);
+            Balance actualBalance = balanceService.find(command);
 
             // Assert
             verify(balanceRepository, times(1)).findByUserId(USER_ID);
 
-            assertThat(actualBalance.getId()).isEqualTo(1L);
             assertThat(actualBalance.getUserId()).isEqualTo(1L);
             assertThat(actualBalance.getBalance()).isEqualTo(1000L);
         }
 
         @Test
         @DisplayName("[실패] 잔액 조회 - 사용자 없음 예외(NOT_FOUND)")
-        void findBalance_NotFound() {
+        void findBalance_notFound() {
 
             // Arrange
             BalanceCommand.Find command = new BalanceCommand.Find(USER_ID);
@@ -80,7 +78,7 @@ class BalanceServiceTest {
             when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.empty());
 
             // Act
-            GlobalException exception = assertThrows(GlobalException.class, () -> balanceService.findBalance(command));
+            GlobalException exception = assertThrows(GlobalException.class, () -> balanceService.find(command));
 
             // Assert
             verify(balanceRepository, times(1)).findByUserId(USER_ID);
@@ -97,7 +95,8 @@ class BalanceServiceTest {
         void charge_ok() {
 
             // Arrange
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(BALANCE));
+            Balance balance = new Balance(USER_ID, 1000L);
+            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(balance));
 
             // Act
             Balance actualBalance = balanceService.charge(new BalanceCommand.Charge(USER_ID, 1000L));
@@ -105,7 +104,6 @@ class BalanceServiceTest {
             // Assert
             verify(balanceRepository, times(1)).findByUserId(USER_ID);
 
-            assertThat(actualBalance.getId()).isEqualTo(1L);
             assertThat(actualBalance.getUserId()).isEqualTo(1L);
             assertThat(actualBalance.getBalance()).isEqualTo(2000L); // 1000+1000
 
@@ -113,7 +111,6 @@ class BalanceServiceTest {
             verify(balanceHistoryRepository, times(1)).save(captor.capture());
 
             BalanceHistory balanceHistory = captor.getValue();
-            assertThat(balanceHistory.getBalanceId()).isEqualTo(1L);
             assertThat(balanceHistory.getIssuedCouponId()).isEqualTo(null);
             assertThat(balanceHistory.getAmount()).isEqualTo(1000L);
             assertThat(balanceHistory.getTransactionType()).isEqualTo(TransactionType.CHARGE);
@@ -121,7 +118,7 @@ class BalanceServiceTest {
 
         @Test
         @DisplayName("[실패] 잔액 충전 - 없는 잔고(존재하지 않는 사용자) 예외(NOT_FOUND)")
-        void charge_NotFound() {
+        void charge_notFound() {
 
             // Arrange
             when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.empty());
@@ -135,18 +132,19 @@ class BalanceServiceTest {
         }
 
         @Test
-        @DisplayName("[실패] 잔액 충전 - 잔액이 음수(BAD_REQUEST)")
-        void charge_BadRequest() {
+        @DisplayName("[실패] 잔액 충전 - 유효하지 않은 충전 금액 예외 (INVALID_CHARGE_AMOUNT)")
+        void charge_invalidChargeAmount() {
 
             // Arrange
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(BALANCE));
+            Balance balance = new Balance(USER_ID, 1000L);
+            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(balance));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class, () -> balanceService.charge(new BalanceCommand.Charge(1L, -1000L)));
 
             // Assert
             verify(balanceRepository, times(1)).findByUserId(USER_ID);
-            assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.BAD_REQUEST);
+            assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_CHARGE_AMOUNT);
         }
     }
 
@@ -159,10 +157,11 @@ class BalanceServiceTest {
         void reduce_ok() {
 
             // Arrange
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(BALANCE));
+            Balance balance = new Balance(USER_ID, 1000L);
+            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(balance));
 
             // Act
-            Balance actual = balanceService.reduceBalance(new BalanceCommand.Reduce(USER_ID, 500L));
+            Balance actual = balanceService.reduce(new BalanceCommand.Reduce(USER_ID, 500L, null));
 
             // Assert
             assertThat(actual.getUserId()).isEqualTo(USER_ID);
@@ -172,31 +171,32 @@ class BalanceServiceTest {
         }
 
         @Test
-        @DisplayName("[실패] 잔고 부족 (잔고금액<결제금액) -> (BAD_REQUEST)")
-        void reduce_BadRequest() {
+        @DisplayName("[실패] 잔고 부족 (잔고금액 < 결제금액) -> (INSUFFICIENT_BALANCE)")
+        void reduce_insufficientBalance() {
 
             // Arrange
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(BALANCE));
+            Balance balance = new Balance(USER_ID, 1000L);
+            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(balance));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
-                    () ->  balanceService.reduceBalance(new BalanceCommand.Reduce(USER_ID, 1500L)));
+                    () ->  balanceService.reduce(new BalanceCommand.Reduce(USER_ID, 1500L, null)));
 
             // Assert
             verify(balanceRepository).findByUserId(USER_ID);
-            assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.BAD_REQUEST);
+            assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INSUFFICIENT_BALANCE);
         }
 
         @Test
         @DisplayName("[실패] 잔액 차감 -> 사용자 없음(NOT_FOUND)")
-        void reduceBalance_NotFound() {
+        void reduceBalance_notFound() {
 
             // Arrange
             when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.empty());
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
-                    () ->  balanceService.reduceBalance(new BalanceCommand.Reduce(USER_ID, 500L)));
+                    () ->  balanceService.reduce(new BalanceCommand.Reduce(USER_ID, 500L, null)));
 
             // Assert
             verify(balanceRepository).findByUserId(USER_ID);

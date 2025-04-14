@@ -25,7 +25,12 @@ public record BalanceCommand() {
 
     public record Reduce(
             Long userId,
-            Long paymentAmount
+            Long paymentAmount,
+            Long issuedCouponId
+    ) {}
+
+    public record Create(
+            Long userId
     ) {}
 }
 

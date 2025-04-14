@@ -21,7 +21,7 @@ public class BalanceService {
 
 
     @Transactional(readOnly = true)
-    public Balance findBalance(BalanceCommand.Find command) {
+    public Balance find(BalanceCommand.Find command) {
 
         return balanceRepository.findByUserId(command.userId())
                 .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
@@ -35,23 +35,24 @@ public class BalanceService {
 
         balance.charge(command.amount());
 
-        balanceHistoryRepository.save(
-                BalanceHistory.builder()
-                        .balanceId(balance.getId())
-                        .amount(command.amount())
-                        .transactionType(TransactionType.CHARGE)
-                        .build()
-        );
+        balanceHistoryRepository.save(new BalanceHistory(balance.getId(), command.amount(), TransactionType.CHARGE));
 
         return balance;
     }
 
     @Transactional
-    public Balance reduceBalance(BalanceCommand.Reduce command) {
+    public Balance reduce(BalanceCommand.Reduce command) {
 
         Balance balance = balanceRepository.findByUserId(command.userId())
                 .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
 
+        balanceHistoryRepository.save(new BalanceHistory(balance.getId(), command.issuedCouponId(), command.paymentAmount(), TransactionType.USE));
+
         return balance.reduce(command.paymentAmount());
+    }
+
+    public Balance create(BalanceCommand.Create command) {
+
+        return balanceRepository.save(new Balance(command.userId(), 0L));
     }
 }

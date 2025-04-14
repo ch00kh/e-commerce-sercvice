@@ -16,13 +16,6 @@ public class BalanceController implements IBalanceController {
 
     private final BalanceFacade balanceFacade;
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<UserBalance> findBalance(@PathVariable Long userId) {
-
-        return ResponseEntity.ok()
-                .body(UserBalance.from(balanceFacade.findBalance(BalanceRequest.Find.toCriteria(userId))));
-    }
-
     @PostMapping("/{userId}")
     public ResponseEntity<UserBalance> charge(
             @PathVariable Long userId,
@@ -30,5 +23,12 @@ public class BalanceController implements IBalanceController {
     ) {
         return ResponseEntity.ok()
                 .body(UserBalance.from(balanceFacade.charge(request.toCriteria(userId))));
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserBalance> findBalance(@PathVariable Long userId) {
+
+        return ResponseEntity.ok()
+                .body(UserBalance.from(balanceFacade.findBalance(BalanceRequest.Find.toCriteria(userId))));
     }
 }
