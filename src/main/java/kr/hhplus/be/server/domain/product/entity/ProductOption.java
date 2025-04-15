@@ -1,40 +1,38 @@
 package kr.hhplus.be.server.domain.product.entity;
 
+import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.BaseTimeEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.*;
 
+@Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = @Index(name = "idx_product_id", columnList = "productId"))
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@Slf4j
 public class ProductOption extends BaseTimeEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private Long productId;
+
+    @Column(nullable = false)
     private String optionValue;
+
+    @Column(nullable = false)
     private Long price;
+
+    @Column(nullable = false)
     private Integer stock;
 
-    @Builder
-    public ProductOption(Long id, String optionValue, Long price, Integer stock) {
-        this.id = id;
-        this.optionValue = optionValue;
-        this.price = price;
-        this.stock = stock;
+    public boolean isEnoughStock(Integer stock) {
+        return this.stock - stock >= 0;
     }
 
     public Integer reduceStock(Integer stock) {
-        this.stock = this.stock - stock;
-
-        if (this.stock < 0) {
-            log.error("Out Of Stock...");
-            this.stock = 0;
-        }
-        return this.stock;
+        return this.stock - stock;
     }
 }

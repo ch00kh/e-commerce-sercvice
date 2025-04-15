@@ -47,20 +47,30 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductInfo.CheckedProductOrder reduceStock(List<OrderCommand.OrderItem> command) {
+    public ProductInfo.Order reduceStock(List<OrderCommand.OrderItem> command) {
 
-        return new ProductInfo.CheckedProductOrder (command.stream().map(i -> {
-            ProductOption productOptions = productOptionRepository.findById(i.productOptionId())
+        return new ProductInfo.Order(command.stream().map(i -> {
+            ProductOption productOption = productOptionRepository.findById(i.productOptionId())
                     .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
 
-            Integer remainingStock = productOptions.reduceStock(i.quantity());
+            if (productOption.isEnoughStock(i.quantity())) {
+                Integer remainingStock = productOption.reduceStock(i.quantity());
 
-            return ProductInfo.CheckedStock.builder()
-                    .optionId(productOptions.getId())
-                    .isEnough(remainingStock > 0)
-                    .requestQuantity(i.quantity())
-                    .remainingQuantity(remainingStock)
-                    .build();
+                return ProductInfo.CheckedStock.builder()
+                        .optionId(productOption.getId())
+                        .isEnough(true)
+                        .requestQuantity(i.quantity())
+                        .remainingQuantity(remainingStock)
+                        .build();
+
+            } else {
+                return ProductInfo.CheckedStock.builder()
+                        .optionId(productOption.getId())
+                        .isEnough(false)
+                        .requestQuantity(i.quantity())
+                        .remainingQuantity(productOption.getStock())
+                        .build();
+            }
 
         }).toList());
     }

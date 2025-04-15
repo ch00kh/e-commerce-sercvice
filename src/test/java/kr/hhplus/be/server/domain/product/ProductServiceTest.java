@@ -51,12 +51,12 @@ class ProductServiceTest {
     void setUp() {
         PRODUCT_ID1 = 1L;
         PRODUCT1 = new Product(PRODUCT_ID1, "총각쓰떡", "백설기");
-        PRODUCT_OPTION1 = new ProductOption(101L, "백설기/10개", 5500L, 100);
-        PRODUCT_OPTION2 = new ProductOption(102L, "우유설기/10개", 5900L, 99);
+        PRODUCT_OPTION1 = ProductOption.builder().id(101L).optionValue("백설기/10개").price(5500L).stock(100).build();
+        PRODUCT_OPTION2 = ProductOption.builder().id(102L).optionValue("우유설기/10개").price(5900L).stock(99).build();
 
         PRODUCT_ID2 = 2L;
         PRODUCT2 = new Product(PRODUCT_ID2, "총각쓰떡", "백일떡");
-        PRODUCT_OPTION3 = new ProductOption(111L, "백일떡/10개", 13700L, 50);
+        PRODUCT_OPTION2 = ProductOption.builder().id(111L).optionValue("백일떡/10개").price(13700L).stock(50).build();
     }
 
     @Test
@@ -164,7 +164,7 @@ class ProductServiceTest {
             when(productOptionRepository.findById(102L)).thenReturn(Optional.of(PRODUCT_OPTION2));
 
             // Act
-            ProductInfo.CheckedProductOrder actualInfo = productService.reduceStock(orderItems);
+            ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
 
             // Assert
             verify(productOptionRepository, times(1)).findById(PRODUCT_OPTION1.getId());
@@ -196,7 +196,7 @@ class ProductServiceTest {
             when(productOptionRepository.findById(102L)).thenReturn(Optional.of(PRODUCT_OPTION2));
 
             // Act
-            ProductInfo.CheckedProductOrder actualInfo = productService.reduceStock(orderItems);
+            ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
 
             // Assert
             verify(productOptionRepository, times(1)).findById(PRODUCT_OPTION1.getId());
@@ -228,7 +228,7 @@ class ProductServiceTest {
             when(productOptionRepository.findById(102L)).thenReturn(Optional.of(PRODUCT_OPTION2));
 
             // Act
-            ProductInfo.CheckedProductOrder actualInfo = productService.reduceStock(orderItems);
+            ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
 
             // Assert
             verify(productOptionRepository, times(1)).findById(PRODUCT_OPTION1.getId());

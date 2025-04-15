@@ -29,7 +29,12 @@ public record ProductInfo(){
                     product.getBrand(),
                     product.getName(),
                     productOption.stream().map(o ->
-                            new ProductOption(o.getId(), o.getOptionValue(), o.getPrice(), o.getStock())
+                            ProductOption.builder()
+                                    .id(o.getId())
+                                    .optionValue(o.getOptionValue())
+                                    .price(o.getPrice())
+                                    .stock(o.getStock())
+                                    .build()
                     ).toList()
             );
         }
@@ -43,7 +48,7 @@ public record ProductInfo(){
             Integer remainingQuantity
     ) {}
 
-    public record CheckedProductOrder(
+    public record Order(
             List<CheckedStock> checkStocks
     ) {}
 }
