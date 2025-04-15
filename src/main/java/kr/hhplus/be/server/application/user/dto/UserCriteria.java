@@ -13,11 +13,10 @@ public record UserCriteria() {
     }
 
     public record Create(
-            Long id,
             String name
     ) {
         public UserCommand.Create toCommand() {
-            return new UserCommand.Create(id, name);
+            return new UserCommand.Create(name);
         }
     }
 }

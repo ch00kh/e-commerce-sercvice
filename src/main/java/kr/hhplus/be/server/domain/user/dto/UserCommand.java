@@ -11,7 +11,6 @@ public record UserCommand() {
     }
 
     public record Create(
-            Long id,
             String name
     ) {}
 }
