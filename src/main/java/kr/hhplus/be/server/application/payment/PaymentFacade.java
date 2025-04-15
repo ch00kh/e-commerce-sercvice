@@ -4,6 +4,7 @@ import kr.hhplus.be.server.application.payment.dto.PaymentCriteria;
 import kr.hhplus.be.server.application.payment.dto.PaymentResult;
 import kr.hhplus.be.server.domain.balance.BalanceService;
 import kr.hhplus.be.server.domain.balance.dto.BalanceCommand;
+import kr.hhplus.be.server.domain.balance.entity.Balance;
 import kr.hhplus.be.server.domain.order.OrderService;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.order.entity.Order;
@@ -32,7 +33,7 @@ public class PaymentFacade {
         Order order = orderService.findById(new OrderCommand.Find(payment.getOrderId()));
 
         // 결제금액 차감
-        balanceService.reduceBalance(new BalanceCommand.Reduce(order.getUserId(), order.getPaymentAmount()));
+        Balance balance = balanceService.reduce(new BalanceCommand.Reduce(order.getUserId(), order.getPaymentAmount(), order.getIssuedCouponId()));
 
         // 결제 완료
         Payment pay = paymentService.pay(new PaymentCommand.Pay(criteria.paymentId(), order.getPaymentAmount()));
@@ -55,7 +56,9 @@ public class PaymentFacade {
         return PaymentResult.Pay.builder()
                 .id(pay.getId())
                 .orderId(pay.getOrderId())
-                .status(pay.getStatus())
+                .balance(balance.getBalance())
+                .orderStatus(order.getStatus())
+                .paymentStatus(pay.getStatus())
                 .amount(pay.getAmount())
                 .paidAt(pay.getPaidAt())
                 .build();

@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.order.entity;
 
+import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.BaseTimeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,14 +10,35 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "`order`",
+        indexes = {
+        @Index(name = "idx_user_id", columnList = "userId"),
+        @Index(name = "idx_coupon_id", columnList = "issuedCouponId")
+})
 public class Order extends BaseTimeEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private Long userId;
+
+    @Column
     private Long issuedCouponId;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
+
+    @Column(nullable = false)
     private Long totalAmount;
+
+    @Column(nullable = false)
     private Long discountAmount;
+
+    @Column(nullable = false)
     private Long paymentAmount;
 
     @Builder

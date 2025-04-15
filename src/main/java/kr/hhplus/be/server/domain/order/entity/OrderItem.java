@@ -1,21 +1,40 @@
 package kr.hhplus.be.server.domain.order.entity;
 
+import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.BaseTimeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(indexes = {
+        @Index(name = "idx_order_id", columnList = "orderId"),
+        @Index(name = "idx_productOption_id", columnList = "productOptionId")
+})
 public class OrderItem extends BaseTimeEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private Long orderId;
+
+    @Column(nullable = false)
     private Long productOptionId;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
+
+    @Column(nullable = false)
     private Long unitPrice;
+
+    @Column(nullable = false)
     private Integer quantity;
 
     @Builder

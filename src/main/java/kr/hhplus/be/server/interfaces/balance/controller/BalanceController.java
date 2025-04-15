@@ -3,6 +3,7 @@ package kr.hhplus.be.server.interfaces.balance.controller;
 import kr.hhplus.be.server.application.balance.BalanceFacade;
 import kr.hhplus.be.server.interfaces.balance.dto.BalanceRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import static kr.hhplus.be.server.interfaces.balance.dto.BalanceResponse.UserBal
 @RequiredArgsConstructor
 public class BalanceController implements IBalanceController {
 
+    @Autowired
     private final BalanceFacade balanceFacade;
 
     @PostMapping("/{userId}")

@@ -31,8 +31,6 @@ public class OrderFacade {
     @Transactional
     public OrderResult.Create order(OrderCriteria.Order criteria) {
 
-        // lock
-
         // 상품 조회
         ProductInfo.ProductAggregate product = productService.findProduct(new ProductCommand.Find(criteria.userId()));
 
@@ -53,14 +51,14 @@ public class OrderFacade {
                 .orderItems(orderItemCommand)
                 .build());
 
-        // 쿠폰 사용 시 검증, 사용 처리, 적용
+        // 쿠폰 사용 시 쿠폰 조회, 사용 처리, 적용
         if (criteria.couponId() != null) {
             CouponInfo.CouponAggregate couponInfo = couponService.use(new CouponCommand.Use(criteria.userId(), criteria.couponId()));
             order = orderService.useCoupon(OrderCommand.UseCoupon.toCommand(order.orderId(), couponInfo.couponId(), couponInfo.discountPrice()));
         }
 
         // 재고 차감 -> 재고 부족시 해당 옵션 상태 HOLD
-        ProductInfo.CheckedProductOrder checkProductOrder = productService.reduceStock(orderItemCommand);
+        ProductInfo.Order checkProductOrder = productService.reduceStock(orderItemCommand);
 
         // 재고 부족시 -> 생성된 주문아이템 상태 변경(보류)
         checkProductOrder.checkStocks().forEach(stock -> {
@@ -70,8 +68,6 @@ public class OrderFacade {
                 }
             });
         });
-
-        // lock
 
         //  결제 정보 저장
         paymentService.save(new PaymentCommand.Save(order.orderId(), order.paymentAmount()));

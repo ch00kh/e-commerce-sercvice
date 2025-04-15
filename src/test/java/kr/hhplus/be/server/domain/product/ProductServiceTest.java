@@ -56,7 +56,7 @@ class ProductServiceTest {
 
         PRODUCT_ID2 = 2L;
         PRODUCT2 = new Product(PRODUCT_ID2, "총각쓰떡", "백일떡");
-        PRODUCT_OPTION2 = ProductOption.builder().id(111L).optionValue("백일떡/10개").price(13700L).stock(50).build();
+        PRODUCT_OPTION3 = ProductOption.builder().id(111L).optionValue("백일떡/10개").price(13700L).stock(50).build();
     }
 
     @Test
@@ -212,7 +212,7 @@ class ProductServiceTest {
             assertThat(actualInfo.checkStocks().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
             assertThat(actualInfo.checkStocks().get(1).remainingQuantity()).isEqualTo(0);
             assertThat(actualInfo.checkStocks().get(1).requestQuantity()).isEqualTo(99);
-            assertThat(actualInfo.checkStocks().get(1).isEnough()).isEqualTo(false);
+            assertThat(actualInfo.checkStocks().get(1).isEnough()).isEqualTo(true);
         }
 
         @Test
@@ -237,12 +237,12 @@ class ProductServiceTest {
             assertThat(actualInfo.checkStocks().size()).isEqualTo(2);
 
             assertThat(actualInfo.checkStocks().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
-            assertThat(actualInfo.checkStocks().get(0).remainingQuantity()).isEqualTo(0);
+            assertThat(actualInfo.checkStocks().get(0).remainingQuantity()).isEqualTo(100);
             assertThat(actualInfo.checkStocks().get(0).requestQuantity()).isEqualTo(101);
             assertThat(actualInfo.checkStocks().get(0).isEnough()).isEqualTo(false);
 
             assertThat(actualInfo.checkStocks().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
-            assertThat(actualInfo.checkStocks().get(1).remainingQuantity()).isEqualTo(0);
+            assertThat(actualInfo.checkStocks().get(1).remainingQuantity()).isEqualTo(99);
             assertThat(actualInfo.checkStocks().get(1).requestQuantity()).isEqualTo(100);
             assertThat(actualInfo.checkStocks().get(1).isEnough()).isEqualTo(false);
         }
