@@ -31,13 +31,13 @@ public class UserFacadeTest {
     @DisplayName("[성공] 사용자 생성 - 잔고도 같이 생성")
     void createUser_ShouldCreateUserAndBalance() {
 
-        // Given
+        // Arrange
         UserCriteria.Create criteria = new UserCriteria.Create("추경현");
 
-        // When
+        // Act
         UserResult.Create result = userFacade.createUser(criteria);
 
-        // Then
+        // Assert
         assertThat(result.id()).isEqualTo(1L);
         assertThat(result.name()).isEqualTo("추경현");
         assertThat(result.balance()).isEqualTo(0);
