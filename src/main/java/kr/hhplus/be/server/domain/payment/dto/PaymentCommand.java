@@ -1,7 +1,5 @@
 package kr.hhplus.be.server.domain.payment.dto;
 
-import lombok.Builder;
-
 public record PaymentCommand() {
 
     
@@ -10,8 +8,8 @@ public record PaymentCommand() {
             Long amount
     ) {}
 
-    public record Find(
-            Long paymentId
+    public record FindOrder(
+            Long orderId
     ) {}
 
 

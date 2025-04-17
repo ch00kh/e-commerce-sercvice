@@ -66,7 +66,11 @@ class CouponServiceTest {
         CouponInfo.CouponAggregate actualInfo = couponService.use(command);
 
         // Assert
-        assertThat(actualInfo).isNull();
+        assertThat(actualInfo.couponId()).isNull();
+        assertThat(actualInfo.discountPrice()).isNull();
+        assertThat(actualInfo.status()).isNull();
+        assertThat(actualInfo.usedAt()).isNull();
+        assertThat(actualInfo.expiredAt()).isNull();
     }
 
     @Nested

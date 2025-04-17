@@ -36,32 +36,32 @@ public class PaymentFacade {
         Balance balance = balanceService.reduce(new BalanceCommand.Reduce(order.getUserId(), order.getPaymentAmount(), order.getIssuedCouponId()));
 
         // 결제 완료
-        Payment pay = paymentService.pay(new PaymentCommand.Pay(criteria.paymentId(), order.getPaymentAmount()));
+        Payment pay = paymentService.pay(new PaymentCommand.Pay(payment.getId(), order.getPaymentAmount()));
 
         // 주문 상태 변경
         order = orderService.pay(new OrderCommand.Find(payment.getOrderId()));
 
         // 주문 정보 전송
-        orderService.sendOrder(OrderCommand.Send.builder()
-                .id(order.getId())
-                .userId(order.getUserId())
-                .issuedCouponId(order.getIssuedCouponId())
-                .status(order.getStatus())
-                .paymentAmount(order.getPaymentAmount())
-                .totalAmount(order.getTotalAmount())
-                .discountAmount(order.getDiscountAmount())
-                .build()
+        orderService.sendOrder(
+                new OrderCommand.Send(
+                        order.getId(),
+                        order.getUserId(),
+                        order.getIssuedCouponId(),
+                        order.getStatus(),
+                        order.getPaymentAmount(),
+                        order.getTotalAmount(),
+                        order.getDiscountAmount()
+                )
         );
 
-        return PaymentResult.Pay.builder()
-                .id(pay.getId())
-                .orderId(pay.getOrderId())
-                .balance(balance.getBalance())
-                .orderStatus(order.getStatus())
-                .paymentStatus(pay.getStatus())
-                .amount(pay.getAmount())
-                .paidAt(pay.getPaidAt())
-                .build();
-
+        return new PaymentResult.Pay(
+                pay.getId(),
+                pay.getOrderId(),
+                balance.getBalance(),
+                order.getStatus(),
+                pay.getStatus(),
+                pay.getAmount(),
+                pay.getPaidAt()
+        );
     }
 }

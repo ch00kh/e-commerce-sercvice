@@ -44,7 +44,7 @@ public class Payment extends BaseTimeEntity {
     public Payment pay(Long amount) {
         this.paidAt = LocalDateTime.now();
         this.amount -= amount;
-        if (this.amount <= 0) {
+        if (this.amount < 0) {
             throw new GlobalException(ErrorCode.BAD_REQUEST);
         }
         if (this.amount == 0) {

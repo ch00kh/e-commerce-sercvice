@@ -47,17 +47,17 @@ class PaymentServiceTest {
         void findPayment_ok() {
 
             // Arrange
-            Payment payedPayment = PAYMENT.pay(100000L);
-
-            when(paymentRepository.findById(anyLong())).thenReturn(Optional.of(payedPayment));
+            when(paymentRepository.findByOrderId(anyLong())).thenReturn(Optional.of(PAYMENT));
 
             // Act
-            Payment actual = paymentService.findPayment(new PaymentCommand.Find(anyLong()));
+            Payment actual = paymentService.findPayment(new PaymentCommand.FindOrder(anyLong()));
 
             // Assert
-            verify(paymentRepository, times(1)).findById(anyLong());
-            assertThat(actual).isNotNull();
-            assertThat(actual.getStatus()).isEqualTo(PaymentStatus.PAYED);
+            verify(paymentRepository, times(1)).findByOrderId(anyLong());
+            assertThat(actual.getOrderId()).isEqualTo(100L);
+            assertThat(actual.getAmount()).isEqualTo(100000L);
+            assertThat(actual.getStatus()).isEqualTo(PaymentStatus.PENDING);
+            assertThat(actual.getPaidAt()).isNull();
         }
 
         @Test
@@ -65,14 +65,14 @@ class PaymentServiceTest {
         void findPayment_NotFound() {
 
             // Arrange
-            when(paymentRepository.findById(anyLong())).thenReturn(Optional.empty());
+            when(paymentRepository.findByOrderId(anyLong())).thenReturn(Optional.empty());
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
-                    () -> paymentService.findPayment(new PaymentCommand.Find(anyLong())));
+                    () -> paymentService.findPayment(new PaymentCommand.FindOrder(anyLong())));
 
             // Assert
-            verify(paymentRepository, times(1)).findById(anyLong());
+            verify(paymentRepository, times(1)).findByOrderId(anyLong());
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
         }
     }
@@ -82,20 +82,36 @@ class PaymentServiceTest {
     class pay {
 
         @Test
-        @DisplayName("[성공] 결제")
-        void pay_ok() {
+        @DisplayName("[성공] 결제 - 전체 금액 결제")
+        void payAllAmount_ok() {
 
             // Arrange
             when(paymentRepository.findById(anyLong())).thenReturn(Optional.of(PAYMENT));
 
             // Act
-            Payment result = paymentService.pay(new PaymentCommand.Pay(anyLong(), 10000L));
+            Payment result = paymentService.pay(new PaymentCommand.Pay(anyLong(), 100000L));
 
             // Assert
             verify(paymentRepository, times(1)).findById(anyLong());
-            assertThat(result.getId()).isEqualTo(anyLong());
             assertThat(result.getStatus()).isEqualTo(PaymentStatus.PAYED);
-            assertThat(result.getAmount()).isEqualTo(10000L);
+            assertThat(result.getAmount()).isEqualTo(0L);
+            assertThat(result.getPaidAt()).isNotNull();
+        }
+
+        @Test
+        @DisplayName("[성공] 결제 - 일부 금액 결제")
+        void paySomeAmount_ok() {
+
+            // Arrange
+            when(paymentRepository.findById(anyLong())).thenReturn(Optional.of(PAYMENT));
+
+            // Act
+            Payment result = paymentService.pay(new PaymentCommand.Pay(anyLong(), 50000L));
+
+            // Assert
+            verify(paymentRepository, times(1)).findById(anyLong());
+            assertThat(result.getStatus()).isEqualTo(PaymentStatus.PENDING);
+            assertThat(result.getAmount()).isEqualTo(50000L);
             assertThat(result.getPaidAt()).isNotNull();
         }
 
