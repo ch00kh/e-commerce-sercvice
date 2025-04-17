@@ -13,7 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -110,6 +113,12 @@ public class OrderService {
         return order.pay();
     }
 
+    @Transactional(readOnly = true)
+    public List<OrderInfo.Best> findBestSelling(OrderCommand.FindBest command) {
+        return orderItemRepository.findBestSelling(command.days(), command.limit());
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void sendOrder(OrderCommand.Send build) {
         // 주문 정보 전송 비돟기 처리
     }

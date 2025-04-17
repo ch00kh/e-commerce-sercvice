@@ -72,4 +72,16 @@ public class ProductService {
             }
         }).toList());
     }
+
+    @Transactional(readOnly = true)
+    public ProductInfo.ProductAggregate findProductByOptionId(ProductCommand.FindByProductOptionId command) {
+
+        ProductOption productOption = productOptionRepository.findById(command.productOptionId())
+                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+
+        Product product = productRepository.findById(productOption.getProductId())
+                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+
+        return ProductInfo.ProductAggregate.from(product, productOption);
+    }
 }

@@ -20,6 +20,7 @@ public class CouponService {
     private final CouponRepository couponRepository;
     private final IssuedCouponRepository issuedCouponRepository;
 
+    @Transactional
     public CouponAggregate use(CouponCommand.Use command) {
 
         if (command.couponId() == null) {

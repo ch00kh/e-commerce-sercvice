@@ -12,9 +12,11 @@ public record ProductResult() {
         public static ProductList from(ProductInfo.ProductList productInfo) {
             return new ProductList(productInfo.products().stream().map(ProductAggregate::from).toList());
         }
+        public static ProductList from(List<ProductInfo.ProductAggregate> productInfo) {
+            return new ProductList(productInfo.stream().map(ProductAggregate::from).toList());
+        }
     }
 
-    
     public record ProductAggregate(
             Long productId,
             String brand,
@@ -35,7 +37,6 @@ public record ProductResult() {
                             .toList()
             );
         }
-
     }
 
     public record Option(

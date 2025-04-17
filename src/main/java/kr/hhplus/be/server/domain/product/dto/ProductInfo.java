@@ -22,6 +22,14 @@ public record ProductInfo(){
         String name,
         List<Option> options
     ) {
+        public static ProductAggregate from(Product product, ProductOption productOption) {
+            return new ProductAggregate(
+                    product.getId(),
+                    product.getBrand(),
+                    product.getName(),
+                    List.of(new Option(productOption.getId(), productOption.getOptionValue(), productOption.getPrice(), productOption.getStock()))
+            );
+        }
         public static ProductAggregate from(Product product, List<ProductOption> productOption) {
             return new ProductAggregate(
                     product.getId(),

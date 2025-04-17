@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("[단위테스트] OrderService")
-class CreateServiceTest {
+class OrderServiceTest {
 
     @Mock
     private OrderRepository orderRepository;
@@ -273,6 +273,29 @@ class CreateServiceTest {
         // Assert
         verify(orderRepository).findById(ORDER_ID);
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
+    }
 
+    @Test
+    @DisplayName("[성공] 인기 판매상품 조회")
+    void findBestSelling_ok() {
+
+        // Arrange
+        when(orderItemRepository.findBestSelling(3,5))
+                .thenReturn(List.of(
+                        new OrderInfo.Best(101L, 150L),
+                        new OrderInfo.Best(102L, 120L),
+                        new OrderInfo.Best(103L, 100L),
+                        new OrderInfo.Best(104L, 80L),
+                        new OrderInfo.Best(105L, 70L)
+                ));
+
+        // Act
+        List<OrderInfo.Best> result = orderService.findBestSelling(new OrderCommand.FindBest(3, 5));
+
+        // Then
+        verify(orderItemRepository).findBestSelling(3, 5);
+
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(5);
     }
 }

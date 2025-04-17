@@ -4,7 +4,6 @@ import kr.hhplus.be.server.domain.order.entity.OrderStatus;
 
 public record OrderInfo() {
 
-    
     public record Create(
             Long orderId,
             Long userId,
@@ -13,6 +12,10 @@ public record OrderInfo() {
             Long totalAmount,
             Long discountAmount,
             Long paymentAmount
-    ) {
-    }
+    ) {}
+
+    public record Best(
+            Long productOptionId,
+            Long totalSaleQuantity
+    ) {}
 }

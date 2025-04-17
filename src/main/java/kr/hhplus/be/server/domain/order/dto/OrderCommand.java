@@ -36,7 +36,6 @@ public record OrderCommand() {
             Long orderId
     ) {}
 
-    
     public record Send(
             Long id,
             Long userId,
@@ -45,5 +44,10 @@ public record OrderCommand() {
             Long paymentAmount,
             Long totalAmount,
             Long discountAmount
+    ) {}
+
+    public record FindBest(
+            Integer days,
+            Integer limit
     ) {}
 }

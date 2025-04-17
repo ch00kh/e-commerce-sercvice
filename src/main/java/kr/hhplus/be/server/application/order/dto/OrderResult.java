@@ -5,7 +5,6 @@ import kr.hhplus.be.server.domain.order.entity.OrderStatus;
 
 public record OrderResult() {
 
-    
     public record Create(
             Long orderId,
             Long userId,
@@ -25,4 +24,5 @@ public record OrderResult() {
             );
         }
     }
+
 }
