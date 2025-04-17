@@ -1,17 +1,23 @@
 package kr.hhplus.be.server.interfaces.payment.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.hhplus.be.server.interfaces.payment.dto.PaymentRequest;
+import kr.hhplus.be.server.application.payment.PaymentFacade;
+import kr.hhplus.be.server.application.payment.dto.PaymentCriteria;
+import kr.hhplus.be.server.application.payment.dto.PaymentResult;
+import kr.hhplus.be.server.domain.order.entity.OrderStatus;
+import kr.hhplus.be.server.domain.payment.entity.PaymentStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
+
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(PaymentController.class)
 class PaymentControllerTest {
@@ -19,21 +25,38 @@ class PaymentControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @MockitoBean
+    private PaymentFacade paymentFacade;
 
     @Test
     @DisplayName("[성공] 결제 처리")
     void processPaymentSuccess() throws Exception {
 
-        PaymentRequest paymentRequest = new PaymentRequest(1001L, 10001L);
-        String requestBody = objectMapper.writeValueAsString(paymentRequest);
+        // Arrange
+        String requestBody = """
+        {
+            "orderId": 1,
+            "amount": 1000
+        }
+        """;
 
-        mockMvc.perform(post("/api/payment")
+        String responseBody = """
+        {
+            "orderId": 1,
+            "orderStatus": "PAYED",
+            "paymentId": 10,
+            "paymentStatus": "PAYED"
+        }
+        """;
+
+        when(paymentFacade.pay(new PaymentCriteria.Pay(1L, 1000L)))
+                .thenReturn(new PaymentResult.Pay(10L, 1L, 1000L, OrderStatus.PAYED, PaymentStatus.PAYED, 1000L, LocalDateTime.now()));
+
+        // Act & Assert
+        mockMvc.perform(post("/api/v1/payment")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.orderId").value(10001))
-                .andExpect(jsonPath("$.status").value("PAYED"));
+                .andExpect(content().json(responseBody));
     }
 }
