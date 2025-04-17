@@ -52,7 +52,7 @@ public class OrderFacade {
         // 쿠폰 적용
         orderService.useCoupon(OrderCommand.UseCoupon.toCommand(order.orderId(), couponInfo.couponId(), couponInfo.discountPrice()));
 
-        // 재고 차감 -> 재고 부족시 해당 옵션 상태 HOLDe
+        // 재고 차감 -> 재고 부족시 해당 옵션 상태
         ProductInfo.Order checkProductOrder = productService.reduceStock(orderItemCommand);
 
         // 재고 부족시 -> 생성된 주문아이템 상태 변경(보류)
