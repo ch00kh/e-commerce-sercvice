@@ -178,15 +178,17 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   actor USER
-  participant Product
-  participant OrderProduct
+  participant ProductFacade
+  participant OrderService
+  participant ProductService
   
   activate USER
-  USER ->>+ Product: 인기 판매 상품 조회 요청
-  Product ->>+ OrderProduct: 최근 3일간 가장 많이 팔린 상위 5개 조회
-  OrderProduct -->>- Product: 인기 판매 상품 반환
-  Product ->> Product: 인기 판매 상품 기반 상품 정보 조회
-  Product -->>- USER: 인기 판매 상품 정보 응답
+  USER ->>+ ProductFacade: 인기 판매 상품 조회 요청
+  ProductFacade ->>+ OrderService: 최근 X일간 가장 많이 팔린 상위 X개 조회
+  OrderService ->>- ProductFacade: 상품옵션id, 판매량 반환 
+  ProductFacade ->>+ ProductService: 상품옵션 id기반 상품 정보 조회
+  ProductService ->>- ProductFacade: 상품 정보 반환
+  ProductFacade ->>- USER: 인기 판매 상품 정보 응답
   deactivate USER
 ```
 
