@@ -203,12 +203,13 @@
   ```
 --- 
 ### 선착순 쿠폰 API
-- URL : `/api/coupon/{id}`
+- URL : `/api/coupon/issue`
 - METHOD : `POST`
 - Request Body
   ```json
   {
-    "couponId": 1
+    "userId": 1,
+    "couponId": 100
   }
   ```
 - Response Header

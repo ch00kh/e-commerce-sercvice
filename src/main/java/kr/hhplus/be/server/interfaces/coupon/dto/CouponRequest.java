@@ -1,9 +1,12 @@
 package kr.hhplus.be.server.interfaces.coupon.dto;
 
-import lombok.Builder;
-
+import kr.hhplus.be.server.application.coupon.dto.CouponCriteria;
 
 public record CouponRequest(
-    Long couponId
+        Long userId,
+        Long couponId
 ) {
+    public CouponCriteria.Issue toCriteria() {
+        return new CouponCriteria.Issue(userId, couponId);
+    }
 }
