@@ -181,6 +181,7 @@ class ProductServiceTest {
         @Test
         @DisplayName("[성공] 모든 상품 재고 여유(경계값)")
         void reduceStock_ok_BoundaryCheck() {
+
             // Arrange
             List<OrderCommand.OrderItem> orderItems = List.of(
                     new OrderCommand.OrderItem(101L, 5500L, 99L),
@@ -213,6 +214,7 @@ class ProductServiceTest {
         @Test
         @DisplayName("[실패] 일부 상품 재고 부족 -> 예외는 아니지만, CheckStock 검증")
         void reduceStock_ok_anyStockIsNotEnough() {
+
             // Arrange
             List<OrderCommand.OrderItem> orderItems = List.of(
                     new OrderCommand.OrderItem(101L, 5500L, 101L),

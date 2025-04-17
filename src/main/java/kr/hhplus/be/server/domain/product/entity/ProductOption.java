@@ -39,7 +39,8 @@ public class ProductOption extends BaseTimeEntity {
         return this.stock - stock >= 0;
     }
 
-    public Long reduceStock(Long stock) {
-        return this.stock - stock;
+    public Long reduceStock(Long quantity) {
+        this.stock -= quantity;
+        return this.stock;
     }
 }
