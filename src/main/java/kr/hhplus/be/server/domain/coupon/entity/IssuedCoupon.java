@@ -5,7 +5,6 @@ import kr.hhplus.be.server.domain.BaseCreatedTimeEntity;
 import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,11 +13,10 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(indexes = {
-        @Index(name = "idx_user_id", columnList = "userId"),
-        @Index(name = "idx_coupon_id", columnList = "couponId")
-})
-
+//@Table(indexes = {
+//        @Index(name = "idx_user_id", columnList = "userId"),
+//        @Index(name = "idx_coupon_id", columnList = "couponId")
+//})
 @AllArgsConstructor
 public class IssuedCoupon extends BaseCreatedTimeEntity {
 

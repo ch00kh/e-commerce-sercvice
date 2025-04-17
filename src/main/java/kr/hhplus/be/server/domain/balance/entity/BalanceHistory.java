@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(indexes = {
-        @Index(name = "idx_balance_id", columnList = "balanceId"),
-        @Index(name = "idx_issuedCoupon_id", columnList = "issuedCouponId")
-})
+//@Table(indexes = {
+//        @Index(name = "idx_balance_id", columnList = "balanceId"),
+//        @Index(name = "idx_issuedCoupon_id", columnList = "issuedCouponId")
+//})
 public class BalanceHistory extends BaseTimeEntity {
 
     @Id

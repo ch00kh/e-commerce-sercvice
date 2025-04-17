@@ -12,11 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "`order`",
-        indexes = {
-        @Index(name = "idx_user_id", columnList = "userId"),
-        @Index(name = "idx_coupon_id", columnList = "issuedCouponId")
-})
+@Table(name = "`order`")
+//        indexes = {
+//        @Index(name = "idx_user_id", columnList = "userId"),
+//        @Index(name = "idx_coupon_id", columnList = "issuedCouponId")
+//})
 public class Order extends BaseTimeEntity {
 
     @Id

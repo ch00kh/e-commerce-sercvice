@@ -13,9 +13,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-
 @AllArgsConstructor
-@Table(indexes = @Index(name = "idx_order_id", columnList = "orderId"))
+//@Table(indexes = @Index(name = "idx_order_id", columnList = "orderId"))
 public class Payment extends BaseTimeEntity {
 
     @Id
