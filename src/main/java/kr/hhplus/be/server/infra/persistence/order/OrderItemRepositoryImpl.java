@@ -38,4 +38,14 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
         return bestSelling.stream()
                 .map(e -> new OrderInfo.Best(e.getProductOptionId(), e.getTotalSaleQuantity())).toList();
     }
+
+    @Override
+    public List<OrderItem> findByOrderId(Long orderId) {
+        return jpaRepository.findByOrderId(orderId);
+    }
+
+    @Override
+    public List<OrderItem> findByProductOptionId(Long productOptionId) {
+        return jpaRepository.findByProductOptionId(productOptionId);
+    }
 }

@@ -292,7 +292,7 @@ class OrderServiceTest {
         // Act
         List<OrderInfo.Best> result = orderService.findBestSelling(new OrderCommand.FindBest(3, 5));
 
-        // Then
+        // Assert
         verify(orderItemRepository).findBestSelling(3, 5);
 
         assertThat(result).isNotNull();

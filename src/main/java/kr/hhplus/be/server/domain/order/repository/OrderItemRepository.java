@@ -13,4 +13,8 @@ public interface OrderItemRepository {
     OrderItem save(OrderItem orderItem);
 
     List<OrderInfo.Best> findBestSelling(Integer days, Integer limit);
+
+    List<OrderItem> findByOrderId(Long orderId);
+
+    List<OrderItem> findByProductOptionId(Long id);
 }

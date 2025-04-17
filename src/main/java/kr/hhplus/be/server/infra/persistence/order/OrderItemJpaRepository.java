@@ -17,14 +17,18 @@ public interface OrderItemJpaRepository extends JpaRepository<OrderItem, Long> {
 
     @Query("SELECT oi.productOptionId as productOptionId, SUM(oi.quantity) as totalSaleQuantity " +
             "FROM OrderItem oi " +
-            "WHERE oi.createdAt >= :startDate " +
+            "WHERE oi.createdAt >= :startDate " + // 인덱스
             "GROUP BY oi.productOptionId " +
             "ORDER BY SUM(oi.quantity) DESC")
     List<BestSellingProjection> findBestSelling(@Param("startDate") LocalDateTime startDate, Pageable pageable);
+
 
     interface BestSellingProjection {
         Long getProductOptionId();
         Long getTotalSaleQuantity();
     }
 
+    List<OrderItem> findByOrderId(Long orderId);
+
+    List<OrderItem> findByProductOptionId(Long productOptionId);
 }
