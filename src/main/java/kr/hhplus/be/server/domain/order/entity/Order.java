@@ -5,18 +5,16 @@ import kr.hhplus.be.server.domain.BaseTimeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "`order`")
-//        indexes = {
-//        @Index(name = "idx_user_id", columnList = "userId"),
-//        @Index(name = "idx_coupon_id", columnList = "issuedCouponId")
-//})
+@Table(name = "`order`", indexes = {
+        @Index(name = "idx_user_id", columnList = "userId"),
+        @Index(name = "idx_coupon_id", columnList = "issuedCouponId")
+})
 public class Order extends BaseTimeEntity {
 
     @Id
@@ -42,7 +40,7 @@ public class Order extends BaseTimeEntity {
     @Column(nullable = false)
     private Long paymentAmount;
 
-    
+
     public Order(Long userId, Long totalAmount) {
         this.userId = userId;
         this.status = OrderStatus.CREATED;

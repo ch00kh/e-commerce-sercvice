@@ -7,10 +7,11 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-//@Table(indexes = {
-//        @Index(name = "idx_order_id", columnList = "orderId"),
-//        @Index(name = "idx_productOption_id", columnList = "productOptionId")
-//})
+@Table(indexes = {
+        @Index(name = "idx_order_id", columnList = "orderId"),
+        @Index(name = "idx_productOption_id", columnList = "productOptionId"),
+        @Index(name = "idx_order_item_created_prod_opt", columnList = "createdAt, productOptionId, quantity")
+})
 public class OrderItem extends BaseTimeEntity {
 
     @Id

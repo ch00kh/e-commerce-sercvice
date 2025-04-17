@@ -9,7 +9,7 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-//@Table(indexes = {@Index(name = "idx_user_id", columnList = "userId")})
+@Table(indexes = {@Index(name = "idx_user_id", columnList = "userId")})
 public class Balance extends BaseTimeEntity {
 
     @Id
