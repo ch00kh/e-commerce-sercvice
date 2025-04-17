@@ -5,6 +5,8 @@ import kr.hhplus.be.server.domain.balance.repository.BalanceHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
 public class BalanceHistoryRepositoryImpl implements BalanceHistoryRepository {
@@ -14,5 +16,10 @@ public class BalanceHistoryRepositoryImpl implements BalanceHistoryRepository {
     @Override
     public BalanceHistory save(BalanceHistory balanceHistory) {
         return jpaRepository.save(balanceHistory);
+    }
+
+    @Override
+    public List<BalanceHistory> findByBalanceId(Long userId) {
+        return jpaRepository.findByBalanceId(userId);
     }
 }
