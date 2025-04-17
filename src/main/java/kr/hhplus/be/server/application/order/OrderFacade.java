@@ -16,7 +16,6 @@ import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,7 +29,6 @@ public class OrderFacade {
     private final OrderService orderService;
     private final PaymentService paymentService;
 
-    @Transactional
     public OrderResult.Create order(OrderCriteria.Create criteria) {
 
         // 상품 조회
