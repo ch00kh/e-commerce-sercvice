@@ -4,8 +4,7 @@ import java.util.List;
 
 public record OrderCriteria() {
 
-    
-    public record Order(
+    public record Create(
             Long userId,
             Long productId,
             List<OrderItem> items,

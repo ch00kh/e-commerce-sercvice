@@ -1,9 +1,22 @@
 package kr.hhplus.be.server.interfaces.order.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.hhplus.be.server.application.order.OrderFacade;
+import kr.hhplus.be.server.application.order.dto.OrderCriteria;
+import kr.hhplus.be.server.application.order.dto.OrderResult;
+import kr.hhplus.be.server.domain.order.entity.OrderStatus;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(OrderController.class)
 class OrderControllerTest {
@@ -11,36 +24,49 @@ class OrderControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @MockitoBean
+    private OrderFacade orderFacade;
 
-//    @Test
-//    @DisplayName("[성공] 주문 생성")
-//    void order() throws Exception {
-//
-//        OrderRequest mockRequest = OrderRequest.builder()
-//                .userId(1001L)
-//                .productId(10001L)
-//                .items(List.of(OrderRequest.Item.builder()
-//                        .productOptionId(101L)
-//                        .quantity(2)
-//                        .build()))
-//                .couponId(1001L)
-//                .build();
-//
-//        String requestBody = objectMapper.writeValueAsString(mockRequest);
-//
-//        // When & Then
-//        mockMvc.perform(post("/api/order")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(requestBody))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.orderId").value(10001))
-//                .andExpect(jsonPath("$.userId").value(1001))
-//                .andExpect(jsonPath("$.productId").value(10001))
-//                .andExpect(jsonPath("$.status").value("PENDING"))
-//                .andExpect(jsonPath("$.totalAmount").value("11000"))
-//                .andExpect(jsonPath("$.discountAmount").value("1000"))
-//                .andExpect(jsonPath("$.paymentAmount").value("10000"));
-//    }
+
+    @Test
+    @DisplayName("[성공] 주문 생성")
+    void order() throws Exception {
+
+        // Arrange
+        String requestBody = """
+        {
+            "userId": 1,
+            "productId": 1,
+            "items": [
+                {
+                    "optionId": 101,
+                    "quantity": 10
+                }
+            ],
+            "couponId": null
+        }
+        """;
+
+        String responseBody = """
+        {
+            "orderId": 10,
+            "userId": 1,
+            "status": "CREATED",
+            "totalAmount": 20000,
+            "discountAmount": 0,
+            "paymentAmount": 20000
+        }
+        """;
+
+
+        when(orderFacade.order(any(OrderCriteria.Create.class)))
+                .thenReturn(new OrderResult.Create(10L, 1L, OrderStatus.CREATED, 20000L, 0L, 20000L));
+
+        // Act & Assert
+        mockMvc.perform(post("/api/v1/order")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(content().json(responseBody));
+    }
 }

@@ -39,9 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class OrderFacadeTest {
+class CreateFacadeTest {
 
-    private static final Logger log = LoggerFactory.getLogger(OrderFacadeTest.class);
+    private static final Logger log = LoggerFactory.getLogger(CreateFacadeTest.class);
     @Autowired
     private OrderFacade orderFacade;
 
@@ -97,7 +97,7 @@ class OrderFacadeTest {
     void order_ok() {
 
         // Arrange
-        OrderCriteria.Order criteria = new OrderCriteria.Order(USER_ID, PRODUCT.getId(), ORDER_ITEMS, null);
+        OrderCriteria.Create criteria = new OrderCriteria.Create(USER_ID, PRODUCT.getId(), ORDER_ITEMS, null);
 
         // Act
         OrderResult.Create result = orderFacade.order(criteria);
@@ -136,7 +136,7 @@ class OrderFacadeTest {
 
         // Arrange
         issuedCouponRepository.save(new IssuedCoupon(USER_ID, COUPON.getId()));
-        OrderCriteria.Order criteria = new OrderCriteria.Order(USER_ID, PRODUCT.getId(), ORDER_ITEMS, COUPON.getId());
+        OrderCriteria.Create criteria = new OrderCriteria.Create(USER_ID, PRODUCT.getId(), ORDER_ITEMS, COUPON.getId());
 
         // Act
         OrderResult.Create result = orderFacade.order(criteria);
@@ -178,7 +178,7 @@ class OrderFacadeTest {
     void order_notFound() {
 
         // Arrange
-        OrderCriteria.Order criteria = new OrderCriteria.Order(USER_ID, 999L, ORDER_ITEMS, null);
+        OrderCriteria.Create criteria = new OrderCriteria.Create(USER_ID, 999L, ORDER_ITEMS, null);
 
         // Act
         GlobalException exception = assertThrows(GlobalException.class, () -> orderFacade.order(criteria));
@@ -192,7 +192,7 @@ class OrderFacadeTest {
     void orderWithCoupon_couponNotFound() {
 
         // Arrange
-        OrderCriteria.Order criteria = new OrderCriteria.Order(USER_ID, PRODUCT.getId(), ORDER_ITEMS, 999L);
+        OrderCriteria.Create criteria = new OrderCriteria.Create(USER_ID, PRODUCT.getId(), ORDER_ITEMS, 999L);
 
         // Act
         GlobalException exception = assertThrows(GlobalException.class, () -> orderFacade.order(criteria));
@@ -206,7 +206,7 @@ class OrderFacadeTest {
     void orderWithCoupon_issuedCouponNotFound() {
 
         // Arrange
-        OrderCriteria.Order criteria = new OrderCriteria.Order(USER_ID, PRODUCT.getId(), ORDER_ITEMS, COUPON.getId());
+        OrderCriteria.Create criteria = new OrderCriteria.Create(USER_ID, PRODUCT.getId(), ORDER_ITEMS, COUPON.getId());
 
         // Act
         GlobalException exception = assertThrows(GlobalException.class, () -> orderFacade.order(criteria));
@@ -223,7 +223,7 @@ class OrderFacadeTest {
         IssuedCoupon issuedCoupon = issuedCouponRepository.save(new IssuedCoupon(USER_ID, COUPON.getId()));
         issuedCoupon.use(); // 상태 변경 (ISSUED -> USED)
 
-        OrderCriteria.Order criteria = new OrderCriteria.Order(USER_ID, PRODUCT.getId(), ORDER_ITEMS, COUPON.getId());
+        OrderCriteria.Create criteria = new OrderCriteria.Create(USER_ID, PRODUCT.getId(), ORDER_ITEMS, COUPON.getId());
 
         // Act
         GlobalException exception = assertThrows(GlobalException.class, () -> orderFacade.order(criteria));
@@ -243,7 +243,7 @@ class OrderFacadeTest {
                 new OrderCriteria.OrderItem(OPTION2.getId(), 20),
                 new OrderCriteria.OrderItem(OPTION3.getId(), 110)
         );
-        OrderCriteria.Order criteria = new OrderCriteria.Order(USER_ID, PRODUCT.getId(), ORDER_ITEMS, null);
+        OrderCriteria.Create criteria = new OrderCriteria.Create(USER_ID, PRODUCT.getId(), ORDER_ITEMS, null);
 
         // Act
         OrderResult.Create result = orderFacade.order(criteria);

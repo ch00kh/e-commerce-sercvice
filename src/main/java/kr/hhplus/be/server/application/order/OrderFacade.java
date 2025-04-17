@@ -31,7 +31,7 @@ public class OrderFacade {
     private final PaymentService paymentService;
 
     @Transactional
-    public OrderResult.Create order(OrderCriteria.Order criteria) {
+    public OrderResult.Create order(OrderCriteria.Create criteria) {
 
         // 상품 조회
         ProductInfo.ProductAggregate product = productService.findProduct(new ProductCommand.Find(criteria.productId()));

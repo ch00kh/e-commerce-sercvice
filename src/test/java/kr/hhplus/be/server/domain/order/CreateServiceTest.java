@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("[단위테스트] OrderService")
-class OrderServiceTest {
+class CreateServiceTest {
 
     @Mock
     private OrderRepository orderRepository;
