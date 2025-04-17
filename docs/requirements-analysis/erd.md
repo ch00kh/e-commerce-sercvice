@@ -93,6 +93,7 @@ erDiagram
     bigint product_option_id FK
     bigint unit_price "상품 금액"
     bigint quantity "상품 수량"
+    varchar status "주문 상태"
     datetime created_at "생성일시"
     datetime modified_at "수정일시"
   }
