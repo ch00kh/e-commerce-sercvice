@@ -79,20 +79,19 @@ class ProductServiceTest {
         assertThat(actualInfo.products().get(0).productId()).isEqualTo(PRODUCT_ID1);
         assertThat(actualInfo.products().get(0).brand()).isEqualTo("총각쓰떡");
         assertThat(actualInfo.products().get(0).name()).isEqualTo("백설기");
-        assertThat(actualInfo.products().get(0).options().get(0).getOptionValue()).isEqualTo("백설기/10개");
-        assertThat(actualInfo.products().get(0).options().get(0).getPrice()).isEqualTo(5500);
-        assertThat(actualInfo.products().get(0).options().get(0).getStock()).isEqualTo(100);
-        assertThat(actualInfo.products().get(0).options().get(1).getId()).isEqualTo(102);
-        assertThat(actualInfo.products().get(0).options().get(1).getOptionValue()).isEqualTo("우유설기/10개");
-        assertThat(actualInfo.products().get(0).options().get(1).getPrice()).isEqualTo(5900);
-        assertThat(actualInfo.products().get(0).options().get(1).getStock()).isEqualTo(99);
+        assertThat(actualInfo.products().get(0).options().get(0).optionValue()).isEqualTo("백설기/10개");
+        assertThat(actualInfo.products().get(0).options().get(0).price()).isEqualTo(5500);
+        assertThat(actualInfo.products().get(0).options().get(0).stock()).isEqualTo(100);
+        assertThat(actualInfo.products().get(0).options().get(1).optionValue()).isEqualTo("우유설기/10개");
+        assertThat(actualInfo.products().get(0).options().get(1).price()).isEqualTo(5900);
+        assertThat(actualInfo.products().get(0).options().get(1).stock()).isEqualTo(99);
 
         assertThat(actualInfo.products().get(1).productId()).isEqualTo(PRODUCT_ID2);
         assertThat(actualInfo.products().get(1).brand()).isEqualTo("총각쓰떡");
         assertThat(actualInfo.products().get(1).name()).isEqualTo("백일떡");
-        assertThat(actualInfo.products().get(1).options().get(0).getOptionValue()).isEqualTo("백일떡/10개");
-        assertThat(actualInfo.products().get(1).options().get(0).getPrice()).isEqualTo(13700);
-        assertThat(actualInfo.products().get(1).options().get(0).getStock()).isEqualTo(50);
+        assertThat(actualInfo.products().get(1).options().get(0).optionValue()).isEqualTo("백일떡/10개");
+        assertThat(actualInfo.products().get(1).options().get(0).price()).isEqualTo(13700);
+        assertThat(actualInfo.products().get(1).options().get(0).stock()).isEqualTo(50);
     }
 
 
@@ -118,13 +117,12 @@ class ProductServiceTest {
             assertThat(actualInfo.productId()).isEqualTo(PRODUCT_ID1);
             assertThat(actualInfo.brand()).isEqualTo("총각쓰떡");
             assertThat(actualInfo.name()).isEqualTo("백설기");
-            assertThat(actualInfo.options().get(0).getOptionValue()).isEqualTo("백설기/10개");
-            assertThat(actualInfo.options().get(0).getPrice()).isEqualTo(5500L);
-            assertThat(actualInfo.options().get(0).getStock()).isEqualTo(100L);
-            assertThat(actualInfo.options().get(1).getId()).isEqualTo(102L);
-            assertThat(actualInfo.options().get(1).getOptionValue()).isEqualTo("우유설기/10개");
-            assertThat(actualInfo.options().get(1).getPrice()).isEqualTo(5900L);
-            assertThat(actualInfo.options().get(1).getStock()).isEqualTo(99L);
+            assertThat(actualInfo.options().get(0).optionValue()).isEqualTo("백설기/10개");
+            assertThat(actualInfo.options().get(0).price()).isEqualTo(5500L);
+            assertThat(actualInfo.options().get(0).stock()).isEqualTo(100L);
+            assertThat(actualInfo.options().get(1).optionValue()).isEqualTo("우유설기/10개");
+            assertThat(actualInfo.options().get(1).price()).isEqualTo(5900L);
+            assertThat(actualInfo.options().get(1).stock()).isEqualTo(99L);
         }
 
         @Test
@@ -148,7 +146,7 @@ class ProductServiceTest {
     class reduceStock {
 
         @Test
-        @DisplayName("[성공] 모든 상품 재고 여유 -> CheckStock isEnough 값 검증 true")
+        @DisplayName("[성공] 모든 상품 재고 여유 -> CheckStock iscanPurchase 값 검증 true")
         void reduceStock_ok() {
 
             // Arrange
@@ -164,24 +162,24 @@ class ProductServiceTest {
             ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
 
             // Assert
-            verify(productOptionRepository, times(1)).findById(PRODUCT_OPTION1.getId());
-            verify(productOptionRepository, times(1)).findById(PRODUCT_OPTION2.getId());
+            verify(productOptionRepository, times(1)).findById(101L);
+            verify(productOptionRepository, times(1)).findById(102L);
 
             assertThat(actualInfo.checkStocks().size()).isEqualTo(2);
 
             assertThat(actualInfo.checkStocks().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
             assertThat(actualInfo.checkStocks().get(0).remainingQuantity()).isEqualTo(90);
             assertThat(actualInfo.checkStocks().get(0).requestQuantity()).isEqualTo(10);
-            assertThat(actualInfo.checkStocks().get(0).isEnough()).isEqualTo(true);
+            assertThat(actualInfo.checkStocks().get(0).canPurchase()).isEqualTo(true);
 
             assertThat(actualInfo.checkStocks().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
             assertThat(actualInfo.checkStocks().get(1).remainingQuantity()).isEqualTo(90);
             assertThat(actualInfo.checkStocks().get(1).requestQuantity()).isEqualTo(9);
-            assertThat(actualInfo.checkStocks().get(1).isEnough()).isEqualTo(true);
+            assertThat(actualInfo.checkStocks().get(1).canPurchase()).isEqualTo(true);
         }
 
         @Test
-        @DisplayName("[성공/실패] 모든 상품 재고 여유(경계값) -> CheckStock isEnough 값 검증 true")
+        @DisplayName("[성공] 모든 상품 재고 여유(경계값)")
         void reduceStock_ok_BoundaryCheck() {
             // Arrange
             List<OrderCommand.OrderItem> orderItems = List.of(
@@ -196,20 +194,20 @@ class ProductServiceTest {
             ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
 
             // Assert
-            verify(productOptionRepository, times(1)).findById(PRODUCT_OPTION1.getId());
-            verify(productOptionRepository, times(1)).findById(PRODUCT_OPTION2.getId());
+            verify(productOptionRepository, times(1)).findById(101L);
+            verify(productOptionRepository, times(1)).findById(102L);
 
             assertThat(actualInfo.checkStocks().size()).isEqualTo(2);
 
             assertThat(actualInfo.checkStocks().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
             assertThat(actualInfo.checkStocks().get(0).remainingQuantity()).isEqualTo(1);
             assertThat(actualInfo.checkStocks().get(0).requestQuantity()).isEqualTo(99);
-            assertThat(actualInfo.checkStocks().get(0).isEnough()).isEqualTo(true);
+            assertThat(actualInfo.checkStocks().get(0).canPurchase()).isEqualTo(true);
 
             assertThat(actualInfo.checkStocks().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
             assertThat(actualInfo.checkStocks().get(1).remainingQuantity()).isEqualTo(0);
             assertThat(actualInfo.checkStocks().get(1).requestQuantity()).isEqualTo(99);
-            assertThat(actualInfo.checkStocks().get(1).isEnough()).isEqualTo(true);
+            assertThat(actualInfo.checkStocks().get(1).canPurchase()).isEqualTo(true);
         }
 
         @Test
@@ -228,20 +226,20 @@ class ProductServiceTest {
             ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
 
             // Assert
-            verify(productOptionRepository, times(1)).findById(PRODUCT_OPTION1.getId());
-            verify(productOptionRepository, times(1)).findById(PRODUCT_OPTION2.getId());
+            verify(productOptionRepository, times(1)).findById(101L);
+            verify(productOptionRepository, times(1)).findById(102L);
 
             assertThat(actualInfo.checkStocks().size()).isEqualTo(2);
 
             assertThat(actualInfo.checkStocks().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
             assertThat(actualInfo.checkStocks().get(0).remainingQuantity()).isEqualTo(100);
             assertThat(actualInfo.checkStocks().get(0).requestQuantity()).isEqualTo(101);
-            assertThat(actualInfo.checkStocks().get(0).isEnough()).isEqualTo(false);
+            assertThat(actualInfo.checkStocks().get(0).canPurchase()).isEqualTo(false);
 
             assertThat(actualInfo.checkStocks().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
             assertThat(actualInfo.checkStocks().get(1).remainingQuantity()).isEqualTo(99);
             assertThat(actualInfo.checkStocks().get(1).requestQuantity()).isEqualTo(100);
-            assertThat(actualInfo.checkStocks().get(1).isEnough()).isEqualTo(false);
+            assertThat(actualInfo.checkStocks().get(1).canPurchase()).isEqualTo(false);
         }
     }
 }

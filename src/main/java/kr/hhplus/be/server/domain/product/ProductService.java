@@ -53,17 +53,17 @@ public class ProductService {
             ProductOption productOption = productOptionRepository.findById(i.productOptionId())
                     .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
 
-            if (productOption.isEnoughStock(i.quantity())) {
+            if (productOption.canPurchase(i.quantity())) {
                 Integer remainingStock = productOption.reduceStock(i.quantity());
 
-                return new ProductInfo.CheckedStock(
+                return new ProductInfo.OptionDetail(
                         productOption.getId(),
                         true,
                         i.quantity(),
                         remainingStock
                 );
             } else {
-                return new ProductInfo.CheckedStock(
+                return new ProductInfo.OptionDetail(
                         productOption.getId(),
                         false,
                         i.quantity(),

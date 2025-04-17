@@ -27,10 +27,10 @@ public record ProductResult() {
                     product.brand(),
                     product.name(),
                     product.options().stream().map(o -> new Option(
-                                    o.getId(),
-                                    o.getOptionValue(),
-                                    o.getPrice(),
-                                    o.getStock()
+                                    o.optionId(),
+                                    o.optionValue(),
+                                    o.price(),
+                                    o.stock()
                             ))
                             .toList()
             );
@@ -38,7 +38,6 @@ public record ProductResult() {
 
     }
 
-    
     public record Option(
             Long optionId,
             String optionValue,

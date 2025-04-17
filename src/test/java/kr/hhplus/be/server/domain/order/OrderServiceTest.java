@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.order;
 
+import kr.hhplus.be.server.domain.coupon.dto.CouponInfo;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.order.dto.OrderInfo;
 import kr.hhplus.be.server.domain.order.entity.Order;
@@ -106,8 +107,23 @@ class OrderServiceTest {
     }
 
     @Nested
-    @DisplayName("주문 생성 후 쿠폰 적용")
+    @DisplayName("쿠폰 사용")
     class useCoupon {
+
+        @Test
+        @DisplayName("[성공] 쿠폰 미사용")
+        void useCoupon_couponIsNull() {
+
+            // Arrange
+            CouponInfo.CouponAggregate couponInfo = new CouponInfo.CouponAggregate(null, null, null, null, null);
+            OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, couponInfo.couponId(), couponInfo.discountPrice());
+
+            // Act
+            OrderInfo.Create actualInfo = orderService.useCoupon(command);
+
+            // Assert
+            assertThat(actualInfo).isNull();
+        }
 
         @Test
         @DisplayName("[성공] 쿠폰 적용 시 금액 계산 (주문금액 > 할인금액)")

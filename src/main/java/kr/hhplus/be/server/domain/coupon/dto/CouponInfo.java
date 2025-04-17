@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 
 public record CouponInfo() {
 
-    
     public record CouponAggregate(
             Long couponId,
             Long discountPrice,
@@ -17,6 +16,9 @@ public record CouponInfo() {
             LocalDateTime expiredAt
 
     ) {
+        public static CouponAggregate from() {
+            return new CouponAggregate(null, null, null, null, null);
+        }
         public static CouponAggregate from(Coupon coupon, IssuedCoupon issuedCoupon) {
             return new CouponAggregate(
                     coupon.getId(),

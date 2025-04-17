@@ -55,6 +55,20 @@ class CouponServiceTest {
         ISSUED_COUPON = new IssuedCoupon(USER_ID, COUPON_ID);
     }
 
+    @Test
+    @DisplayName("쿠폰 미사용")
+    void unuseCoupon_() {
+
+        // Arrange
+        CouponCommand.Use command = new CouponCommand.Use(USER_ID, null);
+
+        // Act
+        CouponInfo.CouponAggregate actualInfo = couponService.use(command);
+
+        // Assert
+        assertThat(actualInfo).isNull();
+    }
+
     @Nested
     @DisplayName("쿠폰 적용")
     class useCoupon {

@@ -35,7 +35,7 @@ public class ProductOption extends BaseTimeEntity {
         this.stock = stock;
     }
 
-    public boolean isEnoughStock(Integer stock) {
+    public boolean canPurchase(Integer stock) {
         return this.stock - stock >= 0;
     }
 

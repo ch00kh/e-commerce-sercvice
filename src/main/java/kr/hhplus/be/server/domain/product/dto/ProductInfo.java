@@ -20,7 +20,7 @@ public record ProductInfo(){
         Long productId,
         String brand,
         String name,
-        List<ProductOption> options
+        List<Option> options
     ) {
         public static ProductAggregate from(Product product, List<ProductOption> productOption) {
             return new ProductAggregate(
@@ -28,20 +28,27 @@ public record ProductInfo(){
                     product.getBrand(),
                     product.getName(),
                     productOption.stream().map(o ->
-                            new ProductOption(o.getId(), o.getOptionValue(), o.getPrice(), o.getStock())
+                            new Option(o.getId(), o.getOptionValue(), o.getPrice(), o.getStock())
                     ).toList()
             );
         }
     }
 
-    public record CheckedStock(
+    public record Option(
+        Long optionId,
+        String optionValue,
+        Long price,
+        Integer stock
+    ) {}
+
+    public record OptionDetail(
             Long optionId,
-            boolean isEnough,
+            boolean canPurchase,
             Integer requestQuantity,
             Integer remainingQuantity
     ) {}
 
     public record Order(
-            List<CheckedStock> checkStocks
+            List<OptionDetail> checkStocks
     ) {}
 }

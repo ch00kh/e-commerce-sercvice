@@ -22,6 +22,10 @@ public class CouponService {
 
     public CouponAggregate use(CouponCommand.Use command) {
 
+        if (command.couponId() == null) {
+            return CouponAggregate.from();
+        }
+
         Coupon coupon = couponRepository.findById(command.couponId())
                 .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
 
