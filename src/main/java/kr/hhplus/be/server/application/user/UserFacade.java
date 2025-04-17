@@ -9,6 +9,7 @@ import kr.hhplus.be.server.domain.user.UserService;
 import kr.hhplus.be.server.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -17,6 +18,7 @@ public class UserFacade {
     private final UserService userService;
     private final BalanceService balanceService;
 
+    @Transactional
     public UserResult.Create createUser(UserCriteria.Create criteria) {
 
         User user = userService.create(criteria.toCommand());

@@ -9,6 +9,7 @@ import kr.hhplus.be.server.domain.product.ProductService;
 import kr.hhplus.be.server.domain.product.dto.ProductCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class ProductFacade {
         return ProductResult.ProductAggregate.from(productService.findProduct(criteria.toCommand()));
     }
 
+    @Transactional
     public ProductResult.ProductList findBest(ProductCriteria.FindBest criteria) {
 
         List<OrderInfo.Best> orderInfo = orderService.findBestSelling(new OrderCommand.FindBest(criteria.days(), criteria.limit()));

@@ -71,8 +71,6 @@ public class Order extends BaseTimeEntity {
             this.discountAmount = discountAmount;
             paymentAmount = totalAmount - discountAmount;
         }
-
-        log.info("totalAmount");
     }
 
     public Order pay() {
