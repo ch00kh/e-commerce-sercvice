@@ -21,7 +21,9 @@ public class UserService {
                 .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
     }
 
+    @Transactional
     public User create(UserCommand.Create command) {
-        return  userRepository.save(new User(command.name()));
+        return userRepository.save(new User(command.name()));
     }
+
 }
