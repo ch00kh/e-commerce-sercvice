@@ -99,7 +99,7 @@ class BalanceControllerTest {
             """;
 
             // Act & Assert
-            mockMvc.perform(post("/api/v1/balances/{id}", USER_ID)
+            mockMvc.perform(post("/api/v1/balances/{userId}", USER_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(requestBody))
                     .andExpect(status().isBadRequest())

@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -50,9 +49,9 @@ class CouponControllerTest {
             """;
 
         when(couponFacade.firstComeFirstIssue(new CouponCriteria.Issue(1L, 100L)))
-                .thenReturn(new CouponResult.Issued(anyLong(), 1L, 100L, CouponStatus.ISSUED, LocalDateTime.now()));
+                .thenReturn(new CouponResult.Issued(1L, 1L, 100L, CouponStatus.ISSUED, LocalDateTime.now()));
 
-        mockMvc.perform(post("/api/coupon/issue")
+        mockMvc.perform(post("/api/v1/coupon/issue")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())

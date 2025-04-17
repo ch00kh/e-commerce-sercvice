@@ -6,9 +6,9 @@ import java.time.LocalDateTime;
 
 public record CouponResult() {
 
-    
+
     public record Issued(
-            Long id,
+            Long issuedCouponId,
             Long userId,
             Long couponId,
             CouponStatus status,
