@@ -18,8 +18,9 @@ public class OrderController implements IOrderController {
     private final OrderFacade orderFacade;
 
     @PostMapping
-    public ResponseEntity<OrderResponse.Create> order(@RequestBody OrderRequest.Create request) {
-
+    public ResponseEntity<OrderResponse.Create> order(
+            @RequestBody OrderRequest.Create request
+    ) {
         return ResponseEntity.ok().body(OrderResponse.Create.from(orderFacade.order(request.toCriteria())));
     }
 }

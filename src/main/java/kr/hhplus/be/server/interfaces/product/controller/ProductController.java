@@ -25,7 +25,9 @@ public class ProductController implements IProductController {
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<ProductAggregate> findProduct(@PathVariable Long productId) {
+    public ResponseEntity<ProductAggregate> findProduct(
+            @PathVariable Long productId
+    ) {
         return ResponseEntity.ok().body(ProductAggregate.from(productFacade.findProduct(ProductRequest.Find.toCriteria(productId))));
     }
 

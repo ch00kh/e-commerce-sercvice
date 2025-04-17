@@ -28,8 +28,9 @@ public class BalanceController implements IBalanceController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserBalance> findBalance(@PathVariable Long userId) {
-
+    public ResponseEntity<UserBalance> findBalance(
+            @PathVariable Long userId
+    ) {
         return ResponseEntity.ok()
                 .body(UserBalance.from(balanceFacade.findBalance(BalanceRequest.Find.toCriteria(userId))));
     }

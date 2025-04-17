@@ -18,8 +18,9 @@ public class PaymentController implements IPaymentController {
     private final PaymentFacade paymentFacade;
 
     @PostMapping
-    public ResponseEntity<PaymentResponse> pay(@RequestBody PaymentRequest request) {
-
+    public ResponseEntity<PaymentResponse> pay(
+            @RequestBody PaymentRequest request
+    ) {
         return ResponseEntity.ok()
                 .body(PaymentResponse.from(paymentFacade.pay(request.toCriteria())));
     }
