@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 public record CouponResult() {
 
-    @Builder
+    
     public record Issued(
             Long id,
             Long userId,

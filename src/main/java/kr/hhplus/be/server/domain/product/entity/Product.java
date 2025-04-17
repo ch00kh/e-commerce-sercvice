@@ -23,4 +23,8 @@ public class Product extends BaseTimeEntity {
     @Column(nullable = false)
     private String name;
 
+    public Product(String brand, String name) {
+        this.brand = brand;
+        this.name = name;
+    }
 }

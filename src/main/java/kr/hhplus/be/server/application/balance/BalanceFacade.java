@@ -18,7 +18,6 @@ public class BalanceFacade {
      */
     @Transactional
     public BalanceResult.UserBalance charge(BalanceCriteria.Charge criteria) {
-
         return BalanceResult.UserBalance.from(balanceService.charge(criteria.toCommand()));
     }
 
@@ -27,7 +26,6 @@ public class BalanceFacade {
      */
     @Transactional(readOnly = true)
     public BalanceResult.UserBalance findBalance(BalanceCriteria.Find criteria) {
-
         return BalanceResult.UserBalance.from(balanceService.find(criteria.toCommand()));
     }
 

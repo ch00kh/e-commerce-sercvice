@@ -4,7 +4,7 @@ import lombok.Builder;
 
 public record PaymentCommand() {
 
-    @Builder
+    
     public record Save(
             Long orderId,
             Long amount

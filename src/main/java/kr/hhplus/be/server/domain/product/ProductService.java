@@ -56,22 +56,20 @@ public class ProductService {
             if (productOption.isEnoughStock(i.quantity())) {
                 Integer remainingStock = productOption.reduceStock(i.quantity());
 
-                return ProductInfo.CheckedStock.builder()
-                        .optionId(productOption.getId())
-                        .isEnough(true)
-                        .requestQuantity(i.quantity())
-                        .remainingQuantity(remainingStock)
-                        .build();
-
+                return new ProductInfo.CheckedStock(
+                        productOption.getId(),
+                        true,
+                        i.quantity(),
+                        remainingStock
+                );
             } else {
-                return ProductInfo.CheckedStock.builder()
-                        .optionId(productOption.getId())
-                        .isEnough(false)
-                        .requestQuantity(i.quantity())
-                        .remainingQuantity(productOption.getStock())
-                        .build();
+                return new ProductInfo.CheckedStock(
+                        productOption.getId(),
+                        false,
+                        i.quantity(),
+                        productOption.getStock()
+                );
             }
-
         }).toList());
     }
 }

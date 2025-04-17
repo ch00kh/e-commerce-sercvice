@@ -37,7 +37,7 @@ public class OrderItem extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer quantity;
 
-    @Builder
+    
     public OrderItem(Long orderId, Long productOptionId, Long unitPrice, Integer quantity) {
         this.orderId = orderId;
         this.productOptionId = productOptionId;

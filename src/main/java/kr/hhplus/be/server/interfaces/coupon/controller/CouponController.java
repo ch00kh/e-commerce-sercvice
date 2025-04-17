@@ -14,10 +14,7 @@ public class CouponController implements ICouponController {
             @PathVariable Long id,
             @RequestBody CouponRequest request
     ) {
-        CouponResponse mock = CouponResponse.builder()
-                .couponId(1001L)
-                .status("ISSUED")
-                .build();
+        CouponResponse mock = new CouponResponse(100L, "ISSUED");
         return ResponseEntity.ok(mock);
     }
 

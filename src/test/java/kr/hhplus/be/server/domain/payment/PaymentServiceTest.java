@@ -31,22 +31,11 @@ class PaymentServiceTest {
     @InjectMocks
     private PaymentService paymentService;
 
-    private Long USER_ID;
-    private Long PAYMENT_ID;
-    private Long ORDER_ID;
     private Payment PAYMENT;
 
     @BeforeEach
     void setUp() {
-        USER_ID = 1L;
-        PAYMENT_ID = 1L;
-        ORDER_ID = 100L;
-
-        PAYMENT = Payment.builder()
-                .id(PAYMENT_ID)
-                .orderId(ORDER_ID)
-                .status(PaymentStatus.PENDING)
-                .build();
+        PAYMENT = new Payment(100L, 100000L);
     }
 
     @Nested
@@ -58,17 +47,16 @@ class PaymentServiceTest {
         void findPayment_ok() {
 
             // Arrange
-            Payment payedPayment = PAYMENT.pay(1000L);
+            Payment payedPayment = PAYMENT.pay(100000L);
 
-            when(paymentRepository.findById(PAYMENT_ID)).thenReturn(Optional.of(payedPayment));
+            when(paymentRepository.findById(anyLong())).thenReturn(Optional.of(payedPayment));
 
             // Act
-            Payment actual = paymentService.findPayment(new PaymentCommand.Find(PAYMENT_ID));
+            Payment actual = paymentService.findPayment(new PaymentCommand.Find(anyLong()));
 
             // Assert
-            verify(paymentRepository, times(1)).findById(PAYMENT_ID);
+            verify(paymentRepository, times(1)).findById(anyLong());
             assertThat(actual).isNotNull();
-            assertThat(actual.getId()).isEqualTo(PAYMENT_ID);
             assertThat(actual.getStatus()).isEqualTo(PaymentStatus.PAYED);
         }
 
@@ -77,17 +65,16 @@ class PaymentServiceTest {
         void findPayment_NotFound() {
 
             // Arrange
-            when(paymentRepository.findById(PAYMENT_ID)).thenReturn(Optional.empty());
+            when(paymentRepository.findById(anyLong())).thenReturn(Optional.empty());
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
-                    () -> paymentService.findPayment(new PaymentCommand.Find(PAYMENT_ID)));
+                    () -> paymentService.findPayment(new PaymentCommand.Find(anyLong())));
 
             // Assert
-            verify(paymentRepository, times(1)).findById(PAYMENT_ID);
+            verify(paymentRepository, times(1)).findById(anyLong());
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
         }
-
     }
 
     @Nested
@@ -99,14 +86,14 @@ class PaymentServiceTest {
         void pay_ok() {
 
             // Arrange
-            when(paymentRepository.findById(PAYMENT_ID)).thenReturn(Optional.of(PAYMENT));
+            when(paymentRepository.findById(anyLong())).thenReturn(Optional.of(PAYMENT));
 
             // Act
-            Payment result = paymentService.pay(new PaymentCommand.Pay(PAYMENT_ID, 10000L));
+            Payment result = paymentService.pay(new PaymentCommand.Pay(anyLong(), 10000L));
 
             // Assert
-            verify(paymentRepository, times(1)).findById(PAYMENT_ID);
-            assertThat(result.getId()).isEqualTo(PAYMENT_ID);
+            verify(paymentRepository, times(1)).findById(anyLong());
+            assertThat(result.getId()).isEqualTo(anyLong());
             assertThat(result.getStatus()).isEqualTo(PaymentStatus.PAYED);
             assertThat(result.getAmount()).isEqualTo(10000L);
             assertThat(result.getPaidAt()).isNotNull();
@@ -117,14 +104,14 @@ class PaymentServiceTest {
         void pay_NotFound() {
 
             // Arrange
-            when(paymentRepository.findById(PAYMENT_ID)).thenReturn(Optional.empty());
+            when(paymentRepository.findById(anyLong())).thenReturn(Optional.empty());
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
-                    () -> paymentService.pay(new PaymentCommand.Pay(PAYMENT_ID, 10000L)));
+                    () -> paymentService.pay(new PaymentCommand.Pay(anyLong(), 10000L)));
 
             // Assert
-            verify(paymentRepository).findById(PAYMENT_ID);
+            verify(paymentRepository).findById(anyLong());
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
         }
     }

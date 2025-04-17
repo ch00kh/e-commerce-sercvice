@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domain.order;
 
-import kr.hhplus.be.server.domain.order.dto.OrderInfo;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
+import kr.hhplus.be.server.domain.order.dto.OrderInfo;
 import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.order.entity.OrderItem;
 import kr.hhplus.be.server.domain.order.entity.OrderStatus;
@@ -10,6 +10,8 @@ import kr.hhplus.be.server.domain.order.repository.OrderRepository;
 import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OrderService {
 
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
 
@@ -27,39 +30,36 @@ public class OrderService {
                 .mapToLong(item -> item.unitPrice() * item.quantity())
                 .sum();
 
-        Order order = Order.builder()
-                .userId(command.userId())
-                .issuedCouponId(command.issuedCouponId())
-                .totalAmount(totalAmount)
-                .build();
+        Order order = new Order(command.userId(), totalAmount);
 
         Order savedOrder = orderRepository.save(order);
 
         command.orderItems().forEach(item -> {
-                    OrderItem orderItem = OrderItem.builder()
-                            .orderId(savedOrder.getId())
-                            .productOptionId(item.productOptionId())
-                            .unitPrice(item.unitPrice())
-                            .quantity(item.quantity())
-                            .build();
-                    orderItemRepository.save(orderItem);
+            orderItemRepository.save(
+                    new OrderItem(
+                            savedOrder.getId(),
+                            item.productOptionId(),
+                            item.unitPrice(),
+                            item.quantity()
+                    ));
                 }
         );
 
-        return OrderInfo.Create.builder()
-                .orderId(order.getId())
-                .userId(order.getUserId())
-                .status(order.getStatus())
-                .totalAmount(order.getTotalAmount())
-                .discountAmount(order.getDiscountAmount())
-                .paymentAmount(order.getPaymentAmount())
-                .build();
+        return new OrderInfo.Create(
+                order.getId(),
+                order.getUserId(),
+                null,
+                order.getStatus(),
+                order.getTotalAmount(),
+                order.getDiscountAmount(),
+                order.getPaymentAmount()
+            );
     }
 
     @Transactional
     public void holdOrder(OrderCommand.HoldOrder command) {
 
-        OrderItem orderItem = orderItemRepository.findByProductOptionId(command.productOptionId())
+        OrderItem orderItem = orderItemRepository.findByOrderIdAndProductOptionId(command.orderId() ,command.productOptionId())
                 .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
 
         orderItem.holdStatus();
@@ -68,20 +68,24 @@ public class OrderService {
     @Transactional
     public OrderInfo.Create useCoupon(OrderCommand.UseCoupon command) {
 
+        if (command.couponId() == null) {
+            return null;
+        }
+
         Order order = orderRepository.findById(command.orderId())
                 .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
 
         order.useCoupon(command.couponId(), command.discountPrice());
 
-        return OrderInfo.Create.builder()
-                .orderId(order.getId())
-                .userId(order.getUserId())
-                .issuedCouponId(order.getIssuedCouponId())
-                .status(order.getStatus())
-                .totalAmount(order.getTotalAmount())
-                .discountAmount(order.getDiscountAmount())
-                .paymentAmount(order.getPaymentAmount())
-                .build();
+        return new OrderInfo.Create(
+                order.getId(),
+                order.getUserId(),
+                order.getIssuedCouponId(),
+                order.getStatus(),
+                order.getTotalAmount(),
+                order.getDiscountAmount(),
+                order.getPaymentAmount()
+        );
     }
 
     @Transactional(readOnly = true)

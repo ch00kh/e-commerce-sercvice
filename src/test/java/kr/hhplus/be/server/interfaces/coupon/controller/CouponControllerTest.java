@@ -27,9 +27,7 @@ class CouponControllerTest {
     @DisplayName("[성공] 선착순 쿠폰 발급")
     void issueTest() throws Exception {
 
-        CouponRequest mockRequest = CouponRequest.builder()
-                .couponId(1001L)
-                .build();
+        CouponRequest mockRequest = new CouponRequest(10001L);
 
         String requestJson = objectMapper.writeValueAsString(mockRequest);
 

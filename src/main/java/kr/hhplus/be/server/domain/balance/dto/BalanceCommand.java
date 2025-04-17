@@ -4,7 +4,7 @@ import lombok.Builder;
 
 public record BalanceCommand() {
 
-    @Builder
+    
     public record Find(
             Long userId
     ) {
@@ -13,7 +13,7 @@ public record BalanceCommand() {
         }
     }
 
-    @Builder
+    
     public record Charge(
             Long userId,
             Long amount

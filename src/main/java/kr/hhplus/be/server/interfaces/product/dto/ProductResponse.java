@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.interfaces.product.dto;
 
 import kr.hhplus.be.server.application.product.dto.ProductResult;
-import lombok.Builder;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ public record ProductResponse() {
         }
     }
 
-    @Builder
+    
     public record ProductAggregate(
             Long productId,
             String brand,
@@ -23,16 +22,16 @@ public record ProductResponse() {
             List<ProductResponse.Option> options
     ) {
         public static ProductAggregate from(ProductResult.ProductAggregate product) {
-            return ProductAggregate.builder()
-                    .productId(product.productId())
-                    .brand(product.brand())
-                    .name(product.name())
-                    .options(product.options().stream().map(Option::from).toList())
-                    .build();
+            return new ProductAggregate(
+                    product.productId(),
+                    product.brand(),
+                    product.name(),
+                    product.options().stream().map(Option::from).toList()
+            );
         }
     }
 
-    @Builder
+    
     public record Option(
             Long optionId,
             String optionValue,
@@ -40,12 +39,12 @@ public record ProductResponse() {
             Integer stock
     ) {
         public static Option from(ProductResult.Option option) {
-            return Option.builder()
-                    .optionId(option.optionId())
-                    .optionValue(option.optionValue())
-                    .price(option.price())
-                    .stock(option.stock())
-                    .build();
+            return new Option(
+                    option.optionId(),
+                    option.optionValue(),
+                    option.price(),
+                    option.stock()
+            );
         }
     }
 }

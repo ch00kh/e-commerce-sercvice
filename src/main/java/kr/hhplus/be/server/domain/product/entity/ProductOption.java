@@ -8,7 +8,6 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = @Index(name = "idx_product_id", columnList = "productId"))
-@Builder
 @AllArgsConstructor
 public class ProductOption extends BaseTimeEntity {
 
@@ -27,6 +26,14 @@ public class ProductOption extends BaseTimeEntity {
 
     @Column(nullable = false)
     private Integer stock;
+
+    
+    public ProductOption(Long productId, String optionValue, Long price, Integer stock) {
+        this.productId = productId;
+        this.optionValue = optionValue;
+        this.price = price;
+        this.stock = stock;
+    }
 
     public boolean isEnoughStock(Integer stock) {
         return this.stock - stock >= 0;

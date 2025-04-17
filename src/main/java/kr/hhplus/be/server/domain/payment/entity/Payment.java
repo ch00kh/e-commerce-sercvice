@@ -2,8 +2,9 @@ package kr.hhplus.be.server.domain.payment.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.BaseTimeEntity;
+import kr.hhplus.be.server.global.exception.ErrorCode;
+import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-@Builder
+
 @AllArgsConstructor
 @Table(indexes = @Index(name = "idx_order_id", columnList = "orderId"))
 public class Payment extends BaseTimeEntity {
@@ -34,16 +35,21 @@ public class Payment extends BaseTimeEntity {
     @Column
     private LocalDateTime paidAt;
 
-    @Builder
     public Payment(Long orderId, Long amount) {
         this.orderId = orderId;
+        this.amount = amount;
         this.status = PaymentStatus.PENDING;
     }
 
     public Payment pay(Long amount) {
         this.paidAt = LocalDateTime.now();
-        this.amount = amount;
-        this.status = PaymentStatus.PAYED;
+        this.amount -= amount;
+        if (this.amount <= 0) {
+            throw new GlobalException(ErrorCode.BAD_REQUEST);
+        }
+        if (this.amount == 0) {
+            this.status = PaymentStatus.PAYED;
+        }
         return this;
     }
 }

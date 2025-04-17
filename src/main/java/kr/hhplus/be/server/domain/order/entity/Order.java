@@ -3,10 +3,11 @@ package kr.hhplus.be.server.domain.order.entity;
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.BaseTimeEntity;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,13 +42,21 @@ public class Order extends BaseTimeEntity {
     @Column(nullable = false)
     private Long paymentAmount;
 
-    @Builder
-    public Order(Long userId, Long issuedCouponId, Long totalAmount) {
+    
+    public Order(Long userId, Long totalAmount) {
         this.userId = userId;
-        this.issuedCouponId = issuedCouponId;
         this.status = OrderStatus.CREATED;
         this.totalAmount = totalAmount;
         this.discountAmount = 0L;
+        this.paymentAmount = totalAmount;
+    }
+
+    public Order(Long userId, Long issuedCouponId, Long totalAmount) {
+        this.userId = userId;
+        this.status = OrderStatus.CREATED;
+        this.totalAmount = totalAmount;
+        this.discountAmount = 0L;
+        this.issuedCouponId = issuedCouponId;
         this.paymentAmount = totalAmount;
     }
 
@@ -62,6 +71,8 @@ public class Order extends BaseTimeEntity {
             this.discountAmount = discountAmount;
             paymentAmount = totalAmount - discountAmount;
         }
+
+        log.info("totalAmount");
     }
 
     public Order pay() {

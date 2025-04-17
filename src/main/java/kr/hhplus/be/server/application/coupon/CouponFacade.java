@@ -13,16 +13,19 @@ public class CouponFacade {
 
     private final CouponService couponService;
 
+    /**
+     * 선착순 쿠폰 발급
+     */
     public CouponResult.Issued firstComeFirstIssue(CouponCriteria.Issue criteria) {
 
         IssuedCoupon issuedCoupon = couponService.issue(criteria.toCommand());
 
-        return CouponResult.Issued.builder()
-                .id(issuedCoupon.getId())
-                .userId(issuedCoupon.getUserId())
-                .couponId(issuedCoupon.getCouponId())
-                .status(issuedCoupon.getStatus())
-                .expiredAt(issuedCoupon.getExpiredAt())
-                .build();
+        return new CouponResult.Issued(
+                issuedCoupon.getId(),
+                issuedCoupon.getUserId(),
+                issuedCoupon.getCouponId(),
+                issuedCoupon.getStatus(),
+                issuedCoupon.getExpiredAt()
+        );
     }
 }

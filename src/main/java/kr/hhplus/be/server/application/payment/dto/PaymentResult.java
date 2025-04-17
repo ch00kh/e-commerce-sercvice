@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 public record PaymentResult() {
 
-    @Builder
+    
     public record Pay(
             Long id,
             Long orderId,

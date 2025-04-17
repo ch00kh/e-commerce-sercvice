@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.application.product.dto;
 
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
-import lombok.Builder;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ public record ProductResult() {
         }
     }
 
-    @Builder
+    
     public record ProductAggregate(
             Long productId,
             String brand,
@@ -23,22 +22,23 @@ public record ProductResult() {
             List<Option> options
     ) {
         public static ProductAggregate from(ProductInfo.ProductAggregate product) {
-            return ProductAggregate.builder()
-                    .productId(product.productId())
-                    .brand(product.brand())
-                    .name(product.name())
-                    .options(product.options().stream().map(o -> Option.builder()
-                                    .optionId(o.getId())
-                                    .optionValue(o.getOptionValue())
-                                    .price(o.getPrice())
-                                    .stock(o.getStock())
-                                    .build())
-                            .toList())
-                    .build();
+            return new ProductAggregate(
+                    product.productId(),
+                    product.brand(),
+                    product.name(),
+                    product.options().stream().map(o -> new Option(
+                                    o.getId(),
+                                    o.getOptionValue(),
+                                    o.getPrice(),
+                                    o.getStock()
+                            ))
+                            .toList()
+            );
         }
+
     }
 
-    @Builder
+    
     public record Option(
             Long optionId,
             String optionValue,
@@ -46,12 +46,13 @@ public record ProductResult() {
             Integer stock
     ) {
         public static Option from(ProductResult.Option option) {
-            return Option.builder()
-                    .optionId(option.optionId())
-                    .optionValue(option.optionValue())
-                    .price(option.price())
-                    .stock(option.stock())
-                    .build();
+            return new Option(
+                    option.optionId(),
+                    option.optionValue(),
+                    option.price(),
+                    option.stock()
+            );
         }
+
     }
 }

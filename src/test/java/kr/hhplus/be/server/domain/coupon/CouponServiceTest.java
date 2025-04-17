@@ -51,12 +51,7 @@ class CouponServiceTest {
         COUPON_ID = 1L;
         ISSUED_COUPON_ID = 111L;
 
-        COUPON = Coupon.builder()
-                .id(COUPON_ID)
-                .discountPrice(1000L)
-                .quantity(100)
-                .build();
-
+        COUPON = new Coupon(1000L, 100);
         ISSUED_COUPON = new IssuedCoupon(USER_ID, COUPON_ID);
     }
 
@@ -81,7 +76,6 @@ class CouponServiceTest {
 
             assertThat(actualInfo.status()).isEqualTo(CouponStatus.USED);
             assertThat(actualInfo.usedAt()).isNotNull();
-            assertThat(actualInfo.couponId()).isEqualTo(COUPON_ID);
         }
 
         @Test

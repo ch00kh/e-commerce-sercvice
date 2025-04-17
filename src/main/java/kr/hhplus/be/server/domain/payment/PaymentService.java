@@ -18,10 +18,7 @@ public class PaymentService {
     @Transactional
     public Payment save(PaymentCommand.Save command) {
 
-        return paymentRepository.save(Payment.builder()
-                .orderId(command.orderId())
-                .amount(command.amount())
-                .build());
+        return paymentRepository.save(new Payment(command.orderId(), command.amount()));
     }
 
     @Transactional(readOnly = true)

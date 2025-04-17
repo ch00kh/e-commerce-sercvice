@@ -65,17 +65,9 @@ class OrderServiceTest {
     void createOrder_hasNoCoupon_ok() {
 
         // Arrange
-        Order order = Order.builder()
-                .userId(USER_ID)
-                .issuedCouponId(null)
-                .totalAmount(20000L)
-                .build();
+        Order order = new Order(USER_ID, 20000L);
 
-        OrderCommand.Create command = OrderCommand.Create.builder()
-                .userId(USER_ID)
-                .issuedCouponId(null)
-                .orderItems(ORDER_ITEMS)
-                .build();
+        OrderCommand.Create command = new OrderCommand.Create(USER_ID, ORDER_ITEMS);
 
         when(orderRepository.save(any(Order.class))).thenReturn(order);
 
@@ -99,22 +91,17 @@ class OrderServiceTest {
 
         // Arrange
         Long productOptionId = 1L;
-        OrderCommand.HoldOrder command = new OrderCommand.HoldOrder(productOptionId);
+        OrderCommand.HoldOrder command = new OrderCommand.HoldOrder(1L, productOptionId);
 
-        OrderItem orderItem = OrderItem.builder()
-                .orderId(1L)
-                .productOptionId(1L)
-                .unitPrice(1000L)
-                .quantity(100)
-                .build();
+        OrderItem orderItem = new OrderItem(1L, 1L, 1000L, 100);
 
-        when(orderItemRepository.findByProductOptionId(productOptionId)).thenReturn(Optional.of(orderItem));
+        when(orderItemRepository.findByOrderIdAndProductOptionId(1L, productOptionId)).thenReturn(Optional.of(orderItem));
 
         // Act
         orderService.holdOrder(command);
 
         // Assert
-        verify(orderItemRepository, times(1)).findByProductOptionId(productOptionId);
+        verify(orderItemRepository, times(1)).findByOrderIdAndProductOptionId(1L, productOptionId);
         assertEquals(OrderStatus.PENDING, orderItem.getStatus());
     }
 
@@ -127,11 +114,7 @@ class OrderServiceTest {
         void useCoupon_totalAmountGtDiscountAmount() {
 
             // Arrange
-            Order order = Order.builder()
-                    .userId(USER_ID)
-                    .issuedCouponId(null)
-                    .totalAmount(10000L)
-                    .build();
+            Order order = new Order(USER_ID, 10000L);
 
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, COUPON_ID, 3000L);
 
@@ -152,11 +135,7 @@ class OrderServiceTest {
         void useCoupon_totalAmountLtDiscountAmount() {
 
             // Arrange
-            Order order = Order.builder()
-                    .userId(USER_ID)
-                    .issuedCouponId(null)
-                    .totalAmount(10000L)
-                    .build();
+            Order order = new Order(USER_ID, 10000L);
 
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, COUPON_ID, 20000L);
 
@@ -177,11 +156,7 @@ class OrderServiceTest {
         void useCoupon_totalAmountEqDiscountAmount() {
 
             // Arrange
-            Order order = Order.builder()
-                    .userId(USER_ID)
-                    .issuedCouponId(null)
-                    .totalAmount(10000L)
-                    .build();
+            Order order = new Order(USER_ID, 10000L);
 
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, COUPON_ID, 10000L);
 
@@ -206,11 +181,7 @@ class OrderServiceTest {
         @DisplayName("[성공] 주문 조회")
         void findById_ok() {
             // Arrange
-            Order order = Order.builder()
-                    .userId(USER_ID)
-                    .issuedCouponId(COUPON_ID)
-                    .totalAmount(10000L)
-                    .build();
+            Order order = new Order(USER_ID, COUPON_ID, 10000L);
 
             order.pay();
 
@@ -250,11 +221,7 @@ class OrderServiceTest {
     void pay_ok() {
 
         // Arrange
-        Order order = Order.builder()
-                .userId(USER_ID)
-                .issuedCouponId(COUPON_ID)
-                .totalAmount(10000L)
-                .build();
+        Order order = new Order(USER_ID, COUPON_ID, 10000L);
         order.pay();
 
         Order mockOrder = mock(Order.class);
