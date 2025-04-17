@@ -14,7 +14,7 @@ public record OrderCommand() {
     public record OrderItem (
             Long productOptionId,
             Long unitPrice,
-            Integer quantity
+            Long quantity
     ) {}
 
     public record HoldOrder(

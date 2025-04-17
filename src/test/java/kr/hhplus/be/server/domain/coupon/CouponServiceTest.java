@@ -51,7 +51,7 @@ class CouponServiceTest {
         COUPON_ID = 1L;
         ISSUED_COUPON_ID = 111L;
 
-        COUPON = new Coupon(1000L, 100);
+        COUPON = new Coupon(1000L, 100L);
         ISSUED_COUPON = new IssuedCoupon(USER_ID, COUPON_ID);
     }
 
@@ -196,8 +196,8 @@ class CouponServiceTest {
         void issue_outOfStockCoupon() {
 
             // Arrange
-            Coupon insufficientCoupon1 = new Coupon(1L, 1000L, 0);
-            Coupon insufficientCoupon2 = new Coupon(2L, 1000L, -1);
+            Coupon insufficientCoupon1 = new Coupon(1L, 1000L, 0L);
+            Coupon insufficientCoupon2 = new Coupon(2L, 1000L, -1L);
 
             when(couponRepository.findById(1L)).thenReturn(Optional.of(insufficientCoupon1));
             when(couponRepository.findById(2L)).thenReturn(Optional.of(insufficientCoupon2));

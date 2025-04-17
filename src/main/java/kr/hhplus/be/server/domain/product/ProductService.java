@@ -54,7 +54,7 @@ public class ProductService {
                     .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
 
             if (productOption.canPurchase(i.quantity())) {
-                Integer remainingStock = productOption.reduceStock(i.quantity());
+                Long remainingStock = productOption.reduceStock(i.quantity());
 
                 return new ProductInfo.OptionDetail(
                         productOption.getId(),

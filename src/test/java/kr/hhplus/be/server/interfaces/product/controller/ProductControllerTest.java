@@ -42,12 +42,12 @@ class ProductControllerTest {
     @BeforeEach
     void setUp() {
         PRODUCT_ID1 = 1L;
-        PRODUCT_OPTION1 = new ProductResult.Option(101L, "백설기/10개", 5500L, 100);
-        PRODUCT_OPTION2 = new ProductResult.Option(102L, "우유설기/10개", 5900L, 99);
+        PRODUCT_OPTION1 = new ProductResult.Option(101L, "백설기/10개", 5500L, 100L);
+        PRODUCT_OPTION2 = new ProductResult.Option(102L, "우유설기/10개", 5900L, 99L);
         PRODUCT1 = new ProductResult.ProductAggregate(PRODUCT_ID1, "총각쓰떡", "백설기", List.of(PRODUCT_OPTION1, PRODUCT_OPTION2));
 
         PRODUCT_ID2 = 2L;
-        PRODUCT_OPTION3 = new ProductResult.Option(111L, "백일떡/10개", 13700L, 50);
+        PRODUCT_OPTION3 = new ProductResult.Option(111L, "백일떡/10개", 13700L, 50L);
         PRODUCT2 = new ProductResult.ProductAggregate(PRODUCT_ID2, "총각쓰떡", "백일떡", List.of(PRODUCT_OPTION3));
     }
 

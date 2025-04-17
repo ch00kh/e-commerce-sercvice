@@ -27,7 +27,7 @@ public record OrderRequest() {
 
     public record Item(
             Long optionId,
-            Integer quantity
+            Long quantity
     ) {
     }
 }

@@ -25,21 +25,21 @@ public class ProductOption extends BaseTimeEntity {
     private Long price;
 
     @Column(nullable = false)
-    private Integer stock;
+    private Long stock;
 
     
-    public ProductOption(Long productId, String optionValue, Long price, Integer stock) {
+    public ProductOption(Long productId, String optionValue, Long price, Long stock) {
         this.productId = productId;
         this.optionValue = optionValue;
         this.price = price;
         this.stock = stock;
     }
 
-    public boolean canPurchase(Integer stock) {
+    public boolean canPurchase(Long stock) {
         return this.stock - stock >= 0;
     }
 
-    public Integer reduceStock(Integer stock) {
+    public Long reduceStock(Long stock) {
         return this.stock - stock;
     }
 }

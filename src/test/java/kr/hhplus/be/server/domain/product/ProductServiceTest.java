@@ -51,12 +51,12 @@ class ProductServiceTest {
     void setUp() {
         PRODUCT_ID1 = 1L;
         PRODUCT1 = new Product(PRODUCT_ID1, "총각쓰떡", "백설기");
-        PRODUCT_OPTION1 = new ProductOption(PRODUCT_ID1, "백설기/10개",5500L, 100);
-        PRODUCT_OPTION2 = new ProductOption(PRODUCT_ID1, "우유설기/10개",5900L, 99);
+        PRODUCT_OPTION1 = new ProductOption(PRODUCT_ID1, "백설기/10개",5500L, 100L);
+        PRODUCT_OPTION2 = new ProductOption(PRODUCT_ID1, "우유설기/10개",5900L, 99L);
 
         PRODUCT_ID2 = 2L;
         PRODUCT2 = new Product(PRODUCT_ID2, "총각쓰떡", "백일떡");
-        PRODUCT_OPTION3 = new ProductOption(PRODUCT_ID2, "백일떡/10개",13700L, 50);
+        PRODUCT_OPTION3 = new ProductOption(PRODUCT_ID2, "백일떡/10개",13700L, 50L);
     }
 
     @Test
@@ -151,8 +151,8 @@ class ProductServiceTest {
 
             // Arrange
             List<OrderCommand.OrderItem> orderItems = List.of(
-                    new OrderCommand.OrderItem(101L, 5500L, 10),
-                    new OrderCommand.OrderItem(102L, 5900L, 9)
+                    new OrderCommand.OrderItem(101L, 5500L, 10L),
+                    new OrderCommand.OrderItem(102L, 5900L, 9L)
             );
 
             when(productOptionRepository.findById(101L)).thenReturn(Optional.of(PRODUCT_OPTION1));
@@ -183,8 +183,8 @@ class ProductServiceTest {
         void reduceStock_ok_BoundaryCheck() {
             // Arrange
             List<OrderCommand.OrderItem> orderItems = List.of(
-                    new OrderCommand.OrderItem(101L, 5500L, 99),
-                    new OrderCommand.OrderItem(102L, 5900L, 99)
+                    new OrderCommand.OrderItem(101L, 5500L, 99L),
+                    new OrderCommand.OrderItem(102L, 5900L, 99L)
             );
 
             when(productOptionRepository.findById(101L)).thenReturn(Optional.of(PRODUCT_OPTION1));
@@ -215,8 +215,8 @@ class ProductServiceTest {
         void reduceStock_ok_anyStockIsNotEnough() {
             // Arrange
             List<OrderCommand.OrderItem> orderItems = List.of(
-                    new OrderCommand.OrderItem(101L, 5500L, 101),
-                    new OrderCommand.OrderItem(102L, 5900L, 100)
+                    new OrderCommand.OrderItem(101L, 5500L, 101L),
+                    new OrderCommand.OrderItem(102L, 5900L, 100L)
             );
 
             when(productOptionRepository.findById(101L)).thenReturn(Optional.of(PRODUCT_OPTION1));

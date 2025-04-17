@@ -79,17 +79,17 @@ class CreateFacadeTest {
     void setUp() {
         USER_ID = 1L;
         PRODUCT = productRepository.save(new Product("농심", "라면"));
-        OPTION1 = productOptionRepository.save(new ProductOption(PRODUCT.getId(), "신라면", 1000L, 100));
-        OPTION2 = productOptionRepository.save(new ProductOption(PRODUCT.getId(), "너구리", 2000L, 100));
-        OPTION3 = productOptionRepository.save(new ProductOption(PRODUCT.getId(), "짜파게티", 3000L, 100));
+        OPTION1 = productOptionRepository.save(new ProductOption(PRODUCT.getId(), "신라면", 1000L, 100L));
+        OPTION2 = productOptionRepository.save(new ProductOption(PRODUCT.getId(), "너구리", 2000L, 100L));
+        OPTION3 = productOptionRepository.save(new ProductOption(PRODUCT.getId(), "짜파게티", 3000L, 100L));
 
         ORDER_ITEMS = List.of(
-                new OrderCriteria.OrderItem(OPTION1.getId(), 30),
-                new OrderCriteria.OrderItem(OPTION2.getId(), 20),
-                new OrderCriteria.OrderItem(OPTION3.getId(), 10)
+                new OrderCriteria.OrderItem(OPTION1.getId(), 30L),
+                new OrderCriteria.OrderItem(OPTION2.getId(), 20L),
+                new OrderCriteria.OrderItem(OPTION3.getId(), 10L)
         );
 
-        COUPON = couponRepository.save(new Coupon(1000L, 10));
+        COUPON = couponRepository.save(new Coupon(1000L, 10L));
     }
 
     @Test
@@ -239,9 +239,9 @@ class CreateFacadeTest {
 
         // Arrange
         ORDER_ITEMS = List.of(
-                new OrderCriteria.OrderItem(OPTION1.getId(), 30),
-                new OrderCriteria.OrderItem(OPTION2.getId(), 20),
-                new OrderCriteria.OrderItem(OPTION3.getId(), 110)
+                new OrderCriteria.OrderItem(OPTION1.getId(), 30L),
+                new OrderCriteria.OrderItem(OPTION2.getId(), 20L),
+                new OrderCriteria.OrderItem(OPTION3.getId(), 110L)
         );
         OrderCriteria.Create criteria = new OrderCriteria.Create(USER_ID, PRODUCT.getId(), ORDER_ITEMS, null);
 

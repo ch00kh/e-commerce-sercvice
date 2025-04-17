@@ -46,14 +46,14 @@ public record ProductInfo(){
         Long optionId,
         String optionValue,
         Long price,
-        Integer stock
+        Long stock
     ) {}
 
     public record OptionDetail(
             Long optionId,
             boolean canPurchase,
-            Integer requestQuantity,
-            Integer remainingQuantity
+            Long requestQuantity,
+            Long remainingQuantity
     ) {}
 
     public record Order(

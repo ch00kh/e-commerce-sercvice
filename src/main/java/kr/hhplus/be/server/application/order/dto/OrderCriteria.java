@@ -14,7 +14,7 @@ public record OrderCriteria() {
     
     public record OrderItem(
             Long productOptionId,
-            Integer quantity
+            Long quantity
     ) {}
 
 

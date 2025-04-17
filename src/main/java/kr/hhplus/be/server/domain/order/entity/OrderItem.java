@@ -2,15 +2,11 @@ package kr.hhplus.be.server.domain.order.entity;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.BaseTimeEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = {
         @Index(name = "idx_order_id", columnList = "orderId"),
         @Index(name = "idx_productOption_id", columnList = "productOptionId")
@@ -35,10 +31,10 @@ public class OrderItem extends BaseTimeEntity {
     private Long unitPrice;
 
     @Column(nullable = false)
-    private Integer quantity;
+    private Long quantity;
 
     
-    public OrderItem(Long orderId, Long productOptionId, Long unitPrice, Integer quantity) {
+    public OrderItem(Long orderId, Long productOptionId, Long unitPrice, Long quantity) {
         this.orderId = orderId;
         this.productOptionId = productOptionId;
         this.status = OrderStatus.CREATED;

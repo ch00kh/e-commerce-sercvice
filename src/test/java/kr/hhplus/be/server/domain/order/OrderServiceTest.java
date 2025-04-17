@@ -56,8 +56,8 @@ class OrderServiceTest {
         COUPON_ID = 11L;
         ORDER_ID = 111L;
 
-        ORDER_ITEM1 = new OrderCommand.OrderItem(1L, 10000L, 1);
-        ORDER_ITEM2 = new OrderCommand.OrderItem(2L, 5000L, 2);
+        ORDER_ITEM1 = new OrderCommand.OrderItem(1L, 10000L, 1L);
+        ORDER_ITEM2 = new OrderCommand.OrderItem(2L, 5000L, 2L);
         ORDER_ITEMS = List.of(ORDER_ITEM1, ORDER_ITEM2);
     }
 
@@ -94,7 +94,7 @@ class OrderServiceTest {
         Long productOptionId = 1L;
         OrderCommand.HoldOrder command = new OrderCommand.HoldOrder(1L, productOptionId);
 
-        OrderItem orderItem = new OrderItem(1L, 1L, 1000L, 100);
+        OrderItem orderItem = new OrderItem(1L, 1L, 1000L, 100L);
 
         when(orderItemRepository.findByOrderIdAndProductOptionId(1L, productOptionId)).thenReturn(Optional.of(orderItem));
 

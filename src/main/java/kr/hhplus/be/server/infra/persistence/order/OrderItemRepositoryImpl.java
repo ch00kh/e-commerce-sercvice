@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +31,11 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
     @Override
     public List<OrderInfo.Best> findBestSelling(Integer days, Integer limit) {
         PageRequest pageRequest = PageRequest.of(0, limit);
-        return jpaRepository.findBestSelling(days, pageRequest);
+        LocalDateTime startDate = LocalDateTime.now().minusDays(days);
+
+        List<OrderItemJpaRepository.BestSellingProjection> bestSelling = jpaRepository.findBestSelling(startDate, pageRequest);
+
+        return bestSelling.stream()
+                .map(e -> new OrderInfo.Best(e.getProductOptionId(), e.getTotalSaleQuantity())).toList();
     }
 }
