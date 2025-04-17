@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface OrderItemRepository {
 
-    Optional<OrderItem> findByProductOptionId(Long productOptionId);
+    Optional<OrderItem> findByOrderIdAndProductOptionId(Long orderId, Long productOptionId);
 
     OrderItem save(OrderItem orderItem);
 

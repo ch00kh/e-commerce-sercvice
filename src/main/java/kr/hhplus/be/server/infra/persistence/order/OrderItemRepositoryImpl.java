@@ -15,8 +15,8 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
     private final OrderItemJpaRepository jpaRepository;
 
     @Override
-    public Optional<OrderItem> findByProductOptionId(Long productOptionId) {
-        return jpaRepository.findByProductOptionId(productOptionId);
+    public Optional<OrderItem> findByOrderIdAndProductOptionId(Long orderId, Long productOptionId) {
+        return jpaRepository.findByOrderIdAndProductOptionId(orderId, productOptionId);
     }
 
     @Override

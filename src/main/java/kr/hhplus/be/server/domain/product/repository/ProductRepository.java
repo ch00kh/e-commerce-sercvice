@@ -11,4 +11,6 @@ public interface ProductRepository {
 
     List<Product> findAll();
 
+    Product save(Product product);
+
 }
