@@ -12,4 +12,5 @@ public interface PaymentRepository {
 
     Optional<Payment> findByOrderId(Long orderId);
 
+    void deleteAll();
 }

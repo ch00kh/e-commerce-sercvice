@@ -48,4 +48,9 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
     public List<OrderItem> findByProductOptionId(Long productOptionId) {
         return jpaRepository.findByProductOptionId(productOptionId);
     }
+
+    @Override
+    public void deleteAll() {
+        jpaRepository.deleteAll();
+    }
 }

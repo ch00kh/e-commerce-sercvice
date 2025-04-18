@@ -22,4 +22,9 @@ public class BalanceHistoryRepositoryImpl implements BalanceHistoryRepository {
     public List<BalanceHistory> findByBalanceId(Long userId) {
         return jpaRepository.findByBalanceId(userId);
     }
+
+    @Override
+    public void deleteAll() {
+        jpaRepository.deleteAll();
+    }
 }

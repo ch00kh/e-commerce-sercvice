@@ -9,4 +9,6 @@ public interface BalanceRepository {
     Optional<Balance> findByUserId(Long id);
 
     Balance save(Balance balance);
+
+    void deleteAll();
 }

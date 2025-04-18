@@ -22,4 +22,9 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
     public IssuedCoupon save(IssuedCoupon issuedCoupon) {
         return jpaRepository.save(issuedCoupon);
     }
+
+    @Override
+    public void deleteAll() {
+        jpaRepository.deleteAll();
+    }
 }

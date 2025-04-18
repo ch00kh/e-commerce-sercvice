@@ -9,11 +9,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
+@Transactional
 @ActiveProfiles("test")
 @DisplayName("[통합테스트] UserService")
 class UserServiceIntegrationTest {
@@ -43,13 +45,12 @@ class UserServiceIntegrationTest {
     void findNonExistingUser() {
 
         // Arrange
-        Long userId = 9999L;
+        UserCommand.Find command = new UserCommand.Find(9999L);
 
-        // Act & Assert
-        GlobalException exception = assertThrows(GlobalException.class,
-                () -> userService.findByUserId(new UserCommand.Find(userId)));
+        // Act
+        GlobalException exception = assertThrows(GlobalException.class, () -> userService.findByUserId(command));
 
-        // 예외 코드 확인
+        // Assert
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
     }
 }

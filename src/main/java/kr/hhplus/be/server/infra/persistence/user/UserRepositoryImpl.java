@@ -22,4 +22,9 @@ public class UserRepositoryImpl implements UserRepository {
     public User save(User user) {
         return jpaRepository.save(user);
     }
+
+    @Override
+    public void deleteAll() {
+        jpaRepository.deleteAll();
+    }
 }

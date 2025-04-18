@@ -19,10 +19,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
-@DisplayName("[동시성 테스트] PaymentServiceTest")
-@Slf4j
+@DisplayName("[동시성 테스트] PaymentService")
 class PaymentServiceConcurrencyTest {
 
     @Autowired
@@ -36,6 +36,8 @@ class PaymentServiceConcurrencyTest {
 
     @BeforeEach
     void setUp() {
+        paymentRepository.deleteAll();
+
         ORDER_ID = 100L;
         PAYMENT = paymentRepository.save(new Payment(ORDER_ID, 100000L));
     }

@@ -14,8 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -25,11 +23,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("[동시성 테스트] BalanceService")
-@Transactional(propagation = Propagation.NEVER)
-@Slf4j
 class BalanceServiceConcurrencyTest {
 
     @Autowired
@@ -49,6 +46,10 @@ class BalanceServiceConcurrencyTest {
 
     @BeforeEach
     void setUp() {
+        userRepository.deleteAll();
+        balanceRepository.deleteAll();
+        balanceHistoryRepository.deleteAll();
+
         USER = userRepository.save(new User("추경현"));
         BALANCE = balanceRepository.save(new Balance(USER.getId(), 0L));
 

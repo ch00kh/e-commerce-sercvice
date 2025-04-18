@@ -18,10 +18,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("[동시성 테스트] CouponService")
-@Slf4j
 class CouponServiceConcurrencyTest {
 
     @Autowired
@@ -35,6 +35,7 @@ class CouponServiceConcurrencyTest {
 
     @BeforeEach
     void setUp() {
+        couponRepository.deleteAll();
         COUPON = couponRepository.save(new Coupon(1000L, 100L));
         COUPON_ID = COUPON.getId();
     }

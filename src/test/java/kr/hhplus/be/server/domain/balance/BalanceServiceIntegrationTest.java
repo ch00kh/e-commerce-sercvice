@@ -24,11 +24,11 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("[통합테스트] BalanceService")
 @Transactional
-@Slf4j
 class BalanceServiceIntegrationTest {
 
     @Autowired
@@ -48,8 +48,11 @@ class BalanceServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        userRepository.deleteAll();
+        balanceRepository.deleteAll();
+
         USER = userRepository.save(new User("추경현"));
-        BALANCE = balanceRepository.save(new Balance(USER.getId(), 0L));
+        BALANCE = balanceRepository.save(new Balance(USER.getId(), 1000L));
 
         log.info("USER ID: {}", USER.getId());
         log.info("BALANCE ID: {}", BALANCE.getId());
@@ -113,7 +116,7 @@ class BalanceServiceIntegrationTest {
             assertThat(actualBalance.getBalance()).isEqualTo(2000L);
 
             List<BalanceHistory> actualBalanceHistory = balanceHistoryRepository.findByBalanceId(BALANCE.getId());
-            assertThat(actualBalanceHistory).hasSize(2);
+            assertThat(actualBalanceHistory).hasSize(1);
         }
 
         @Test
@@ -166,7 +169,7 @@ class BalanceServiceIntegrationTest {
             assertThat(actualBalance.getBalance()).isEqualTo(0);
 
             List<BalanceHistory> actualBalanceHistory = balanceHistoryRepository.findByBalanceId(BALANCE.getId());
-            assertThat(actualBalanceHistory).hasSize(2);
+            assertThat(actualBalanceHistory).hasSize(1);
         }
 
         @Test

@@ -22,4 +22,9 @@ public class OrderRepositoryImpl implements OrderRepository {
     public Optional<Order> findById(Long orderId) {
         return jpaRepository.findById(orderId);
     }
+
+    @Override
+    public void deleteAll() {
+        jpaRepository.deleteAll();
+    }
 }

@@ -24,9 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
+@Transactional
 @ActiveProfiles("test")
 @DisplayName("[통합테스트] ProductService")
-@Transactional
 class ProductServiceIntegrationTest {
 
     @Autowired
@@ -49,6 +49,9 @@ class ProductServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        productRepository.deleteAll();
+        productOptionRepository.deleteAll();
+
         PRODUCT1 = productRepository.save(new Product("양반", "김"));
         PRODUCT1_OPTION1 = productOptionRepository.save(new ProductOption(PRODUCT1.getId(), "들기름 김", 1000L, 1000L));
         PRODUCT1_OPTION2 = productOptionRepository.save(new ProductOption(PRODUCT1.getId(), "참기름 김", 1250L, 500L));

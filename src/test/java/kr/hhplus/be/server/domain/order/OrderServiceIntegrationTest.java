@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -30,11 +29,11 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Slf4j
 @SpringBootTest
+@Transactional
 @ActiveProfiles("test")
 @DisplayName("[통합테스트] OrderService")
-@Transactional(propagation = Propagation.NEVER)
-@Slf4j
 class OrderServiceIntegrationTest {
 
     @Autowired
@@ -62,6 +61,11 @@ class OrderServiceIntegrationTest {
 
     @BeforeEach
     void setup() {
+        orderRepository.deleteAll();
+        orderItemRepository.deleteAll();
+        productRepository.deleteAll();
+        productOptionRepository.deleteAll();
+
         USER_ID = 1L;
         COUPON_ID = 11L;
         ORDER_ID = 111L;
@@ -231,7 +235,7 @@ class OrderServiceIntegrationTest {
     void pay_NotFound() {
 
         // Arrange
-        OrderCommand.Find command = new OrderCommand.Find(ORDER_ID);
+        OrderCommand.Find command = new OrderCommand.Find(999L);
 
         // Act
         GlobalException exception = assertThrows(GlobalException.class, () -> orderService.pay(command));

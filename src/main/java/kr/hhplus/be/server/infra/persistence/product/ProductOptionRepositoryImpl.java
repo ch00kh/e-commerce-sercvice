@@ -28,4 +28,9 @@ public class ProductOptionRepositoryImpl implements ProductOptionRepository {
     public ProductOption save(ProductOption productOption) {
         return jpaRepository.save(productOption);
     }
+
+    @Override
+    public void deleteAll() {
+        jpaRepository.deleteAll();
+    }
 }

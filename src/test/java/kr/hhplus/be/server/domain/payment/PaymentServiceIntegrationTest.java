@@ -11,12 +11,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@Transactional
 @ActiveProfiles("test")
-@DisplayName("[통합테스트] PaymentServiceTest")
+@DisplayName("[통합테스트] PaymentService")
 class PaymentServiceIntegrationTest {
 
     @Autowired
@@ -30,6 +32,8 @@ class PaymentServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        paymentRepository.deleteAll();
+
         ORDER_ID = 100L;
         PAYMENT = paymentRepository.save(new Payment(ORDER_ID, 100000L));
     }

@@ -15,8 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +25,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("[동시성 테스트] OrderService")
-@Transactional(propagation = Propagation.NEVER)
-@Slf4j
 class OrderServiceConcurrencyTest {
 
     @Autowired
@@ -54,6 +51,10 @@ class OrderServiceConcurrencyTest {
 
     @BeforeEach
     void setup() {
+        orderItemRepository.deleteAll();
+        productRepository.deleteAll();
+        productOptionRepository.deleteAll();
+
         PRODUCT = productRepository.save(new Product("양반", "김"));
         PRODUCT_OPTION = productOptionRepository.save(new ProductOption(PRODUCT.getId(), "들기름 김", 1000L, 100L));
 

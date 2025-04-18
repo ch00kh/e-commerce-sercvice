@@ -10,4 +10,5 @@ public interface BalanceHistoryRepository {
 
     List<BalanceHistory> findByBalanceId(Long userId);
 
+    void deleteAll();
 }

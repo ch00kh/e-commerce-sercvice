@@ -18,9 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@Transactional
 @ActiveProfiles("test")
 @DisplayName("[통합테스트] CouponService")
-@Transactional
 class CouponServiceIntegrationTest {
 
     @Autowired
@@ -39,6 +39,9 @@ class CouponServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        couponRepository.deleteAll();
+        issuedCouponRepository.deleteAll();
+
         USER_ID = 1L;
         COUPON = couponRepository.save(new Coupon(1000L, 100L));
         COUPON_ID = COUPON.getId();

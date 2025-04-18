@@ -22,10 +22,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("[동시성 테스트] ProductService")
-@Slf4j
 class ProductServiceConcurrencyTest {
 
     @Autowired
@@ -43,6 +43,9 @@ class ProductServiceConcurrencyTest {
 
     @BeforeEach
     void setUp() {
+        productRepository.deleteAll();
+        productOptionRepository.deleteAll();
+
         PRODUCT = productRepository.save(new Product("양반", "김"));
         PRODUCT_OPTION = productOptionRepository.save(new ProductOption(PRODUCT.getId(), "들기름 김", 1000L, 100L));
     }

@@ -17,4 +17,6 @@ public interface OrderItemRepository {
     List<OrderItem> findByOrderId(Long orderId);
 
     List<OrderItem> findByProductOptionId(Long id);
+
+    void deleteAll();
 }

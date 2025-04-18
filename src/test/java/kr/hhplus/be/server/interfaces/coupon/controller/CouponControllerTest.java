@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(CouponController.class)
+@DisplayName("[단위테스트] CouponController")
 class CouponControllerTest {
 
     @Autowired
