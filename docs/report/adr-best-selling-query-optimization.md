@@ -77,7 +77,7 @@ FROM order_item;
 - `created_at`: 20건의 고유값 (낮은 카디널리티)
 - `total_rows`: 2,000,000건
 
-### 인덱스 컬럼 순선 설계
+### 인덱스 컬럼 순서 설계
 
 1. 필터 조건 (WHERE → `created_at`) : 범위 조건의 효율적인 인덱스 활용
 2. 집계 기준 컬럼 (GROUP BY → `product_option_id`) : 그룹화 시 성능 향상
