@@ -17,12 +17,17 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
 
+    /**
+     * 결제 정보 저장
+     */
     @Transactional
     public Payment save(PaymentCommand.Save command) {
-
         return paymentRepository.save(new Payment(command.orderId(), command.amount()));
     }
 
+    /**
+     * 결제 조회
+     */
     @Transactional(readOnly = true)
     public Payment findPayment(PaymentCommand.FindOrder command) {
 
@@ -32,6 +37,9 @@ public class PaymentService {
         return payment;
     }
 
+    /**
+     * 결제
+     */
     @Transactional
     public Payment pay(PaymentCommand.Pay command) {
 

@@ -26,6 +26,9 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
 
+    /**
+     * 주문 생성
+     */
     @Transactional
     public OrderInfo.Create createOrder(OrderCommand.Create command) {
 
@@ -59,6 +62,9 @@ public class OrderService {
             );
     }
 
+    /**
+     * 주문 상품 보류 (CREATED -> PENDING)
+     */
     @Transactional
     public void holdOrder(OrderCommand.HoldOrder command) {
 
@@ -68,8 +74,11 @@ public class OrderService {
         orderItem.holdStatus();
     }
 
+    /**
+     * 쿠폰 적용
+     */
     @Transactional
-    public OrderInfo.Create useCoupon(OrderCommand.UseCoupon command) {
+    public OrderInfo.Create applyCoupon(OrderCommand.UseCoupon command) {
 
         if (command.couponId() == null) {
             return null;
@@ -91,6 +100,9 @@ public class OrderService {
         );
     }
 
+    /**
+     * 주문 조회
+     */
     @Transactional(readOnly = true)
     public Order findById(OrderCommand.Find command) {
 
@@ -104,6 +116,9 @@ public class OrderService {
         return order;
     }
 
+    /**
+     * 주문 상품 결제 (PAYED)
+     */
     @Transactional
     public Order pay(OrderCommand.Find command) {
 
@@ -113,13 +128,18 @@ public class OrderService {
         return order.pay();
     }
 
+    /**
+     * 인기 판매 상품 조회
+     */
     @Transactional(readOnly = true)
     public List<OrderInfo.Best> findBestSelling(OrderCommand.FindBest command) {
         return orderItemRepository.findBestSelling(command.days(), command.limit());
     }
 
+    /**
+     * 주문 정보 전송 비돟기 처리
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void sendOrder(OrderCommand.Send build) {
-        // 주문 정보 전송 비돟기 처리
+    public void sendOrder(OrderCommand.Send command) {
     }
 }

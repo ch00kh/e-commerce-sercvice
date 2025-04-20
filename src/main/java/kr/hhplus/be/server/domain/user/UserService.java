@@ -15,12 +15,18 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    /**
+     * 사용자 조회
+     */
     @Transactional(readOnly = true)
     public User findByUserId(UserCommand.Find command) {
         return userRepository.findById(command.id())
                 .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
     }
 
+    /**
+     * 사용자 생성
+     */
     @Transactional
     public User create(UserCommand.Create command) {
         return userRepository.save(new User(command.name()));

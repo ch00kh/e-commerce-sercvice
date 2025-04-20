@@ -18,6 +18,9 @@ public class UserFacade {
     private final UserService userService;
     private final BalanceService balanceService;
 
+    /**
+     * 사용자 가입
+     */
     @Transactional
     public UserResult.Create createUser(UserCriteria.Create criteria) {
 

@@ -20,16 +20,23 @@ public class ProductFacade {
     ProductService productService;
     OrderService orderService;
 
+    /**
+     * 전체 상품 조회
+     */
     public ProductResult.ProductList findAll() {
-
         return ProductResult.ProductList.from(productService.findAll());
     }
 
+    /**
+     * 상품 정보 조회
+     */
     public ProductResult.ProductAggregate findProduct(ProductCriteria.Find criteria) {
-
         return ProductResult.ProductAggregate.from(productService.findProduct(criteria.toCommand()));
     }
 
+    /**
+     * 인기 판매 상품 조회
+     */
     @Transactional
     public ProductResult.ProductList findBest(ProductCriteria.FindBest criteria) {
 

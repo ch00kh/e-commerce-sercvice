@@ -19,7 +19,9 @@ public class BalanceService {
     private final BalanceRepository balanceRepository;
     private final BalanceHistoryRepository balanceHistoryRepository;
 
-
+    /**
+     * 잔액 조회
+     */
     @Transactional(readOnly = true)
     public Balance find(BalanceCommand.Find command) {
 
@@ -27,6 +29,9 @@ public class BalanceService {
                 .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
     }
 
+    /**
+     * 잔액 충전
+     */
     @Transactional
     public Balance charge(BalanceCommand.Charge command) {
 
@@ -40,6 +45,9 @@ public class BalanceService {
         return balance;
     }
 
+    /**
+     * 잔액 차감
+     */
     @Transactional
     public Balance reduce(BalanceCommand.Reduce command) {
 
@@ -51,6 +59,9 @@ public class BalanceService {
         return balance.reduce(command.paymentAmount());
     }
 
+    /**
+     * 잔고 생성
+     */
     public Balance create(BalanceCommand.Create command) {
 
         return balanceRepository.save(new Balance(command.userId(), 0L));

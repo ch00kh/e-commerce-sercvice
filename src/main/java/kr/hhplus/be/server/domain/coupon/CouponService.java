@@ -20,6 +20,9 @@ public class CouponService {
     private final CouponRepository couponRepository;
     private final IssuedCouponRepository issuedCouponRepository;
 
+    /**
+     * 쿠폰 사용
+     */
     @Transactional
     public CouponAggregate use(CouponCommand.Use command) {
 
@@ -38,6 +41,9 @@ public class CouponService {
         return CouponAggregate.from(coupon, issuedCoupon);
     }
 
+    /**
+     * 쿠폰 발급
+     */
     @Transactional
     public IssuedCoupon issue(CouponCommand.Issue command) {
 

@@ -129,7 +129,7 @@ class OrderServiceIntegrationTest {
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(orderInfo.orderId(), couponInfo.couponId(), couponInfo.discountPrice());
 
             // Act
-            OrderInfo.Create actualInfo = orderService.useCoupon(command);
+            OrderInfo.Create actualInfo = orderService.applyCoupon(command);
 
             // Assert
             assertThat(actualInfo).isNull();
@@ -144,7 +144,7 @@ class OrderServiceIntegrationTest {
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(orderInfo.orderId(), COUPON_ID, 3000L);
 
             // Act
-            orderInfo = orderService.useCoupon(command);
+            orderInfo = orderService.applyCoupon(command);
 
             // Assert
             Order actual = orderRepository.findById(orderInfo.orderId()).get();
@@ -163,7 +163,7 @@ class OrderServiceIntegrationTest {
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(orderInfo.orderId(), COUPON_ID, 30000L);
 
             // Act
-            orderInfo = orderService.useCoupon(command);
+            orderInfo = orderService.applyCoupon(command);
 
             // Assert
             Order actual = orderRepository.findById(orderInfo.orderId()).get();

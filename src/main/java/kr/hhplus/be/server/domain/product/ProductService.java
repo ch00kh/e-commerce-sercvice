@@ -22,6 +22,9 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductOptionRepository productOptionRepository;
 
+    /**
+     * 전체 상품 조회
+     */
     @Transactional(readOnly = true)
     public ProductInfo.ProductList findAll() {
 
@@ -35,6 +38,9 @@ public class ProductService {
         return ProductInfo.ProductList.of(productAggregates);
     }
 
+    /**
+     * 상품 정보 조회
+     */
     @Transactional(readOnly = true)
     public ProductInfo.ProductAggregate findProduct(ProductCommand.Find command) {
 
@@ -46,6 +52,9 @@ public class ProductService {
         return ProductInfo.ProductAggregate.from(product, productOptions);
     }
 
+    /**
+     * 재고 차감
+     */
     @Transactional
     public ProductInfo.Order reduceStock(List<OrderCommand.OrderItem> command) {
 
@@ -73,6 +82,9 @@ public class ProductService {
         }).toList());
     }
 
+    /**
+     * 상품 정보 조회
+     */
     @Transactional(readOnly = true)
     public ProductInfo.ProductAggregate findProductByOptionId(ProductCommand.FindByProductOptionId command) {
 

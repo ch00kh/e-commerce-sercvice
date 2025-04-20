@@ -119,7 +119,7 @@ class OrderServiceTest {
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, couponInfo.couponId(), couponInfo.discountPrice());
 
             // Act
-            OrderInfo.Create actualInfo = orderService.useCoupon(command);
+            OrderInfo.Create actualInfo = orderService.applyCoupon(command);
 
             // Assert
             assertThat(actualInfo).isNull();
@@ -137,7 +137,7 @@ class OrderServiceTest {
             when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
 
             // Act
-            OrderInfo.Create actualInfo = orderService.useCoupon(command);
+            OrderInfo.Create actualInfo = orderService.applyCoupon(command);
 
             // Assert
             assertThat(actualInfo.issuedCouponId()).isEqualTo(COUPON_ID);
@@ -158,7 +158,7 @@ class OrderServiceTest {
             when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
 
             // Act
-            OrderInfo.Create actualInfo = orderService.useCoupon(command);
+            OrderInfo.Create actualInfo = orderService.applyCoupon(command);
 
             // Assert
             assertThat(actualInfo.issuedCouponId()).isEqualTo(COUPON_ID);
@@ -179,7 +179,7 @@ class OrderServiceTest {
             when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
 
             // Act
-            OrderInfo.Create actualInfo = orderService.useCoupon(command);
+            OrderInfo.Create actualInfo = orderService.applyCoupon(command);
 
             // Assert
             assertThat(actualInfo.issuedCouponId()).isEqualTo(COUPON_ID);

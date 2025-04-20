@@ -23,6 +23,9 @@ public class PaymentFacade {
     private final OrderService orderService;
     private final BalanceService balanceService;
 
+    /**
+     * 결제
+     */
     @Transactional
     public PaymentResult.Pay pay(PaymentCriteria.Pay criteria) {
 
