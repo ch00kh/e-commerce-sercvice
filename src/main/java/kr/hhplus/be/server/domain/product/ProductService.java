@@ -22,6 +22,9 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductOptionRepository productOptionRepository;
 
+    /**
+     * 전체 상품 조회
+     */
     @Transactional(readOnly = true)
     public ProductInfo.ProductList findAll() {
 
@@ -35,6 +38,9 @@ public class ProductService {
         return ProductInfo.ProductList.of(productAggregates);
     }
 
+    /**
+     * 상품 정보 조회
+     */
     @Transactional(readOnly = true)
     public ProductInfo.ProductAggregate findProduct(ProductCommand.Find command) {
 
@@ -46,22 +52,48 @@ public class ProductService {
         return ProductInfo.ProductAggregate.from(product, productOptions);
     }
 
+    /**
+     * 재고 차감
+     */
     @Transactional
-    public ProductInfo.CheckedProductOrder reduceStock(List<OrderCommand.OrderItem> command) {
+    public ProductInfo.Order reduceStock(List<OrderCommand.OrderItem> command) {
 
-        return new ProductInfo.CheckedProductOrder (command.stream().map(i -> {
-            ProductOption productOptions = productOptionRepository.findById(i.productOptionId())
+        return new ProductInfo.Order(command.stream().map(i -> {
+            ProductOption productOption = productOptionRepository.findById(i.productOptionId())
                     .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
 
-            Integer remainingStock = productOptions.reduceStock(i.quantity());
+            if (productOption.canPurchase(i.quantity())) {
+                Long remainingStock = productOption.reduceStock(i.quantity());
 
-            return ProductInfo.CheckedStock.builder()
-                    .optionId(productOptions.getId())
-                    .isEnough(remainingStock > 0)
-                    .requestQuantity(i.quantity())
-                    .remainingQuantity(remainingStock)
-                    .build();
-
+                return new ProductInfo.OptionDetail(
+                        productOption.getId(),
+                        true,
+                        i.quantity(),
+                        remainingStock
+                );
+            } else {
+                return new ProductInfo.OptionDetail(
+                        productOption.getId(),
+                        false,
+                        i.quantity(),
+                        productOption.getStock()
+                );
+            }
         }).toList());
+    }
+
+    /**
+     * 상품 정보 조회
+     */
+    @Transactional(readOnly = true)
+    public ProductInfo.ProductAggregate findProductByOptionId(ProductCommand.FindByProductOptionId command) {
+
+        ProductOption productOption = productOptionRepository.findById(command.productOptionId())
+                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+
+        Product product = productRepository.findById(productOption.getProductId())
+                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+
+        return ProductInfo.ProductAggregate.from(product, productOption);
     }
 }

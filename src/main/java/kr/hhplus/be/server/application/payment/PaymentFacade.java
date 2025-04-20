@@ -4,6 +4,7 @@ import kr.hhplus.be.server.application.payment.dto.PaymentCriteria;
 import kr.hhplus.be.server.application.payment.dto.PaymentResult;
 import kr.hhplus.be.server.domain.balance.BalanceService;
 import kr.hhplus.be.server.domain.balance.dto.BalanceCommand;
+import kr.hhplus.be.server.domain.balance.entity.Balance;
 import kr.hhplus.be.server.domain.order.OrderService;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.order.entity.Order;
@@ -22,6 +23,9 @@ public class PaymentFacade {
     private final OrderService orderService;
     private final BalanceService balanceService;
 
+    /**
+     * 결제
+     */
     @Transactional
     public PaymentResult.Pay pay(PaymentCriteria.Pay criteria) {
 
@@ -32,33 +36,35 @@ public class PaymentFacade {
         Order order = orderService.findById(new OrderCommand.Find(payment.getOrderId()));
 
         // 결제금액 차감
-        balanceService.reduceBalance(new BalanceCommand.Reduce(order.getUserId(), order.getPaymentAmount()));
+        Balance balance = balanceService.reduce(new BalanceCommand.Reduce(order.getUserId(),criteria.amount(), order.getIssuedCouponId()));
 
         // 결제 완료
-        Payment pay = paymentService.pay(new PaymentCommand.Pay(criteria.paymentId(), order.getPaymentAmount()));
+        Payment pay = paymentService.pay(new PaymentCommand.Pay(payment.getId(), order.getPaymentAmount()));
 
         // 주문 상태 변경
         order = orderService.pay(new OrderCommand.Find(payment.getOrderId()));
 
         // 주문 정보 전송
-        orderService.sendOrder(OrderCommand.Send.builder()
-                .id(order.getId())
-                .userId(order.getUserId())
-                .issuedCouponId(order.getIssuedCouponId())
-                .status(order.getStatus())
-                .paymentAmount(order.getPaymentAmount())
-                .totalAmount(order.getTotalAmount())
-                .discountAmount(order.getDiscountAmount())
-                .build()
+        orderService.sendOrder(
+                new OrderCommand.Send(
+                        order.getId(),
+                        order.getUserId(),
+                        order.getIssuedCouponId(),
+                        order.getStatus(),
+                        order.getPaymentAmount(),
+                        order.getTotalAmount(),
+                        order.getDiscountAmount()
+                )
         );
 
-        return PaymentResult.Pay.builder()
-                .id(pay.getId())
-                .orderId(pay.getOrderId())
-                .status(pay.getStatus())
-                .amount(pay.getAmount())
-                .paidAt(pay.getPaidAt())
-                .build();
-
+        return new PaymentResult.Pay(
+                pay.getId(),
+                pay.getOrderId(),
+                balance.getBalance(),
+                order.getStatus(),
+                pay.getStatus(),
+                pay.getAmount(),
+                pay.getPaidAt()
+        );
     }
 }

@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.payment;
 
+import kr.hhplus.be.server.domain.order.repository.OrderRepository;
 import kr.hhplus.be.server.domain.payment.dto.PaymentCommand;
 import kr.hhplus.be.server.domain.payment.entity.Payment;
 import kr.hhplus.be.server.domain.payment.repository.PaymentRepository;
@@ -14,27 +15,31 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final OrderRepository orderRepository;
 
+    /**
+     * 결제 정보 저장
+     */
     @Transactional
     public Payment save(PaymentCommand.Save command) {
-
-        Payment payment = Payment.builder()
-                .orderId(command.orderId())
-                .amount(command.amount())
-                .build();
-
-        return paymentRepository.save(payment);
+        return paymentRepository.save(new Payment(command.orderId(), command.amount()));
     }
 
+    /**
+     * 결제 조회
+     */
     @Transactional(readOnly = true)
-    public Payment findPayment(PaymentCommand.Find command) {
+    public Payment findPayment(PaymentCommand.FindOrder command) {
 
-        Payment payment = paymentRepository.findById(command.paymentId())
+        Payment payment = paymentRepository.findByOrderId(command.orderId())
                 .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
 
         return payment;
     }
 
+    /**
+     * 결제
+     */
     @Transactional
     public Payment pay(PaymentCommand.Pay command) {
 

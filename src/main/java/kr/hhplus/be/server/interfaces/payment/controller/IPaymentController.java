@@ -11,7 +11,7 @@ import kr.hhplus.be.server.interfaces.payment.dto.PaymentResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@Tag(name = "Order API", description = "주문 관련 API")
+@Tag(name = "Create API", description = "주문 관련 API")
 public interface IPaymentController {
 
     @Operation(summary = "주문 API", description = "사용자의 주문을 요청")

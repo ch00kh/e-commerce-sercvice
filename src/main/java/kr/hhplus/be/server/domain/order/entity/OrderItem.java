@@ -1,25 +1,41 @@
 package kr.hhplus.be.server.domain.order.entity;
 
+import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.BaseTimeEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = {
+        @Index(name = "idx_order_id", columnList = "orderId"),
+        @Index(name = "idx_productOption_id", columnList = "productOptionId"),
+        @Index(name = "idx_order_item_created_prod_opt", columnList = "createdAt, productOptionId, quantity")
+})
 public class OrderItem extends BaseTimeEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long orderId;
-    private Long productOptionId;
-    private OrderStatus status;
-    private Long unitPrice;
-    private Integer quantity;
 
-    @Builder
-    public OrderItem(Long orderId, Long productOptionId, Long unitPrice, Integer quantity) {
+    @Column(nullable = false)
+    private Long orderId;
+
+    @Column(nullable = false)
+    private Long productOptionId;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
+    @Column(nullable = false)
+    private Long unitPrice;
+
+    @Column(nullable = false)
+    private Long quantity;
+
+    
+    public OrderItem(Long orderId, Long productOptionId, Long unitPrice, Long quantity) {
         this.orderId = orderId;
         this.productOptionId = productOptionId;
         this.status = OrderStatus.CREATED;

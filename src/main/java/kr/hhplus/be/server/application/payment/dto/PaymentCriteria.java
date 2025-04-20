@@ -5,10 +5,11 @@ import kr.hhplus.be.server.domain.payment.dto.PaymentCommand;
 public record PaymentCriteria() {
 
     public record Pay(
-            Long paymentId
+            Long orderId,
+            Long amount
     ) {
-        public PaymentCommand.Find toCommand() {
-            return new PaymentCommand.Find(paymentId);
+        public PaymentCommand.FindOrder toCommand() {
+            return new PaymentCommand.FindOrder(orderId);
         }
     }
 }

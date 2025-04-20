@@ -7,6 +7,7 @@ import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,36 +36,40 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         USER_ID = 1L;
-        USER = new User(USER_ID, "추경현", "chu@test.test");
+        USER = new User("추경현");
     }
 
-    @Test
-    @DisplayName("[성공] 사용자 조회")
-    void findByUserId() {
+    @Nested
+    @DisplayName("사용자 조회")
+    class findByUserId {
 
-        // Arrange
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(USER));
+        @Test
+        @DisplayName("[성공] 사용자 조회")
+        void findByUserId_ok() {
 
-        // Act
-        User actualUser = userService.findByUserId(new UserCommand.Find(USER_ID));
+            // Arrange
+            when(userRepository.findById(USER_ID)).thenReturn(Optional.of(USER));
 
-        // Assert
-        assertThat(actualUser.getId()).isEqualTo(1L);
-        assertThat(actualUser.getName()).isEqualTo("추경현");
-        assertThat(actualUser.getEmail()).isEqualTo("chu@test.test");
+            // Act
+            User actualUser = userService.findByUserId(new UserCommand.Find(USER_ID));
+
+            // Assert
+            assertThat(actualUser.getName()).isEqualTo("추경현");
+        }
+
+        @Test
+        @DisplayName("[실패] 사용자 조회 - 사용자 없음(NOT_FOUND)")
+        void findByUserId_NotFound() {
+
+            // Arrange
+            when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
+
+            // Act
+            GlobalException exception = assertThrows(GlobalException.class, () -> userService.findByUserId(new UserCommand.Find(USER_ID)));
+
+            // Assert
+            assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
+        }
     }
 
-    @Test
-    @DisplayName("[실패] 사용자 조회 - 사용자 없음(NOT_FOUND)")
-    void findByUserId_NotFound() {
-
-        // Arrange
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
-
-        // Act
-        GlobalException exception = assertThrows(GlobalException.class, () -> userService.findByUserId(new UserCommand.Find(USER_ID)));
-
-        // Assert
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
-    }
 }

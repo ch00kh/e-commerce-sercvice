@@ -21,15 +21,18 @@
   ```
 - Response Header
 
-  | code | message               | 
-  |------|-----------------------|
-  | 200  | OK                    |
-  | 400  | BAD_REQUEST           |
-  | 500  | INTERNAL_SERVER_ERROR |
+  | code | message                | 
+  |------|------------------------|
+  | 200  | OK                     |
+  | 400  | BAD_REQUEST            |
+  | 400  | INVALID_CHARGE_AMOUNT  |
+  | 400  | BALANCE_EXCEED_MAXIMUM |
+  | 404  | NOT_FOUND              |
+  | 500  | INTERNAL_SERVER_ERROR  |
 - Response Body
   ```json
   {
-    "user_id": 1001,
+    "user_id": 1,
     "balance": 10000
   }
   ```
@@ -200,12 +203,13 @@
   ```
 --- 
 ### 선착순 쿠폰 API
-- URL : `/api/coupon/{id}`
+- URL : `/api/coupon/issue`
 - METHOD : `POST`
 - Request Body
   ```json
   {
-    "couponId": 1001
+    "userId": 1,
+    "couponId": 100
   }
   ```
 - Response Header
@@ -213,6 +217,7 @@
   | code | message               |
   |------|-----------------------|
   | 200  | OK                    |
+  | 400  | OUT_OF_STOCK_COUPON   |
   | 404  | NOT_FOUND             |
   | 500  | INTERNAL_SERVER_ERROR |
 

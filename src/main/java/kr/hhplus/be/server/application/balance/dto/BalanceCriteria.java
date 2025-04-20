@@ -1,11 +1,9 @@
 package kr.hhplus.be.server.application.balance.dto;
 
 import kr.hhplus.be.server.domain.balance.dto.BalanceCommand;
-import lombok.Builder;
 
 public record BalanceCriteria() {
 
-    @Builder
     public record Find(
             Long userId
     ) {
@@ -14,7 +12,6 @@ public record BalanceCriteria() {
         }
     }
 
-    @Builder
     public record Charge(
             Long userId,
             Long amount
@@ -23,5 +20,11 @@ public record BalanceCriteria() {
             return new BalanceCommand.Charge(userId, amount);
         }
     }
+
+    public record Create(
+            Long userId
+    ) {}
+
+
 
 }

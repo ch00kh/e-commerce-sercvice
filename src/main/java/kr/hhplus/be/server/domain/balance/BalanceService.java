@@ -19,14 +19,19 @@ public class BalanceService {
     private final BalanceRepository balanceRepository;
     private final BalanceHistoryRepository balanceHistoryRepository;
 
-
+    /**
+     * 잔액 조회
+     */
     @Transactional(readOnly = true)
-    public Balance findBalance(BalanceCommand.Find command) {
+    public Balance find(BalanceCommand.Find command) {
 
         return balanceRepository.findByUserId(command.userId())
                 .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
     }
 
+    /**
+     * 잔액 충전
+     */
     @Transactional
     public Balance charge(BalanceCommand.Charge command) {
 
@@ -35,23 +40,30 @@ public class BalanceService {
 
         balance.charge(command.amount());
 
-        balanceHistoryRepository.save(
-                BalanceHistory.builder()
-                        .balanceId(balance.getId())
-                        .amount(command.amount())
-                        .transactionType(TransactionType.CHARGE)
-                        .build()
-        );
+        balanceHistoryRepository.save(new BalanceHistory(balance.getId(), command.amount(), TransactionType.CHARGE));
 
         return balance;
     }
 
+    /**
+     * 잔액 차감
+     */
     @Transactional
-    public Balance reduceBalance(BalanceCommand.Reduce command) {
+    public Balance reduce(BalanceCommand.Reduce command) {
 
         Balance balance = balanceRepository.findByUserId(command.userId())
                 .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
 
+        balanceHistoryRepository.save(new BalanceHistory(balance.getId(), command.issuedCouponId(), command.paymentAmount(), TransactionType.USE));
+
         return balance.reduce(command.paymentAmount());
+    }
+
+    /**
+     * 잔고 생성
+     */
+    public Balance create(BalanceCommand.Create command) {
+
+        return balanceRepository.save(new Balance(command.userId(), 0L));
     }
 }

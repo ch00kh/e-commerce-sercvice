@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.order;
 
+import kr.hhplus.be.server.domain.coupon.dto.CouponInfo;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.order.dto.OrderInfo;
 import kr.hhplus.be.server.domain.order.entity.Order;
@@ -55,8 +56,8 @@ class OrderServiceTest {
         COUPON_ID = 11L;
         ORDER_ID = 111L;
 
-        ORDER_ITEM1 = new OrderCommand.OrderItem(1L, 10000L, 1);
-        ORDER_ITEM2 = new OrderCommand.OrderItem(2L, 5000L, 2);
+        ORDER_ITEM1 = new OrderCommand.OrderItem(1L, 10000L, 1L);
+        ORDER_ITEM2 = new OrderCommand.OrderItem(2L, 5000L, 2L);
         ORDER_ITEMS = List.of(ORDER_ITEM1, ORDER_ITEM2);
     }
 
@@ -65,17 +66,9 @@ class OrderServiceTest {
     void createOrder_hasNoCoupon_ok() {
 
         // Arrange
-        Order order = Order.builder()
-                .userId(USER_ID)
-                .issuedCouponId(null)
-                .totalAmount(20000L)
-                .build();
+        Order order = new Order(USER_ID, 20000L);
 
-        OrderCommand.Create command = OrderCommand.Create.builder()
-                .userId(USER_ID)
-                .issuedCouponId(null)
-                .orderItems(ORDER_ITEMS)
-                .build();
+        OrderCommand.Create command = new OrderCommand.Create(USER_ID, ORDER_ITEMS);
 
         when(orderRepository.save(any(Order.class))).thenReturn(order);
 
@@ -99,46 +92,52 @@ class OrderServiceTest {
 
         // Arrange
         Long productOptionId = 1L;
-        OrderCommand.HoldOrder command = new OrderCommand.HoldOrder(productOptionId);
+        OrderCommand.HoldOrder command = new OrderCommand.HoldOrder(1L, productOptionId);
 
-        OrderItem orderItem = OrderItem.builder()
-                .orderId(1L)
-                .productOptionId(1L)
-                .unitPrice(1000L)
-                .quantity(100)
-                .build();
+        OrderItem orderItem = new OrderItem(1L, 1L, 1000L, 100L);
 
-        when(orderItemRepository.findByProductOptionId(productOptionId)).thenReturn(Optional.of(orderItem));
+        when(orderItemRepository.findByOrderIdAndProductOptionId(1L, productOptionId)).thenReturn(Optional.of(orderItem));
 
         // Act
         orderService.holdOrder(command);
 
         // Assert
-        verify(orderItemRepository, times(1)).findByProductOptionId(productOptionId);
+        verify(orderItemRepository, times(1)).findByOrderIdAndProductOptionId(1L, productOptionId);
         assertEquals(OrderStatus.PENDING, orderItem.getStatus());
     }
 
     @Nested
-    @DisplayName("주문 생성 후 쿠폰 적용")
+    @DisplayName("쿠폰 사용")
     class useCoupon {
+
+        @Test
+        @DisplayName("[성공] 쿠폰 미사용")
+        void useCoupon_couponIsNull() {
+
+            // Arrange
+            CouponInfo.CouponAggregate couponInfo = new CouponInfo.CouponAggregate(null, null, null, null, null);
+            OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, couponInfo.couponId(), couponInfo.discountPrice());
+
+            // Act
+            OrderInfo.Create actualInfo = orderService.applyCoupon(command);
+
+            // Assert
+            assertThat(actualInfo).isNull();
+        }
 
         @Test
         @DisplayName("[성공] 쿠폰 적용 시 금액 계산 (주문금액 > 할인금액)")
         void useCoupon_totalAmountGtDiscountAmount() {
 
             // Arrange
-            Order order = Order.builder()
-                    .userId(USER_ID)
-                    .issuedCouponId(null)
-                    .totalAmount(10000L)
-                    .build();
+            Order order = new Order(USER_ID, 10000L);
 
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, COUPON_ID, 3000L);
 
             when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
 
             // Act
-            OrderInfo.Create actualInfo = orderService.useCoupon(command);
+            OrderInfo.Create actualInfo = orderService.applyCoupon(command);
 
             // Assert
             assertThat(actualInfo.issuedCouponId()).isEqualTo(COUPON_ID);
@@ -152,18 +151,14 @@ class OrderServiceTest {
         void useCoupon_totalAmountLtDiscountAmount() {
 
             // Arrange
-            Order order = Order.builder()
-                    .userId(USER_ID)
-                    .issuedCouponId(null)
-                    .totalAmount(10000L)
-                    .build();
+            Order order = new Order(USER_ID, 10000L);
 
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, COUPON_ID, 20000L);
 
             when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
 
             // Act
-            OrderInfo.Create actualInfo = orderService.useCoupon(command);
+            OrderInfo.Create actualInfo = orderService.applyCoupon(command);
 
             // Assert
             assertThat(actualInfo.issuedCouponId()).isEqualTo(COUPON_ID);
@@ -177,18 +172,14 @@ class OrderServiceTest {
         void useCoupon_totalAmountEqDiscountAmount() {
 
             // Arrange
-            Order order = Order.builder()
-                    .userId(USER_ID)
-                    .issuedCouponId(null)
-                    .totalAmount(10000L)
-                    .build();
+            Order order = new Order(USER_ID, 10000L);
 
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, COUPON_ID, 10000L);
 
             when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
 
             // Act
-            OrderInfo.Create actualInfo = orderService.useCoupon(command);
+            OrderInfo.Create actualInfo = orderService.applyCoupon(command);
 
             // Assert
             assertThat(actualInfo.issuedCouponId()).isEqualTo(COUPON_ID);
@@ -206,11 +197,7 @@ class OrderServiceTest {
         @DisplayName("[성공] 주문 조회")
         void findById_ok() {
             // Arrange
-            Order order = Order.builder()
-                    .userId(USER_ID)
-                    .issuedCouponId(COUPON_ID)
-                    .totalAmount(10000L)
-                    .build();
+            Order order = new Order(USER_ID, COUPON_ID, 10000L);
 
             order.pay();
 
@@ -250,11 +237,7 @@ class OrderServiceTest {
     void pay_ok() {
 
         // Arrange
-        Order order = Order.builder()
-                .userId(USER_ID)
-                .issuedCouponId(COUPON_ID)
-                .totalAmount(10000L)
-                .build();
+        Order order = new Order(USER_ID, COUPON_ID, 10000L);
         order.pay();
 
         Order mockOrder = mock(Order.class);
@@ -290,6 +273,29 @@ class OrderServiceTest {
         // Assert
         verify(orderRepository).findById(ORDER_ID);
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
+    }
 
+    @Test
+    @DisplayName("[성공] 인기 판매상품 조회")
+    void findBestSelling_ok() {
+
+        // Arrange
+        when(orderItemRepository.findBestSelling(3,5))
+                .thenReturn(List.of(
+                        new OrderInfo.Best(101L, 150L),
+                        new OrderInfo.Best(102L, 120L),
+                        new OrderInfo.Best(103L, 100L),
+                        new OrderInfo.Best(104L, 80L),
+                        new OrderInfo.Best(105L, 70L)
+                ));
+
+        // Act
+        List<OrderInfo.Best> result = orderService.findBestSelling(new OrderCommand.FindBest(3, 5));
+
+        // Assert
+        verify(orderItemRepository).findBestSelling(3, 5);
+
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(5);
     }
 }

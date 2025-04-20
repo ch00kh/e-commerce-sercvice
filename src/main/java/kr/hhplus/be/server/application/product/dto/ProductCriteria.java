@@ -12,4 +12,8 @@ public record ProductCriteria() {
         }
     }
 
+    public record FindBest(
+            Integer days,
+            Integer limit
+    ) {}
 }

@@ -14,19 +14,22 @@
 ```mermaid
 sequenceDiagram
   actor USER
-  participant Balance
+  participant BalanceFacade
+  participant BalanceService
   
   activate USER
-  USER ->>+ Balance: 잔액 충전 요청
+  USER ->>+ BalanceFacade: 잔액 충전 요청
+  BalanceFacade ->>+ BalanceService: 사용자 잔액 충전 요청
+  BalanceService ->> BalanceService: 사용자 잔액 조회
   opt 충전 금액이 양수가 아닌 경우
-    Balance -->> USER: 유효하지 않은 충전 금액 예외 발생
+    BalanceService -->> USER: 유효하지 않은 충전 금액 예외 발생(BAD_REQUEST)
   end
-  Balance ->> Balance: 잔고 조회, 충전
-  opt 잔고가 최대 금액을 초과한 경우
-    Balance -->> USER: 잔고 최대 금액 초과 예외 발생
+  BalanceService ->> BalanceService: 사용자 잔액 충전
+  opt 잔고가 최대 금액(10,000,000)을 초과한 경우
+    BalanceService -->> USER: 잔고 최대 금액 초과 예외 발생(BAD_REQUEST)
   end
-  Balance ->> Balance: 잔액 저장
-  Balance -->>- USER: 사용자 잔액 응답
+  BalanceService ->>- BalanceFacade: 사용자 잔액 응답
+  BalanceFacade ->>- USER: 사용자 잔액 응답
   deactivate USER
 ```
 
@@ -36,12 +39,14 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   actor USER
-  participant Balance
+  participant BalanceFacade
+  participant BalanceService
   
   activate USER
-  USER ->>+ Balance: 잔액 조회 요청
-  Balance ->> Balance: 잔액 조회
-  Balance ->>- USER: 조회한 잔액 응답
+  USER ->>+ BalanceFacade: 잔액 조회 요청
+  BalanceFacade ->>+ BalanceService: 사용자 잔액 조회
+  BalanceService ->>- BalanceFacade: 사용자 잔액 응답
+  BalanceFacade ->>- USER: 조회한 잔액 응답
   deactivate USER
 ```
 
@@ -73,47 +78,37 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   actor USER
-  participant Order
-  participant Product
-  participant Coupon
-  participant Payment
+  participant OrderFacade
+  participant ProductService
+  participant OrderService
+  participant CouponService
 
   activate USER
-  USER ->>+ Order: 상품 주문 요청
-  Order ->>+ Product: 상품 정보 조회
-  deactivate Order
-  Product -->>- Order: 상품 정보 반환
-  activate Order
-  opt 쿠폰을 사용하는 경우
-    Order ->>+ Coupon: 유효 쿠폰 검증 요청
-    deactivate Order
-    Coupon ->> Coupon: 쿠폰 검증
+  USER ->>+ OrderFacade: 상품 주문 요청
+  OrderFacade ->>+ ProductService: 주문 상품 조회
+  ProductService ->>- OrderFacade: 주문 상품 응답
+  OrderFacade ->>+ OrderService: 주문 생성
+  OrderService->>- OrderFacade: 생성된 주문 응답
+  opt 쿠폰 사용하는 경우
+    OrderFacade ->>+ CouponService: 쿠폰 사용
+    CouponService ->> CouponService: 쿠폰 조회
     opt 유효하지 않은 쿠폰인 경우
-      Coupon -->> USER: 유효하지 않은 쿠폰 예외 발생
+      CouponService -->> USER: 유효하지 않은 쿠폰 예외 처리(NOT_FOUND)  
     end
-    Coupon ->> Coupon: 쿠폰 사용 처리
-    Coupon -->>- Order: 쿠폰 정보 반환
-    activate Order
-    Order ->> Order: 쿠폰 할인 적용
+    CouponService ->> CouponService: 쿠폰 사용 처리 
+    CouponService ->>- OrderFacade: 쿠폰 적용
+    OrderFacade ->>+ OrderService: 생성된 주문에 쿠폰 추가
+    OrderService ->>- OrderFacade: 쿠폰 추가된 주문 응답
   end
-  
-  Order ->> Order: 주문 정보 생성
-
-  opt 재고 부족한 경우
-    Order ->> Order: 주문 실패 업데이트
-    Order -->> USER: 재고 부족 예외 발생
+  OrderFacade ->>+ ProductService: 재고 차감 처리
+  ProductService ->> ProductService: 재고 확인 및 차감 
+  ProductService ->>- OrderFacade: 상품 옵션별 요청 수량, 재고 응답(충분: true, 부족: false)
+  opt 재고 부족시
+    OrderFacade ->> OrderService: 부족한 주문 상태 변경
+    OrderService ->> OrderService: 주문 상태: PENDING
   end
-  Order ->>+ Product: 재고 차감 처리
-  Product -->>- Order: 재고 차감 완료
-  Order ->>+ Payment: 결제 정보 저장
-  Payment -->>- Order: 결제 정보 반환
-  
-  alt 수동 결제
-    Order -->> USER: 주문 생성 정보 응답
-  else 자동 결제
-    Order -->> Payment: 결제 서비스 호출
-  end
-  deactivate Order
+  OrderFacade ->> PaymentService: 결제 정보 저장
+  OrderFacade ->>- USER: 생성된 주문 응답
   deactivate USER
 ```
 
@@ -123,29 +118,28 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   actor USER
-  participant Payment
-  participant Order
-  participant Balance
+  participant PaymentFacade
+  participant PaymentService
+  participant OrderService
+  participant BalanceService
   participant DataPlatform
   
   activate USER
-  USER ->>+ Payment: 결제 요청
-  Payment ->>+ Order: 주문 정보 조회
-  Order -->>- Payment: 주문 정보 반환
-  Payment ->>+ Balance: 포인트 차감 요청
-  Balance ->> Balance: 포인트 조회
-  deactivate Payment
-  alt 포인트가 부족한 경우
-    Balance -->> USER: 포인트 부족 예외 발생
+  USER ->>+ PaymentFacade: 결제 요청
+  PaymentFacade ->>+ PaymentService: 결제 정보 조회
+  PaymentService ->>- PaymentFacade: 결제 정보 응답
+  PaymentFacade ->>+ OrderService: 주문 정보 조회
+  OrderService ->>- PaymentFacade: 주문 정보 응답
+  PaymentFacade ->>+ BalanceService: 결제 금액 차감
+  alt 결제금액 부족한 경우
+    BalanceService -->> USER: 결제 금액 부족 예외 발생
   end
-  activate Payment
-  Balance ->> Balance: 포인트 차감
-  Balance -->>- Payment: 포인트 정보 반환
-  Payment ->> Payment: 결제 상태 완료 처리
-  Payment ->>+ Order: 주문 상태 확정 처리
-  Order -->>- Payment: 주문 상태 확정 완료
-  Payment -->> DataPlatform: 주문 정보 전송(비동기 처리)
-  Payment -->>- USER: 결제 완료 응답
+  BalanceService ->>- PaymentFacade: 사용자 잔액 응답
+  PaymentFacade ->>+ OrderService: 주문 상태 변경처리
+  OrderService ->> OrderService: 확정 처리
+  OrderService ->>- PaymentFacade: 주문 정보 응답 
+  PaymentFacade -->> DataPlatform: 주문 정보 전송(비동기 처리)
+  PaymentFacade ->>- USER : 사용자 잔액 및 결제 정보 응답
   deactivate USER
 ```
 
@@ -155,24 +149,26 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   actor USER
+  participant CouponFacade
+  participant CouponService
   participant Coupon
-  participant Issued_Coupon
+  participant IssuedCoupon
   
   activate USER
-  USER ->>+ Coupon: 쿠폰 발급 요청
-  Coupon ->> Coupon: 잔여 쿠폰 조회
+  USER ->>+ CouponFacade: 쿠폰 발급 요청
+  CouponFacade ->>+ CouponService: 쿠폰 발급 요청
+  CouponService ->>+ Coupon: 잔여 쿠폰 조회
   opt 쿠폰이 소진된 경우
-    Coupon -->> USER: 쿠폰 소진 예외 발생
+    Coupon -->> USER: 쿠폰 소진 예외 발생()
   end
-  Coupon ->> Coupon: 쿠폰 생성
-  Coupon ->>+ Issued_Coupon: 쿠폰 저장
-  Issued_Coupon ->> Issued_Coupon: 기발급 쿠폰 조회
+  Coupon ->>- CouponService: 쿠폰 수량 감소
+  CouponService ->>+ IssuedCoupon: 기발급 쿠폰 조회
   opt 이미 발급된 쿠폰인 경우
-    Issued_Coupon ->> Coupon: 쿠폰 생성 취소
-    Coupon ->> USER: 기발급된 쿠폰 예외 발생
+    IssuedCoupon-->> USER: 기발급된 쿠폰 예외 발생 -> 쿠폰 생성 rollback
   end
-  Issued_Coupon ->>- Coupon: 쿠폰 저장 완료
-  Coupon -->- USER: 쿠폰발급 완료 응답
+  IssuedCoupon ->>- CouponService: 쿠폰 저장
+  CouponService ->>- CouponFacade: 쿠폰 발급 응답
+  CouponFacade ->>- USER: 쿠폰 발급 응답
   deactivate USER
 ```
 
@@ -182,15 +178,17 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   actor USER
-  participant Product
-  participant OrderProduct
+  participant ProductFacade
+  participant OrderService
+  participant ProductService
   
   activate USER
-  USER ->>+ Product: 인기 판매 상품 조회 요청
-  Product ->>+ OrderProduct: 최근 3일간 가장 많이 팔린 상위 5개 조회
-  OrderProduct -->>- Product: 인기 판매 상품 반환
-  Product ->> Product: 인기 판매 상품 기반 상품 정보 조회
-  Product -->>- USER: 인기 판매 상품 정보 응답
+  USER ->>+ ProductFacade: 인기 판매 상품 조회 요청
+  ProductFacade ->>+ OrderService: 최근 X일간 가장 많이 팔린 상위 X개 조회
+  OrderService ->>- ProductFacade: 상품옵션id, 판매량 반환 
+  ProductFacade ->>+ ProductService: 상품옵션 id기반 상품 정보 조회
+  ProductService ->>- ProductFacade: 상품 정보 반환
+  ProductFacade ->>- USER: 인기 판매 상품 정보 응답
   deactivate USER
 ```
 

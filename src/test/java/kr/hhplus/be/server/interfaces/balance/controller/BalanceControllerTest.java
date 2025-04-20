@@ -15,8 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Optional;
-
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -47,7 +45,7 @@ class BalanceControllerTest {
         CRITERIA_FIND = new BalanceCriteria.Find(1L);
         RESULT = new BalanceResult.UserBalance(1L, 1L, 2000L);
         COMMAND = new BalanceCommand.Charge(1L, 1000L);
-        BALANCE = new Balance(1L, 1L, 1000L);
+        BALANCE = new Balance( 1L, 1000L);
     }
 
     @Nested
@@ -101,7 +99,7 @@ class BalanceControllerTest {
             """;
 
             // Act & Assert
-            mockMvc.perform(post("/api/v1/balances/{id}", USER_ID)
+            mockMvc.perform(post("/api/v1/balances/{userId}", USER_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(requestBody))
                     .andExpect(status().isBadRequest())

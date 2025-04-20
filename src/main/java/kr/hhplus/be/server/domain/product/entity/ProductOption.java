@@ -1,40 +1,46 @@
 package kr.hhplus.be.server.domain.product.entity;
 
+import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.BaseTimeEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.*;
 
+@Entity
 @Getter
-@Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Slf4j
+@Table(indexes = @Index(name = "idx_product_id", columnList = "productId"))
 public class ProductOption extends BaseTimeEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long productId;
-    private String optionValue;
-    private Long price;
-    private Integer stock;
 
-    @Builder
-    public ProductOption(Long id, String optionValue, Long price, Integer stock) {
-        this.id = id;
+    @Column(nullable = false)
+    private Long productId;
+
+    @Column(nullable = false)
+    private String optionValue;
+
+    @Column(nullable = false)
+    private Long price;
+
+    @Column(nullable = false)
+    private Long stock;
+
+    
+    public ProductOption(Long productId, String optionValue, Long price, Long stock) {
+        this.productId = productId;
         this.optionValue = optionValue;
         this.price = price;
         this.stock = stock;
     }
 
-    public Integer reduceStock(Integer stock) {
-        this.stock = this.stock - stock;
+    public boolean canPurchase(Long stock) {
+        return this.stock - stock >= 0;
+    }
 
-        if (this.stock < 0) {
-            log.error("Out Of Stock...");
-            this.stock = 0;
-        }
+    public Long reduceStock(Long quantity) {
+        this.stock -= quantity;
         return this.stock;
     }
 }

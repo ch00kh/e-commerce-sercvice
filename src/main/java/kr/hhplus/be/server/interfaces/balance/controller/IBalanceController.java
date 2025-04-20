@@ -24,6 +24,15 @@ public interface IBalanceController {
             @ApiResponse(responseCode = "400", description = "유효하지 않은 충전 금액", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(example = "{\"code\":400,\"message\":\"BAD_REQUEST\"}"))),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 충전 금액", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(example = "{\"code\":400,\"message\":\"INVALID_CHARGE_AMOUNT\"}"))),
+            @ApiResponse(responseCode = "400", description = "최대 잔고는 10,000,000을 초과할 수 없습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(example = "{\"code\":400,\"message\":\"BALANCE_EXCEED_MAXIMUM\"}"))),
+            @ApiResponse(responseCode = "404", description = "사용자 혹은 잔고를 찾을 수 없습니다.", content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(example = "{\"code\":404,\"message\":\"NOT_FOUND\"}"))),
             @ApiResponse(responseCode = "500", description = "서버 오류 발생", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(example = "{\"code\":500,\"message\":\"INTERNAL_SERVER_ERROR\"}")))
@@ -35,7 +44,7 @@ public interface IBalanceController {
             @ApiResponse(responseCode = "200", description = "잔고 조회 성공", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = BalanceResponse.class))),
-            @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없습니다.", content = @Content(
+            @ApiResponse(responseCode = "404", description = "사용자 혹은 잔고를 찾을 수 없습니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(example = "{\"code\":404,\"message\":\"NOT_FOUND\"}"))),
             @ApiResponse(responseCode = "500", description = "서버 오류 발생", content = @Content(

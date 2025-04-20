@@ -11,4 +11,5 @@ public record ProductRequest() {
             return new ProductCriteria.Find(productId);
         }
     }
+
 }

@@ -19,7 +19,6 @@ public record CouponCommand() {
 
     public record Save(
             Long userId,
-            Long couponId,
-            Long discountPrice
+            Long couponId
     ) {}
 }
