@@ -15,8 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -47,7 +45,7 @@ class PaymentServiceTest {
         void findPayment_ok() {
 
             // Arrange
-            when(paymentRepository.findByOrderId(anyLong())).thenReturn(Optional.of(PAYMENT));
+            when(paymentRepository.findByOrderId(anyLong())).thenReturn(PAYMENT);
 
             // Act
             Payment actual = paymentService.findPayment(new PaymentCommand.FindOrder(anyLong()));
@@ -65,7 +63,7 @@ class PaymentServiceTest {
         void findPayment_NotFound() {
 
             // Arrange
-            when(paymentRepository.findByOrderId(anyLong())).thenReturn(Optional.empty());
+            when(paymentRepository.findByOrderId(anyLong())).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
@@ -86,7 +84,7 @@ class PaymentServiceTest {
         void payAllAmount_ok() {
 
             // Arrange
-            when(paymentRepository.findById(anyLong())).thenReturn(Optional.of(PAYMENT));
+            when(paymentRepository.findById(anyLong())).thenReturn(PAYMENT);
 
             // Act
             Payment result = paymentService.pay(new PaymentCommand.Pay(anyLong(), 100000L));
@@ -103,7 +101,7 @@ class PaymentServiceTest {
         void paySomeAmount_ok() {
 
             // Arrange
-            when(paymentRepository.findById(anyLong())).thenReturn(Optional.of(PAYMENT));
+            when(paymentRepository.findById(anyLong())).thenReturn(PAYMENT);
 
             // Act
             Payment result = paymentService.pay(new PaymentCommand.Pay(anyLong(), 50000L));
@@ -120,7 +118,7 @@ class PaymentServiceTest {
         void pay_NotFound() {
 
             // Arrange
-            when(paymentRepository.findById(anyLong())).thenReturn(Optional.empty());
+            when(paymentRepository.findById(anyLong())).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,

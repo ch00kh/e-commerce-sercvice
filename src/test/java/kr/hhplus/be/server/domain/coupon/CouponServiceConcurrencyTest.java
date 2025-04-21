@@ -77,7 +77,7 @@ class CouponServiceConcurrencyTest {
         log.info("Success count: {}, Failure count: {}", successCount.get(), failureCount.get());
         assertThat(successCount.get() + failureCount.get()).isEqualTo(threadCount);
 
-        Coupon coupon = couponRepository.findById(COUPON_ID).get();
+        Coupon coupon = couponRepository.findById(COUPON_ID);
         assertThat(coupon.getQuantity()).isEqualTo(0);
 
     }

@@ -59,7 +59,7 @@ class CouponServiceIntegrationTest {
         CouponInfo.CouponAggregate couponInfo = couponService.use(command);
 
         // Assert
-        IssuedCoupon actual = issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID).get();
+        IssuedCoupon actual = issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID);
 
         assertThat(actual.getStatus()).isEqualTo(CouponStatus.USED);
         assertThat(actual.getUsedAt()).isNotNull();
@@ -76,10 +76,10 @@ class CouponServiceIntegrationTest {
         IssuedCoupon issuedCoupon = couponService.issue(new CouponCommand.Issue(USER_ID, newCoupon.getId()));
 
         // Assert
-        Coupon coupon = couponRepository.findById(issuedCoupon.getCouponId()).get();
+        Coupon coupon = couponRepository.findById(issuedCoupon.getCouponId());
         assertThat(coupon.getQuantity()).isEqualTo(99L);
 
-        IssuedCoupon actual = issuedCouponRepository.findByUserIdAndCouponId(USER_ID, issuedCoupon.getCouponId()).get();
+        IssuedCoupon actual = issuedCouponRepository.findByUserIdAndCouponId(USER_ID, issuedCoupon.getCouponId());
         assertThat(actual.getCouponId()).isEqualTo(issuedCoupon.getCouponId());
         assertThat(actual.getUserId()).isEqualTo(USER_ID);
         assertThat(actual.getStatus()).isEqualTo(CouponStatus.ISSUED);

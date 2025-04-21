@@ -86,7 +86,7 @@ class OrderServiceIntegrationTest {
         OrderInfo.Create orderInfo = orderService.createOrder(command);
 
         // Assert
-        Order actual = orderRepository.findById(orderInfo.orderId()).get();
+        Order actual = orderRepository.findById(orderInfo.orderId());
         assertThat(actual.getUserId()).isEqualTo(USER_ID);
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.CREATED);
         assertThat(actual.getTotalAmount()).isEqualTo(20000L);
@@ -110,7 +110,7 @@ class OrderServiceIntegrationTest {
         orderService.holdOrder(command);
 
         // Assert
-        OrderItem actual = orderItemRepository.findByOrderIdAndProductOptionId(orderInfo.orderId(), productOptionId).get();
+        OrderItem actual = orderItemRepository.findByOrderIdAndProductOptionId(orderInfo.orderId(), productOptionId);
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.PENDING);
     }
 
@@ -147,7 +147,7 @@ class OrderServiceIntegrationTest {
             orderInfo = orderService.applyCoupon(command);
 
             // Assert
-            Order actual = orderRepository.findById(orderInfo.orderId()).get();
+            Order actual = orderRepository.findById(orderInfo.orderId());
             assertThat(actual.getIssuedCouponId()).isEqualTo(COUPON_ID);
             assertThat(actual.getTotalAmount()).isEqualTo(20000L);
             assertThat(actual.getDiscountAmount()).isEqualTo(3000L);
@@ -166,7 +166,7 @@ class OrderServiceIntegrationTest {
             orderInfo = orderService.applyCoupon(command);
 
             // Assert
-            Order actual = orderRepository.findById(orderInfo.orderId()).get();
+            Order actual = orderRepository.findById(orderInfo.orderId());
             assertThat(actual.getIssuedCouponId()).isEqualTo(COUPON_ID);
             assertThat(actual.getTotalAmount()).isEqualTo(20000L);
             assertThat(actual.getDiscountAmount()).isEqualTo(20000L);
@@ -189,7 +189,7 @@ class OrderServiceIntegrationTest {
             OrderInfo.Create orderInfo = orderService.createOrder(command);
 
             // Assert
-            Order actual = orderRepository.findById(orderInfo.orderId()).get();
+            Order actual = orderRepository.findById(orderInfo.orderId());
 
             assertThat(actual).isNotNull();
             assertThat(actual.getUserId()).isEqualTo(USER_ID);
@@ -222,7 +222,7 @@ class OrderServiceIntegrationTest {
         order = orderService.pay(new OrderCommand.Find(order.getId()));
 
         // Assert
-        Order actual = orderRepository.findById(order.getId()).get();
+        Order actual = orderRepository.findById(order.getId());
         assertThat(actual).isNotNull();
         assertThat(actual.getUserId()).isEqualTo(USER_ID);
         assertThat(actual.getIssuedCouponId()).isEqualTo(COUPON_ID);

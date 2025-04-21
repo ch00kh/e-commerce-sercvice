@@ -49,7 +49,7 @@ class PaymentServiceIntegrationTest {
         Payment payment = paymentService.findPayment(command);
 
         // Assert
-        Payment actual = paymentRepository.findById(payment.getId()).get();
+        Payment actual = paymentRepository.findById(payment.getId());
         assertThat(actual.getOrderId()).isEqualTo(100L);
         assertThat(actual.getAmount()).isEqualTo(100000L);
         assertThat(actual.getStatus()).isEqualTo(PaymentStatus.PENDING);
@@ -71,7 +71,7 @@ class PaymentServiceIntegrationTest {
             Payment payment = paymentService.pay(command);
 
             // Assert
-            Payment actual = paymentRepository.findById(payment.getId()).get();
+            Payment actual = paymentRepository.findById(payment.getId());
 
             assertThat(actual.getStatus()).isEqualTo(PaymentStatus.PAYED);
             assertThat(actual.getAmount()).isEqualTo(0L);
@@ -89,7 +89,7 @@ class PaymentServiceIntegrationTest {
             Payment payment = paymentService.pay(command);
 
             // Assert
-            Payment actual = paymentRepository.findById(payment.getId()).get();
+            Payment actual = paymentRepository.findById(payment.getId());
             assertThat(actual.getStatus()).isEqualTo(PaymentStatus.PENDING);
             assertThat(actual.getAmount()).isEqualTo(50000L);
             assertThat(actual.getPaidAt()).isNotNull();

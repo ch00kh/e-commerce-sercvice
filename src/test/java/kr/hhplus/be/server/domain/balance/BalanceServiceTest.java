@@ -18,8 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -56,7 +54,7 @@ class BalanceServiceTest {
             Balance balance = new Balance(USER_ID, 1000L);
             BalanceCommand.Find command = new BalanceCommand.Find(USER_ID);
 
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(balance));
+            when(balanceRepository.findByUserId(USER_ID)).thenReturn(balance);
 
             // Act
             Balance actualBalance = balanceService.find(command);
@@ -75,7 +73,7 @@ class BalanceServiceTest {
             // Arrange
             BalanceCommand.Find command = new BalanceCommand.Find(USER_ID);
 
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.empty());
+            when(balanceRepository.findByUserId(USER_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class, () -> balanceService.find(command));
@@ -96,7 +94,7 @@ class BalanceServiceTest {
 
             // Arrange
             Balance balance = new Balance(USER_ID, 1000L);
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(balance));
+            when(balanceRepository.findByUserId(USER_ID)).thenReturn(balance);
 
             // Act
             Balance actualBalance = balanceService.charge(new BalanceCommand.Charge(USER_ID, 1000L));
@@ -121,7 +119,7 @@ class BalanceServiceTest {
         void charge_notFound() {
 
             // Arrange
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.empty());
+            when(balanceRepository.findByUserId(USER_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class, () -> balanceService.charge(new BalanceCommand.Charge(1L, 1000L)));
@@ -137,7 +135,7 @@ class BalanceServiceTest {
 
             // Arrange
             Balance balance = new Balance(USER_ID, 1000L);
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(balance));
+            when(balanceRepository.findByUserId(USER_ID)).thenReturn(balance);
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class, () -> balanceService.charge(new BalanceCommand.Charge(1L, -1000L)));
@@ -158,7 +156,7 @@ class BalanceServiceTest {
 
             // Arrange
             Balance balance = new Balance(USER_ID, 1000L);
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(balance));
+            when(balanceRepository.findByUserId(USER_ID)).thenReturn(balance);
 
             // Act
             Balance actual = balanceService.reduce(new BalanceCommand.Reduce(USER_ID, 500L, null));
@@ -176,7 +174,7 @@ class BalanceServiceTest {
 
             // Arrange
             Balance balance = new Balance(USER_ID, 1000L);
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.of(balance));
+            when(balanceRepository.findByUserId(USER_ID)).thenReturn(balance);
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
@@ -192,7 +190,7 @@ class BalanceServiceTest {
         void reduceBalance_notFound() {
 
             // Arrange
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(Optional.empty());
+            when(balanceRepository.findByUserId(USER_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,

@@ -96,7 +96,7 @@ class BalanceServiceConcurrencyTest {
 
         assertThat(successCount.get() + failureCount.get()).isEqualTo(threadCount);
 
-        Balance actualBalance = balanceRepository.findByUserId(USER.getId()).get();
+        Balance actualBalance = balanceRepository.findByUserId(USER.getId());
         assertThat(actualBalance.getBalance()).isEqualTo(1000L * threadCount);
 
         List<BalanceHistory> actualBalanceHistory = balanceHistoryRepository.findByBalanceId(BALANCE.getId());
@@ -142,7 +142,7 @@ class BalanceServiceConcurrencyTest {
         // Assert
         log.info("Success count: {}, Failure count: {}", successCount.get(), failureCount.get());
 
-        Balance actualBalance = balanceRepository.findByUserId(USER.getId()).get();
+        Balance actualBalance = balanceRepository.findByUserId(USER.getId());
         assertThat(actualBalance.getBalance()).isEqualTo(1000L - threadCount * 10L);
 
         List<BalanceHistory> actualBalanceHistory = balanceHistoryRepository.findByBalanceId(BALANCE.getId());

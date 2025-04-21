@@ -75,7 +75,7 @@ class BalanceServiceIntegrationTest {
             // Assert
             assertThat(balance.getBalance()).isEqualTo(1000L);
 
-            Balance actual = balanceRepository.findByUserId(USER.getId()).get();
+            Balance actual = balanceRepository.findByUserId(USER.getId());
             assertThat(actual.getBalance()).isEqualTo(1000L);
 
         }
@@ -112,7 +112,7 @@ class BalanceServiceIntegrationTest {
             // Assert
             assertThat(balance.getBalance()).isEqualTo(2000L); // 1000+1000
 
-            Balance actualBalance = balanceRepository.findByUserId(USER.getId()).get();
+            Balance actualBalance = balanceRepository.findByUserId(USER.getId());
             assertThat(actualBalance.getBalance()).isEqualTo(2000L);
 
             List<BalanceHistory> actualBalanceHistory = balanceHistoryRepository.findByBalanceId(BALANCE.getId());
@@ -165,7 +165,7 @@ class BalanceServiceIntegrationTest {
             // Assert
             assertThat(balance.getBalance()).isEqualTo(0);
 
-            Balance actualBalance = balanceRepository.findByUserId(USER.getId()).get();
+            Balance actualBalance = balanceRepository.findByUserId(USER.getId());
             assertThat(actualBalance.getBalance()).isEqualTo(0);
 
             List<BalanceHistory> actualBalanceHistory = balanceHistoryRepository.findByBalanceId(BALANCE.getId());

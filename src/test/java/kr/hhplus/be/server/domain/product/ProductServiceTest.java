@@ -19,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -104,7 +103,7 @@ class ProductServiceTest {
         void findProduct_ok() {
 
             // Arrange
-            when(productRepository.findById(PRODUCT_ID1)).thenReturn(Optional.of(PRODUCT1));
+            when(productRepository.findById(PRODUCT_ID1)).thenReturn(PRODUCT1);
             when(productOptionRepository.findByProductId(PRODUCT_ID1)).thenReturn(List.of(PRODUCT_OPTION1, PRODUCT_OPTION2));
 
             // Act
@@ -130,7 +129,7 @@ class ProductServiceTest {
         void findProduct_NotFound() {
 
             // Arrange
-            when(productRepository.findById(PRODUCT_ID1)).thenReturn(Optional.empty());
+            when(productRepository.findById(PRODUCT_ID1)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class, () -> productService.findProduct(new ProductCommand.Find(PRODUCT_ID1)));
@@ -155,8 +154,8 @@ class ProductServiceTest {
                     new OrderCommand.OrderItem(102L, 5900L, 9L)
             );
 
-            when(productOptionRepository.findById(101L)).thenReturn(Optional.of(PRODUCT_OPTION1));
-            when(productOptionRepository.findById(102L)).thenReturn(Optional.of(PRODUCT_OPTION2));
+            when(productOptionRepository.findById(101L)).thenReturn(PRODUCT_OPTION1);
+            when(productOptionRepository.findById(102L)).thenReturn(PRODUCT_OPTION2);
 
             // Act
             ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
@@ -188,8 +187,8 @@ class ProductServiceTest {
                     new OrderCommand.OrderItem(102L, 5900L, 99L)
             );
 
-            when(productOptionRepository.findById(101L)).thenReturn(Optional.of(PRODUCT_OPTION1));
-            when(productOptionRepository.findById(102L)).thenReturn(Optional.of(PRODUCT_OPTION2));
+            when(productOptionRepository.findById(101L)).thenReturn(PRODUCT_OPTION1);
+            when(productOptionRepository.findById(102L)).thenReturn(PRODUCT_OPTION2);
 
             // Act
             ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
@@ -221,8 +220,8 @@ class ProductServiceTest {
                     new OrderCommand.OrderItem(102L, 5900L, 100L)
             );
 
-            when(productOptionRepository.findById(101L)).thenReturn(Optional.of(PRODUCT_OPTION1));
-            when(productOptionRepository.findById(102L)).thenReturn(Optional.of(PRODUCT_OPTION2));
+            when(productOptionRepository.findById(101L)).thenReturn(PRODUCT_OPTION1);
+            when(productOptionRepository.findById(102L)).thenReturn(PRODUCT_OPTION2);
 
             // Act
             ProductInfo.Order actualInfo = productService.reduceStock(orderItems);

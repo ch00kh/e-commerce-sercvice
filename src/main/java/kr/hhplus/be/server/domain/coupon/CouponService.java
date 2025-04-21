@@ -30,11 +30,9 @@ public class CouponService {
             return CouponAggregate.from();
         }
 
-        Coupon coupon = couponRepository.findById(command.couponId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        Coupon coupon = couponRepository.findById(command.couponId());
 
-        IssuedCoupon issuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(command.userId(), command.couponId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        IssuedCoupon issuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(command.userId(), command.couponId());
 
         issuedCoupon.use();
 
@@ -48,16 +46,14 @@ public class CouponService {
     public IssuedCoupon issue(CouponCommand.Issue command) {
 
         // 잔여 쿠폰 조회 및 쿠폰 수량 차감
-        Coupon coupon = couponRepository.findById(command.couponId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        Coupon coupon = couponRepository.findById(command.couponId());
 
         coupon.issue();
 
         // 기발급 검증 및 쿠폰 저장
-        issuedCouponRepository.findByUserIdAndCouponId(command.userId(), command.couponId())
-                .ifPresent(issuedCoupon -> {
-                    throw new GlobalException(ErrorCode.ALREADY_ISSUED_COUPON);
-                });
+        if (issuedCouponRepository.existsByUserIdAndCouponId(command.userId(), command.couponId())) {
+            throw new GlobalException(ErrorCode.ALREADY_ISSUED_COUPON);
+        }
 
         return issuedCouponRepository.save(new IssuedCoupon(command.userId(), command.couponId()));
     }

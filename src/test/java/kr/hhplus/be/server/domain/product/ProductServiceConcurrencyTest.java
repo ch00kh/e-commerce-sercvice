@@ -91,7 +91,7 @@ class ProductServiceConcurrencyTest {
         log.info("Success count: {}, Failure count: {}", successCount.get(), failureCount.get());
         assertThat(successCount.get() + failureCount.get()).isEqualTo(threadCount);
 
-        ProductOption updatedOption = productOptionRepository.findById(PRODUCT_OPTION.getId()).orElseThrow();
+        ProductOption updatedOption = productOptionRepository.findById(PRODUCT_OPTION.getId());
         assertThat(updatedOption.getStock()).isEqualTo(0);
     }
 

@@ -42,10 +42,10 @@ public class UserFacadeTest {
         assertThat(result.name()).isEqualTo("추경현");
         assertThat(result.balance()).isEqualTo(0);
 
-        User user = userRepository.findById(result.id()).get();
+        User user = userRepository.findById(result.id());
         assertThat(user.getName()).isEqualTo("추경현");
 
-        Balance balance = balanceRepository.findByUserId(result.id()).get();
+        Balance balance = balanceRepository.findByUserId(result.id());
         assertThat(balance.getBalance()).isEqualTo(0);
     }
 

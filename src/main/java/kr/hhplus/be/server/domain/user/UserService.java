@@ -20,8 +20,7 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public User findByUserId(UserCommand.Find command) {
-        return userRepository.findById(command.id())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        return userRepository.findById(command.id());
     }
 
     /**

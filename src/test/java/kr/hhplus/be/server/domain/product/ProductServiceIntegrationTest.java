@@ -184,10 +184,10 @@ class ProductServiceIntegrationTest {
             assertThat(actual.checkStocks().get(1).remainingQuantity()).isEqualTo(500L);
             assertThat(actual.checkStocks().get(1).requestQuantity()).isEqualTo(600L);
 
-            ProductOption option1 = productOptionRepository.findById(PRODUCT1_OPTION1.getId()).get();
+            ProductOption option1 = productOptionRepository.findById(PRODUCT1_OPTION1.getId());
             assertThat(option1.getStock()).isEqualTo(0);
 
-            ProductOption option2 = productOptionRepository.findById(PRODUCT1_OPTION2.getId()).get();
+            ProductOption option2 = productOptionRepository.findById(PRODUCT1_OPTION2.getId());
             assertThat(option2.getStock()).isEqualTo(500);
         }
 

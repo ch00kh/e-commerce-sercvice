@@ -19,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -82,8 +81,8 @@ class CouponServiceTest {
         void useCoupon_ok() {
 
             // Arrange
-            when(couponRepository.findById(COUPON_ID)).thenReturn(Optional.of(COUPON));
-            when(issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID)).thenReturn(Optional.of(ISSUED_COUPON));
+            when(couponRepository.findById(COUPON_ID)).thenReturn(COUPON);
+            when(issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID)).thenReturn(ISSUED_COUPON);
 
             // Act
             CouponInfo.CouponAggregate actualInfo = couponService.use(new CouponCommand.Use(USER_ID, COUPON_ID));
@@ -101,7 +100,7 @@ class CouponServiceTest {
         void useCoupon_coupon_NotFound() {
 
             // Arrange
-            when(couponRepository.findById(COUPON_ID)).thenReturn(Optional.empty());
+            when(couponRepository.findById(COUPON_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class, () -> couponService.use(new CouponCommand.Use(USER_ID, COUPON_ID)));
@@ -116,8 +115,8 @@ class CouponServiceTest {
         void useCoupon_issuedCoupon_NotFound() {
 
             // Arrange
-            when(couponRepository.findById(COUPON_ID)).thenReturn(Optional.of(COUPON));
-            when(issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID)).thenReturn(Optional.empty());
+            when(couponRepository.findById(COUPON_ID)).thenReturn(COUPON);
+            when(issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class, () -> couponService.use(new CouponCommand.Use(USER_ID, COUPON_ID)));
@@ -135,8 +134,8 @@ class CouponServiceTest {
             // Arrange
             IssuedCoupon usedIssuedCoupon = new IssuedCoupon(ISSUED_COUPON_ID, USER_ID, COUPON_ID, CouponStatus.USED, null, LocalDateTime.now().plusDays(30));
 
-            when(couponRepository.findById(COUPON_ID)).thenReturn(Optional.of(COUPON));
-            when(issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID)).thenReturn(Optional.of(usedIssuedCoupon));
+            when(couponRepository.findById(COUPON_ID)).thenReturn(COUPON);
+            when(issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID)).thenReturn(usedIssuedCoupon);
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class, () -> couponService.use(new CouponCommand.Use(USER_ID, COUPON_ID)));
@@ -157,8 +156,8 @@ class CouponServiceTest {
         void issue_ok() {
 
             // Arrange
-            when(couponRepository.findById(COUPON_ID)).thenReturn(Optional.of(COUPON));
-            when(issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID)).thenReturn(Optional.empty());
+            when(couponRepository.findById(COUPON_ID)).thenReturn(COUPON);
+            when(issuedCouponRepository.existsByUserIdAndCouponId(USER_ID, COUPON_ID)).thenReturn(false);
             when(issuedCouponRepository.save(any(IssuedCoupon.class))).thenReturn(new IssuedCoupon(USER_ID, COUPON_ID));
 
             // Act
@@ -166,7 +165,7 @@ class CouponServiceTest {
 
             // Assert
             verify(couponRepository,times(1)).findById(COUPON_ID);
-            verify(issuedCouponRepository, times(1)).findByUserIdAndCouponId(USER_ID, COUPON_ID);
+            verify(issuedCouponRepository, times(1)).existsByUserIdAndCouponId(USER_ID, COUPON_ID);
             verify(issuedCouponRepository,times(1)).save(any(IssuedCoupon.class));
 
             assertThat(COUPON.getQuantity()).isEqualTo(99);
@@ -180,7 +179,7 @@ class CouponServiceTest {
         void issue_NotFound() {
 
             // Arrange
-            when(couponRepository.findById(COUPON_ID)).thenReturn(Optional.empty());
+            when(couponRepository.findById(COUPON_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
@@ -199,8 +198,8 @@ class CouponServiceTest {
             Coupon insufficientCoupon1 = new Coupon(1L, 1000L, 0L);
             Coupon insufficientCoupon2 = new Coupon(2L, 1000L, -1L);
 
-            when(couponRepository.findById(1L)).thenReturn(Optional.of(insufficientCoupon1));
-            when(couponRepository.findById(2L)).thenReturn(Optional.of(insufficientCoupon2));
+            when(couponRepository.findById(1L)).thenReturn(insufficientCoupon1);
+            when(couponRepository.findById(2L)).thenReturn(insufficientCoupon2);
 
             // Act & Assert
             GlobalException exception1 = assertThrows(GlobalException.class,

@@ -68,8 +68,7 @@ public class OrderService {
     @Transactional
     public void holdOrder(OrderCommand.HoldOrder command) {
 
-        OrderItem orderItem = orderItemRepository.findByOrderIdAndProductOptionId(command.orderId() ,command.productOptionId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        OrderItem orderItem = orderItemRepository.findByOrderIdAndProductOptionId(command.orderId() ,command.productOptionId());
 
         orderItem.holdStatus();
     }
@@ -84,8 +83,7 @@ public class OrderService {
             return null;
         }
 
-        Order order = orderRepository.findById(command.orderId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        Order order = orderRepository.findById(command.orderId());
 
         order.useCoupon(command.couponId(), command.discountPrice());
 
@@ -106,8 +104,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public Order findById(OrderCommand.Find command) {
 
-        Order order = orderRepository.findById(command.orderId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        Order order = orderRepository.findById(command.orderId());
 
         if (order.getStatus() != OrderStatus.PAYED){
             throw new GlobalException(ErrorCode.BAD_REQUEST);
@@ -122,8 +119,7 @@ public class OrderService {
     @Transactional
     public Order pay(OrderCommand.Find command) {
 
-        Order order = orderRepository.findById(command.orderId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        Order order = orderRepository.findById(command.orderId());
 
         return order.pay();
     }

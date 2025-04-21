@@ -20,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -96,7 +95,7 @@ class OrderServiceTest {
 
         OrderItem orderItem = new OrderItem(1L, 1L, 1000L, 100L);
 
-        when(orderItemRepository.findByOrderIdAndProductOptionId(1L, productOptionId)).thenReturn(Optional.of(orderItem));
+        when(orderItemRepository.findByOrderIdAndProductOptionId(1L, productOptionId)).thenReturn(orderItem);
 
         // Act
         orderService.holdOrder(command);
@@ -134,7 +133,7 @@ class OrderServiceTest {
 
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, COUPON_ID, 3000L);
 
-            when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
+            when(orderRepository.findById(anyLong())).thenReturn(order);
 
             // Act
             OrderInfo.Create actualInfo = orderService.applyCoupon(command);
@@ -155,7 +154,7 @@ class OrderServiceTest {
 
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, COUPON_ID, 20000L);
 
-            when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
+            when(orderRepository.findById(anyLong())).thenReturn(order);
 
             // Act
             OrderInfo.Create actualInfo = orderService.applyCoupon(command);
@@ -176,7 +175,7 @@ class OrderServiceTest {
 
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, COUPON_ID, 10000L);
 
-            when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
+            when(orderRepository.findById(anyLong())).thenReturn(order);
 
             // Act
             OrderInfo.Create actualInfo = orderService.applyCoupon(command);
@@ -202,7 +201,7 @@ class OrderServiceTest {
             order.pay();
 
             // Act
-            when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
+            when(orderRepository.findById(anyLong())).thenReturn(order);
 
             Order actual = orderService.findById(new OrderCommand.Find(ORDER_ID));
 
@@ -220,7 +219,7 @@ class OrderServiceTest {
         void findById_NotFound() {
 
             // Arrange
-            when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.empty());
+            when(orderRepository.findById(ORDER_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
@@ -242,7 +241,7 @@ class OrderServiceTest {
 
         Order mockOrder = mock(Order.class);
 
-        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(mockOrder));
+        when(orderRepository.findById(ORDER_ID)).thenReturn(mockOrder);
         when(mockOrder.pay()).thenReturn(order);
 
         // Act
@@ -264,7 +263,7 @@ class OrderServiceTest {
     void pay_NotFound() {
 
         // Arrange
-        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.empty());
+        when(orderRepository.findById(ORDER_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
         // Act
         GlobalException exception = assertThrows(GlobalException.class,

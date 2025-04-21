@@ -14,8 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -48,7 +46,7 @@ class UserServiceTest {
         void findByUserId_ok() {
 
             // Arrange
-            when(userRepository.findById(USER_ID)).thenReturn(Optional.of(USER));
+            when(userRepository.findById(USER_ID)).thenReturn(USER);
 
             // Act
             User actualUser = userService.findByUserId(new UserCommand.Find(USER_ID));
@@ -62,7 +60,7 @@ class UserServiceTest {
         void findByUserId_NotFound() {
 
             // Arrange
-            when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
+            when(userRepository.findById(USER_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class, () -> userService.findByUserId(new UserCommand.Find(USER_ID)));

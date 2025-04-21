@@ -78,7 +78,7 @@ class PaymentServiceConcurrencyTest {
         log.info("Success count: {}, Failure count: {}", successCount.get(), failureCount.get());
         assertThat(successCount.get() + failureCount.get()).isEqualTo(threadCount);
 
-        Payment actual = paymentRepository.findById(PAYMENT.getId()).get();
+        Payment actual = paymentRepository.findById(PAYMENT.getId());
         assertThat(actual.getAmount()).isEqualTo(0L);
         assertThat(actual.getStatus()).isEqualTo(PaymentStatus.PAYED);
         assertThat(actual.getPaidAt()).isNotNull();
