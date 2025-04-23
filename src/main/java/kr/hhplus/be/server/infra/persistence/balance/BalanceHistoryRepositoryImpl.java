@@ -23,8 +23,4 @@ public class BalanceHistoryRepositoryImpl implements BalanceHistoryRepository {
         return jpaRepository.findByBalanceId(userId);
     }
 
-    @Override
-    public void deleteAll() {
-        jpaRepository.deleteAll();
-    }
 }

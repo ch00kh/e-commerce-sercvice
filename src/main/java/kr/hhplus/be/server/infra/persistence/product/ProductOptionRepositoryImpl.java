@@ -30,8 +30,4 @@ public class ProductOptionRepositoryImpl implements ProductOptionRepository {
         return jpaRepository.save(productOption);
     }
 
-    @Override
-    public void deleteAll() {
-        jpaRepository.deleteAll();
-    }
 }

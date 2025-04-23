@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.application.user;
 
+import kr.hhplus.be.server.DatabaseClearExtension;
 import kr.hhplus.be.server.application.user.dto.UserCriteria;
 import kr.hhplus.be.server.application.user.dto.UserResult;
 import kr.hhplus.be.server.domain.balance.entity.Balance;
@@ -8,6 +9,7 @@ import kr.hhplus.be.server.domain.user.entity.User;
 import kr.hhplus.be.server.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -15,7 +17,9 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
+@DisplayName("[통합테스트] UserFacade")
 public class UserFacadeTest {
 
     @Autowired

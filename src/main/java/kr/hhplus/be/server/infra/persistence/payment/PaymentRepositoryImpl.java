@@ -30,8 +30,4 @@ public class PaymentRepositoryImpl implements PaymentRepository {
                 .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
     }
 
-    @Override
-    public void deleteAll() {
-        jpaRepository.deleteAll();
-    }
 }

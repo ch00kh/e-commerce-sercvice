@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product;
 
+import kr.hhplus.be.server.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.product.dto.ProductCommand;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
@@ -13,10 +14,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-@Transactional
+@ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[통합테스트] ProductService")
 class ProductServiceIntegrationTest {
@@ -49,9 +50,6 @@ class ProductServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        productRepository.deleteAll();
-        productOptionRepository.deleteAll();
-
         PRODUCT1 = productRepository.save(new Product("양반", "김"));
         PRODUCT1_OPTION1 = productOptionRepository.save(new ProductOption(PRODUCT1.getId(), "들기름 김", 1000L, 1000L));
         PRODUCT1_OPTION2 = productOptionRepository.save(new ProductOption(PRODUCT1.getId(), "참기름 김", 1250L, 500L));

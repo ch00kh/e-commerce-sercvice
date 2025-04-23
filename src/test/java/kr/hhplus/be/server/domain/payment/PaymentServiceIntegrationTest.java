@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.payment;
 
+import kr.hhplus.be.server.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.payment.dto.PaymentCommand;
 import kr.hhplus.be.server.domain.payment.entity.Payment;
 import kr.hhplus.be.server.domain.payment.entity.PaymentStatus;
@@ -8,15 +9,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Transactional
+@ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[통합테스트] PaymentService")
 class PaymentServiceIntegrationTest {
@@ -32,8 +33,6 @@ class PaymentServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        paymentRepository.deleteAll();
-
         ORDER_ID = 100L;
         PAYMENT = paymentRepository.save(new Payment(ORDER_ID, 100000L));
     }

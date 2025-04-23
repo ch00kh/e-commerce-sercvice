@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.order;
 
+import kr.hhplus.be.server.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.coupon.dto.CouponInfo;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.order.dto.OrderInfo;
@@ -19,10 +20,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
 @SpringBootTest
-@Transactional
+@ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[통합테스트] OrderService")
 class OrderServiceIntegrationTest {
@@ -61,11 +62,6 @@ class OrderServiceIntegrationTest {
 
     @BeforeEach
     void setup() {
-        orderRepository.deleteAll();
-        orderItemRepository.deleteAll();
-        productRepository.deleteAll();
-        productOptionRepository.deleteAll();
-
         USER_ID = 1L;
         COUPON_ID = 11L;
         ORDER_ID = 111L;

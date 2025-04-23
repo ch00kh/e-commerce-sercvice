@@ -23,8 +23,4 @@ public class BalanceRepositoryImpl implements BalanceRepository {
         return jpaRepository.save(balance);
     }
 
-    @Override
-    public void deleteAll() {
-        jpaRepository.deleteAll();
-    }
 }

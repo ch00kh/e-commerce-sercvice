@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.payment;
 
+import kr.hhplus.be.server.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.payment.dto.PaymentCommand;
 import kr.hhplus.be.server.domain.payment.entity.Payment;
 import kr.hhplus.be.server.domain.payment.entity.PaymentStatus;
@@ -8,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -21,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @SpringBootTest
+@ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[동시성 테스트] PaymentService")
 class PaymentServiceConcurrencyTest {
@@ -36,8 +39,6 @@ class PaymentServiceConcurrencyTest {
 
     @BeforeEach
     void setUp() {
-        paymentRepository.deleteAll();
-
         ORDER_ID = 100L;
         PAYMENT = paymentRepository.save(new Payment(ORDER_ID, 100000L));
     }

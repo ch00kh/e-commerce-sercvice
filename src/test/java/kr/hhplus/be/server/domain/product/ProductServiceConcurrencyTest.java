@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product;
 
+import kr.hhplus.be.server.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.domain.product.entity.Product;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -24,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @SpringBootTest
+@ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[동시성 테스트] ProductService")
 class ProductServiceConcurrencyTest {
@@ -43,9 +46,6 @@ class ProductServiceConcurrencyTest {
 
     @BeforeEach
     void setUp() {
-        productRepository.deleteAll();
-        productOptionRepository.deleteAll();
-
         PRODUCT = productRepository.save(new Product("양반", "김"));
         PRODUCT_OPTION = productOptionRepository.save(new ProductOption(PRODUCT.getId(), "들기름 김", 1000L, 100L));
     }

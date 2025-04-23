@@ -9,6 +9,4 @@ public interface IssuedCouponRepository {
     boolean existsByUserIdAndCouponId(Long userId, Long couponId);
 
     IssuedCoupon save(IssuedCoupon issuedCoupon);
-
-    void deleteAll();
 }

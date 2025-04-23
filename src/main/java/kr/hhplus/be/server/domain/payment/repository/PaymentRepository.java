@@ -9,6 +9,4 @@ public interface PaymentRepository {
     Payment findById(Long paymentId);
 
     Payment findByOrderId(Long orderId);
-
-    void deleteAll();
 }

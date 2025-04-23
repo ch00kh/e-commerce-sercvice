@@ -23,8 +23,4 @@ public class OrderRepositoryImpl implements OrderRepository {
         return jpaRepository.findById(orderId).orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
     }
 
-    @Override
-    public void deleteAll() {
-        jpaRepository.deleteAll();
-    }
 }

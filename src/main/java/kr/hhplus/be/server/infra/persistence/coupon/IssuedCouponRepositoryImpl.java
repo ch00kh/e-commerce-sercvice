@@ -28,8 +28,4 @@ public class IssuedCouponRepositoryImpl implements IssuedCouponRepository {
         return jpaRepository.existsByUserIdAndCouponId(userId, couponId);
     }
 
-    @Override
-    public void deleteAll() {
-        jpaRepository.deleteAll();
-    }
 }

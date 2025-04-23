@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.balance;
 
+import kr.hhplus.be.server.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.balance.dto.BalanceCommand;
 import kr.hhplus.be.server.domain.balance.entity.Balance;
 import kr.hhplus.be.server.domain.balance.entity.BalanceHistory;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -25,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @SpringBootTest
+@ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[동시성 테스트] BalanceService")
 class BalanceServiceConcurrencyTest {
@@ -46,15 +49,8 @@ class BalanceServiceConcurrencyTest {
 
     @BeforeEach
     void setUp() {
-        userRepository.deleteAll();
-        balanceRepository.deleteAll();
-        balanceHistoryRepository.deleteAll();
-
         USER = userRepository.save(new User("추경현"));
         BALANCE = balanceRepository.save(new Balance(USER.getId(), 0L));
-
-        log.info("USER ID: {}", USER.getId());
-        log.info("BALANCE ID: {}", BALANCE.getId());
     }
 
     @Test

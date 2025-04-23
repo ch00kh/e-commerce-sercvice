@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.coupon;
 
+import kr.hhplus.be.server.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.coupon.dto.CouponCommand;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
@@ -7,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @SpringBootTest
+@ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[동시성 테스트] CouponService")
 class CouponServiceConcurrencyTest {
@@ -35,7 +38,6 @@ class CouponServiceConcurrencyTest {
 
     @BeforeEach
     void setUp() {
-        couponRepository.deleteAll();
         COUPON = couponRepository.save(new Coupon(1000L, 100L));
         COUPON_ID = COUPON.getId();
     }

@@ -9,6 +9,4 @@ public interface BalanceHistoryRepository {
     BalanceHistory save(BalanceHistory balanceHistory);
 
     List<BalanceHistory> findByBalanceId(Long userId);
-
-    void deleteAll();
 }
