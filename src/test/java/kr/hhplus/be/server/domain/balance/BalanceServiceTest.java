@@ -156,7 +156,7 @@ class BalanceServiceTest {
 
             // Arrange
             Balance balance = new Balance(USER_ID, 1000L);
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(balance);
+            when(balanceRepository.findByUserIdWithPessimisticLock(USER_ID)).thenReturn(balance);
 
             // Act
             Balance actual = balanceService.reduce(new BalanceCommand.Reduce(USER_ID, 500L, null));
@@ -165,7 +165,7 @@ class BalanceServiceTest {
             assertThat(actual.getUserId()).isEqualTo(USER_ID);
             assertThat(actual.getBalance()).isEqualTo(500L);
 
-            verify(balanceRepository).findByUserId(USER_ID);
+            verify(balanceRepository).findByUserIdWithPessimisticLock(USER_ID);
         }
 
         @Test
@@ -174,14 +174,14 @@ class BalanceServiceTest {
 
             // Arrange
             Balance balance = new Balance(USER_ID, 1000L);
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(balance);
+            when(balanceRepository.findByUserIdWithPessimisticLock(USER_ID)).thenReturn(balance);
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
                     () ->  balanceService.reduce(new BalanceCommand.Reduce(USER_ID, 1500L, null)));
 
             // Assert
-            verify(balanceRepository).findByUserId(USER_ID);
+            verify(balanceRepository).findByUserIdWithPessimisticLock(USER_ID);
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INSUFFICIENT_BALANCE);
         }
 
@@ -190,14 +190,14 @@ class BalanceServiceTest {
         void reduceBalance_notFound() {
 
             // Arrange
-            when(balanceRepository.findByUserId(USER_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
+            when(balanceRepository.findByUserIdWithPessimisticLock(USER_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
                     () ->  balanceService.reduce(new BalanceCommand.Reduce(USER_ID, 500L, null)));
 
             // Assert
-            verify(balanceRepository).findByUserId(USER_ID);
+            verify(balanceRepository).findByUserIdWithPessimisticLock(USER_ID);
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
         }
     }

@@ -107,26 +107,27 @@ class BalanceServiceConcurrencyTest {
     }
 
     @Test
-    @DisplayName("잔고 차감")
+    @DisplayName("[비관적 락] 결제시 잔고 차감 -> 모든 요청 성공")
     void reduce_ok() throws InterruptedException {
 
         // Arrange
-        int threadCount = 20;
-        int threadPool = 5;
+        int threadCount = 10;
+        int threadPool = 10;
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadPool);
-        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch taskLatch = new CountDownLatch(threadCount);
+
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failureCount = new AtomicInteger(0);
-
-        balanceService.charge(new BalanceCommand.Charge(USER.getId(), 1000L));
 
         // Act
         for (int i = 0; i < threadCount; i++) {
             executorService.submit(() -> {
                 try {
-                    BalanceCommand.Reduce command = new BalanceCommand.Reduce(USER.getId(), 10L, null);
-                    balanceService.reduce(command);
+                    startLatch.await();
+                    balanceService.reduce(new BalanceCommand.Reduce(USER.getId(), 100L, null));
 
                     successCount.incrementAndGet();
 
@@ -135,20 +136,23 @@ class BalanceServiceConcurrencyTest {
                     log.error("Error reducing balance: {}", e.getMessage());
 
                 } finally {
-                    latch.countDown();
+                    taskLatch.countDown();
                 }
             });
         }
-        latch.await();
+
+        startLatch.countDown();
+        taskLatch.await();
         executorService.shutdown();
 
         // Assert
         log.info("Success count: {}, Failure count: {}", successCount.get(), failureCount.get());
+        assertThat(successCount.get() + failureCount.get()).isEqualTo(threadCount);
 
-        Balance actualBalance = balanceRepository.findByUserId(USER.getId());
-        assertThat(actualBalance.getBalance()).isEqualTo(1000L - threadCount * 10L);
+        Balance balance = balanceRepository.findByUserId(USER.getId());
+        assertThat(balance.getBalance()).isEqualTo(10000L - (threadCount * 100L));
 
-        List<BalanceHistory> actualBalanceHistory = balanceHistoryRepository.findByBalanceId(BALANCE.getId());
-        assertThat(actualBalanceHistory).hasSize(threadCount + 1); // 충전 1번 + 차감 스레드 수
+        List<BalanceHistory> balanceHistory = balanceHistoryRepository.findByBalanceId(BALANCE.getId());
+        assertThat(balanceHistory).hasSize(threadCount);
     }
 }

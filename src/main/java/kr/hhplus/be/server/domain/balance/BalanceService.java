@@ -47,7 +47,7 @@ public class BalanceService {
     @Transactional
     public Balance reduce(BalanceCommand.Reduce command) {
 
-        Balance balance = balanceRepository.findByUserId(command.userId());
+        Balance balance = balanceRepository.findByUserIdWithPessimisticLock(command.userId());
 
         balanceHistoryRepository.save(new BalanceHistory(balance.getId(), command.issuedCouponId(), command.paymentAmount(), TransactionType.USE));
 

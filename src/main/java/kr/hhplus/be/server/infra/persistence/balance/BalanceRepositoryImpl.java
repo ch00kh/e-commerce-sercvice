@@ -24,6 +24,11 @@ public class BalanceRepositoryImpl implements BalanceRepository {
     }
 
     @Override
+    public Balance findByUserIdWithPessimisticLock(Long userId) {
+        return jpaRepository.findByUserIdWithPessimisticLock(userId).orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+    }
+
+    @Override
     public Balance save(Balance balance) {
         return jpaRepository.save(balance);
     }
