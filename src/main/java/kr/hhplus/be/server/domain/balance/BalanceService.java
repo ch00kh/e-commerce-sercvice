@@ -32,7 +32,7 @@ public class BalanceService {
     @Transactional
     public Balance charge(BalanceCommand.Charge command) {
 
-        Balance balance = balanceRepository.findByUserId(command.userId());
+        Balance balance = balanceRepository.findByUserIdWithOptimisticLock(command.userId());
 
         balance.charge(command.amount());
 

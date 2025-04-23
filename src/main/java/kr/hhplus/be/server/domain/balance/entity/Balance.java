@@ -22,6 +22,9 @@ public class Balance extends BaseTimeEntity {
     @Column(nullable = false)
     private Long balance;
 
+    @Version
+    private Long version;
+
     public Balance(Long userId, Long balance) {
         this.userId = userId;
         this.balance = balance;

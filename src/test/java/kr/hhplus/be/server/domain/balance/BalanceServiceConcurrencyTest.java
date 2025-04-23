@@ -50,19 +50,23 @@ class BalanceServiceConcurrencyTest {
     @BeforeEach
     void setUp() {
         USER = userRepository.save(new User("추경현"));
-        BALANCE = balanceRepository.save(new Balance(USER.getId(), 0L));
+        BALANCE = balanceRepository.save(new Balance(USER.getId(), 10000L));
     }
 
     @Test
-    @DisplayName("잔액 충전")
+    @DisplayName("[낙관적 락] 사용자 잔액 충전 -> 일부 요청은 실패")
     void charge_ok() throws InterruptedException {
 
         // Arrange
-        int threadCount = 20;
-        int threadPool = 5;
+        int threadCount = 10;
+        int threadPool = 10;
+        long chargeAmount = 1000L;
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadPool);
-        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch taskLatch = new CountDownLatch(threadCount);
+
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failureCount = new AtomicInteger(0);
 
@@ -70,7 +74,9 @@ class BalanceServiceConcurrencyTest {
         for (int i = 0; i < threadCount; i++) {
             executorService.submit(() -> {
                 try {
-                    BalanceCommand.Charge command = new BalanceCommand.Charge(USER.getId(), 1000L);
+                    startLatch.await();
+
+                    BalanceCommand.Charge command = new BalanceCommand.Charge(USER.getId(), chargeAmount);
                     balanceService.charge(command);
 
                     successCount.incrementAndGet();
@@ -80,23 +86,24 @@ class BalanceServiceConcurrencyTest {
                     log.error("Error charging balance: {}", e.getMessage());
 
                 } finally {
-                    latch.countDown();
+                    taskLatch.countDown();
                 }
             });
         }
-        latch.await();
+
+        startLatch.countDown();
+        taskLatch.await();
         executorService.shutdown();
 
         // Assert
         log.info("Success count: {}, Failure count: {}", successCount.get(), failureCount.get());
-
         assertThat(successCount.get() + failureCount.get()).isEqualTo(threadCount);
 
-        Balance actualBalance = balanceRepository.findByUserId(USER.getId());
-        assertThat(actualBalance.getBalance()).isEqualTo(1000L * threadCount);
+        Balance balance = balanceRepository.findByUserId(USER.getId());
+        assertThat(balance.getBalance()).isEqualTo(10000L + (successCount.get() * chargeAmount));
 
-        List<BalanceHistory> actualBalanceHistory = balanceHistoryRepository.findByBalanceId(BALANCE.getId());
-        assertThat(actualBalanceHistory).hasSize(threadCount);
+        List<BalanceHistory> balanceHistory = balanceHistoryRepository.findByBalanceId(BALANCE.getId());
+        assertThat(balanceHistory).hasSize(successCount.get());
     }
 
     @Test

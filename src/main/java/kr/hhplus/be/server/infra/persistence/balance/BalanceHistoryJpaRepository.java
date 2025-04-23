@@ -8,4 +8,5 @@ import java.util.List;
 public interface BalanceHistoryJpaRepository extends JpaRepository<BalanceHistory, Long> {
 
     List<BalanceHistory> findByBalanceId(Long balanceId);
+
 }

@@ -94,13 +94,13 @@ class BalanceServiceTest {
 
             // Arrange
             Balance balance = new Balance(USER_ID, 1000L);
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(balance);
+            when(balanceRepository.findByUserIdWithOptimisticLock(USER_ID)).thenReturn(balance);
 
             // Act
             Balance actualBalance = balanceService.charge(new BalanceCommand.Charge(USER_ID, 1000L));
 
             // Assert
-            verify(balanceRepository, times(1)).findByUserId(USER_ID);
+            verify(balanceRepository, times(1)).findByUserIdWithOptimisticLock(USER_ID);
 
             assertThat(actualBalance.getUserId()).isEqualTo(1L);
             assertThat(actualBalance.getBalance()).isEqualTo(2000L); // 1000+1000
@@ -119,13 +119,13 @@ class BalanceServiceTest {
         void charge_notFound() {
 
             // Arrange
-            when(balanceRepository.findByUserId(USER_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
+            when(balanceRepository.findByUserIdWithOptimisticLock(USER_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class, () -> balanceService.charge(new BalanceCommand.Charge(1L, 1000L)));
 
             // Assert
-            verify(balanceRepository, times(1)).findByUserId(USER_ID);
+            verify(balanceRepository, times(1)).findByUserIdWithOptimisticLock(USER_ID);
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
         }
 
@@ -135,13 +135,13 @@ class BalanceServiceTest {
 
             // Arrange
             Balance balance = new Balance(USER_ID, 1000L);
-            when(balanceRepository.findByUserId(USER_ID)).thenReturn(balance);
+            when(balanceRepository.findByUserIdWithOptimisticLock(USER_ID)).thenReturn(balance);
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class, () -> balanceService.charge(new BalanceCommand.Charge(1L, -1000L)));
 
             // Assert
-            verify(balanceRepository, times(1)).findByUserId(USER_ID);
+            verify(balanceRepository, times(1)).findByUserIdWithOptimisticLock(USER_ID);
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_CHARGE_AMOUNT);
         }
     }
