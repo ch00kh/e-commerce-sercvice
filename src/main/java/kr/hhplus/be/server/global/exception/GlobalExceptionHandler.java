@@ -15,10 +15,10 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Slf4j
 @RestControllerAdvice
-class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+    public ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
             @NonNull HttpHeaders headers,
             @NonNull HttpStatusCode status,
