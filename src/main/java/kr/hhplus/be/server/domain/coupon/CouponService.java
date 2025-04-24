@@ -46,11 +46,11 @@ public class CouponService {
     public IssuedCoupon issue(CouponCommand.Issue command) {
 
         // 잔여 쿠폰 조회 및 쿠폰 수량 차감
-        Coupon coupon = couponRepository.findById(command.couponId());
+        Coupon coupon = couponRepository.findByIdWithPessimisticLock(command.couponId());
 
         coupon.issue();
 
-        // 기발급 검증 및 쿠폰 저장
+        // 기발급 검증
         if (issuedCouponRepository.existsByUserIdAndCouponId(command.userId(), command.couponId())) {
             throw new GlobalException(ErrorCode.ALREADY_ISSUED_COUPON);
         }

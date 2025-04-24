@@ -33,17 +33,15 @@ class CouponServiceConcurrencyTest {
     @Autowired
     private CouponService couponService;
 
-    private Long COUPON_ID;
     private Coupon COUPON;
 
     @BeforeEach
     void setUp() {
-        COUPON = couponRepository.save(new Coupon(1000L, 100L));
-        COUPON_ID = COUPON.getId();
+        COUPON = couponRepository.save(new Coupon(1000L, 10L));
     }
 
     @Test
-    @DisplayName("쿠폰 발급")
+    @DisplayName("[비관적 락] 선착순 쿠폰 발급 -> 모든 요청은 성공하거나 OUT_OF_STOCK_COUPON 예외가 발생")
     void issue_ok() throws InterruptedException {
 
         // Arrange
@@ -51,7 +49,10 @@ class CouponServiceConcurrencyTest {
         int threadPool = 8;
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadPool);
-        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch taskLatch = new CountDownLatch(threadCount);
+
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failureCount = new AtomicInteger(0);
 
@@ -60,26 +61,29 @@ class CouponServiceConcurrencyTest {
             long finalI = i;
             executorService.submit(() -> {
                 try {
+                    startLatch.await();
 
-                    couponService.issue(new CouponCommand.Issue(finalI, COUPON_ID));
+                    couponService.issue(new CouponCommand.Issue(finalI, COUPON.getId()));
                     successCount.incrementAndGet();
 
                 } catch (Exception e) {
                     failureCount.incrementAndGet();
                     log.error("Error coupon issue: {}", e.getMessage());
                 } finally {
-                    latch.countDown();
+                    taskLatch.countDown();
                 }
             });
         }
-        latch.await();
+
+        startLatch.countDown();
+        taskLatch.await();
         executorService.shutdown();
 
         // Assert
         log.info("Success count: {}, Failure count: {}", successCount.get(), failureCount.get());
         assertThat(successCount.get() + failureCount.get()).isEqualTo(threadCount);
 
-        Coupon coupon = couponRepository.findById(COUPON_ID);
+        Coupon coupon = couponRepository.findById(COUPON.getId());
         assertThat(coupon.getQuantity()).isEqualTo(0);
 
     }
