@@ -42,6 +42,21 @@ class UserServiceIntegrationTest {
     }
 
     @Test
+    @DisplayName("[실패] 사용자 생성 -> 이미 존재하는 사용자(BAD_REQUEST)")
+    void create_badRequest() {
+
+        // Arrange
+        String userName = "추경현";
+        userService.create(new UserCommand.Create(userName));
+
+        // Act
+        GlobalException exception = assertThrows(GlobalException.class, () -> userService.create(new UserCommand.Create(userName)));
+
+        //Assert
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.BAD_REQUEST);
+    }
+
+    @Test
     @DisplayName("[실패] 사용자 조회 -> 사용자 없음 예외 (NOT_FOUND)")
     void findNonExistingUser() {
 

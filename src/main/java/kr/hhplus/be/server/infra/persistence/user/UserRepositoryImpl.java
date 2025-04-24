@@ -7,6 +7,8 @@ import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
@@ -21,6 +23,11 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User save(User user) {
         return jpaRepository.save(user);
+    }
+
+    @Override
+    public Optional<User> findByName(String name) {
+        return jpaRepository.findByName(name);
     }
 
 }
