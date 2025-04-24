@@ -1,8 +1,9 @@
-package kr.hhplus.be.server.interfaces.product.controller;
+package kr.hhplus.be.server.interfaces.product;
 
 import kr.hhplus.be.server.application.product.ProductFacade;
 import kr.hhplus.be.server.application.product.dto.ProductCriteria;
 import kr.hhplus.be.server.application.product.dto.ProductResult;
+import kr.hhplus.be.server.interfaces.product.controller.ProductController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

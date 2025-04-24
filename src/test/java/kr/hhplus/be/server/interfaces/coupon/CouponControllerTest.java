@@ -1,9 +1,10 @@
-package kr.hhplus.be.server.interfaces.coupon.controller;
+package kr.hhplus.be.server.interfaces.coupon;
 
 import kr.hhplus.be.server.application.coupon.CouponFacade;
 import kr.hhplus.be.server.application.coupon.dto.CouponCriteria;
 import kr.hhplus.be.server.application.coupon.dto.CouponResult;
 import kr.hhplus.be.server.domain.coupon.entity.CouponStatus;
+import kr.hhplus.be.server.interfaces.coupon.controller.CouponController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

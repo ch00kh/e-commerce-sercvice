@@ -1,10 +1,11 @@
-package kr.hhplus.be.server.interfaces.balance.controller;
+package kr.hhplus.be.server.interfaces.balance;
 
 import kr.hhplus.be.server.application.balance.BalanceFacade;
 import kr.hhplus.be.server.application.balance.dto.BalanceCriteria;
 import kr.hhplus.be.server.application.balance.dto.BalanceResult;
 import kr.hhplus.be.server.domain.balance.dto.BalanceCommand;
 import kr.hhplus.be.server.domain.balance.entity.Balance;
+import kr.hhplus.be.server.interfaces.balance.controller.BalanceController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

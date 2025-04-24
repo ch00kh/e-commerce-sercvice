@@ -1,9 +1,10 @@
-package kr.hhplus.be.server.interfaces.order.controller;
+package kr.hhplus.be.server.interfaces.order;
 
 import kr.hhplus.be.server.application.order.OrderFacade;
 import kr.hhplus.be.server.application.order.dto.OrderCriteria;
 import kr.hhplus.be.server.application.order.dto.OrderResult;
 import kr.hhplus.be.server.domain.order.entity.OrderStatus;
+import kr.hhplus.be.server.interfaces.order.controller.OrderController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
