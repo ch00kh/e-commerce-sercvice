@@ -19,9 +19,10 @@ public class CouponController implements ICouponController {
 
     @PostMapping("/issue")
     public ResponseEntity<CouponResponse> issue(
-            @RequestBody CouponRequest request
+            @RequestBody CouponRequest.Issue request
     ) {
         return ResponseEntity.ok()
                 .body(CouponResponse.from(couponFacade.firstComeFirstIssue(request.toCriteria())));
     }
+
 }

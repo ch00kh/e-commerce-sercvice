@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static kr.hhplus.be.server.domain.coupon.dto.CouponInfo.CouponAggregate;
 
 @Service
@@ -58,4 +60,21 @@ public class CouponService {
         return issuedCouponRepository.save(new IssuedCoupon(command.userId(), command.couponId()));
     }
 
+    /**
+     * 쿠폰 만료 처리
+     */
+    @Transactional
+    public void expireCoupon() {
+        List<IssuedCoupon> expiredCoupons = issuedCouponRepository.findExpiredCoupons();
+        expiredCoupons.forEach(IssuedCoupon::expireCoupon);
+    }
+
+    /**
+     * 발급 쿠폰 만료일 변경
+     */
+    @Transactional
+    public void changeExpiredAt(CouponCommand.ChangeExpiredAt command) {
+        IssuedCoupon issuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(command.userId(), command.couponId());
+        issuedCoupon.changeExpiredAt(command.expiredAt());
+    }
 }

@@ -16,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -81,5 +84,22 @@ class CouponServiceIntegrationTest {
         assertThat(actual.getCouponId()).isEqualTo(issuedCoupon.getCouponId());
         assertThat(actual.getUserId()).isEqualTo(USER_ID);
         assertThat(actual.getStatus()).isEqualTo(CouponStatus.ISSUED);
+        assertThat(actual.getExpiredAt()).isEqualTo(LocalDate.now().plusDays(30).atStartOfDay());
+    }
+
+    @Test
+    @DisplayName("[성공] 쿠폰 변경 및 만료")
+    void expireCoupon() throws InterruptedException {
+
+        // Act
+        couponService.changeExpiredAt(new CouponCommand.ChangeExpiredAt(USER_ID, COUPON_ID, LocalDateTime.now()));
+
+        Thread.sleep(1000 * 3);
+
+        couponService.expireCoupon();
+
+        // Assert
+        IssuedCoupon actual = issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID);
+        assertThat(actual.getStatus()).isEqualTo(CouponStatus.EXPIRED);
     }
 }
