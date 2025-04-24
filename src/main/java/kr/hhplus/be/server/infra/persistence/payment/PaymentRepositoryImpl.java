@@ -20,8 +20,12 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 
     @Override
     public Payment findById(Long paymentId) {
-        return jpaRepository.findById(paymentId)
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        return jpaRepository.findById(paymentId).orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+    }
+
+    @Override
+    public Payment findByIdWithOptimisticLock(Long paymentId) {
+        return jpaRepository.findByIdWithOptimisticLock(paymentId).orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
     }
 
     @Override

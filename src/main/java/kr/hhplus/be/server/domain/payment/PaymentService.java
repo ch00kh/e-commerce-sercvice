@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
@@ -38,7 +39,7 @@ public class PaymentService {
     @Transactional
     public Payment pay(PaymentCommand.Pay command) {
 
-        Payment payment = paymentRepository.findById(command.paymentId());
+        Payment payment = paymentRepository.findByIdWithOptimisticLock(command.paymentId());
 
         return payment.pay(command.paymentAmount());
     }

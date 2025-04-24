@@ -34,6 +34,9 @@ public class Payment extends BaseTimeEntity {
     @Column
     private LocalDateTime paidAt;
 
+    @Version
+    private Long version;
+
     public Payment(Long orderId, Long amount) {
         this.orderId = orderId;
         this.amount = amount;

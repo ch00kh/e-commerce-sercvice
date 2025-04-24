@@ -8,5 +8,7 @@ public interface PaymentRepository {
 
     Payment findById(Long paymentId);
 
+    Payment findByIdWithOptimisticLock(Long paymentId);
+
     Payment findByOrderId(Long orderId);
 }

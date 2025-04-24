@@ -84,13 +84,13 @@ class PaymentServiceTest {
         void payAllAmount_ok() {
 
             // Arrange
-            when(paymentRepository.findById(anyLong())).thenReturn(PAYMENT);
+            when(paymentRepository.findByIdWithOptimisticLock(anyLong())).thenReturn(PAYMENT);
 
             // Act
             Payment result = paymentService.pay(new PaymentCommand.Pay(anyLong(), 100000L));
 
             // Assert
-            verify(paymentRepository, times(1)).findById(anyLong());
+            verify(paymentRepository, times(1)).findByIdWithOptimisticLock(anyLong());
             assertThat(result.getStatus()).isEqualTo(PaymentStatus.PAYED);
             assertThat(result.getAmount()).isEqualTo(0L);
             assertThat(result.getPaidAt()).isNotNull();
@@ -101,13 +101,13 @@ class PaymentServiceTest {
         void paySomeAmount_ok() {
 
             // Arrange
-            when(paymentRepository.findById(anyLong())).thenReturn(PAYMENT);
+            when(paymentRepository.findByIdWithOptimisticLock(anyLong())).thenReturn(PAYMENT);
 
             // Act
             Payment result = paymentService.pay(new PaymentCommand.Pay(anyLong(), 50000L));
 
             // Assert
-            verify(paymentRepository, times(1)).findById(anyLong());
+            verify(paymentRepository, times(1)).findByIdWithOptimisticLock((anyLong()));
             assertThat(result.getStatus()).isEqualTo(PaymentStatus.PENDING);
             assertThat(result.getAmount()).isEqualTo(50000L);
             assertThat(result.getPaidAt()).isNotNull();
@@ -118,14 +118,14 @@ class PaymentServiceTest {
         void pay_NotFound() {
 
             // Arrange
-            when(paymentRepository.findById(anyLong())).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
+            when(paymentRepository.findByIdWithOptimisticLock(anyLong())).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
                     () -> paymentService.pay(new PaymentCommand.Pay(anyLong(), 10000L)));
 
             // Assert
-            verify(paymentRepository).findById(anyLong());
+            verify(paymentRepository).findByIdWithOptimisticLock(anyLong());
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
         }
     }
