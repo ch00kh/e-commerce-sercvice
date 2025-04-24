@@ -156,7 +156,7 @@ class CouponServiceTest {
         void issue_ok() {
 
             // Arrange
-            when(couponRepository.findByIdWithPessimisticLock(COUPON_ID)).thenReturn(COUPON);
+            when(couponRepository.findByIdWithOptimisticLock(COUPON_ID)).thenReturn(COUPON);
             when(issuedCouponRepository.existsByUserIdAndCouponId(USER_ID, COUPON_ID)).thenReturn(false);
             when(issuedCouponRepository.save(any(IssuedCoupon.class))).thenReturn(new IssuedCoupon(USER_ID, COUPON_ID));
 
@@ -164,7 +164,7 @@ class CouponServiceTest {
             IssuedCoupon actual = couponService.issue(new CouponCommand.Issue(USER_ID, COUPON_ID));
 
             // Assert
-            verify(couponRepository,times(1)).findByIdWithPessimisticLock(COUPON_ID);
+            verify(couponRepository,times(1)).findByIdWithOptimisticLock(COUPON_ID);
             verify(issuedCouponRepository, times(1)).existsByUserIdAndCouponId(USER_ID, COUPON_ID);
             verify(issuedCouponRepository,times(1)).save(any(IssuedCoupon.class));
 
@@ -179,14 +179,14 @@ class CouponServiceTest {
         void issue_NotFound() {
 
             // Arrange
-            when(couponRepository.findByIdWithPessimisticLock(COUPON_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
+            when(couponRepository.findByIdWithOptimisticLock(COUPON_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
                     () -> couponService.issue(new CouponCommand.Issue(USER_ID, COUPON_ID)));
 
             // Assert
-            verify(couponRepository, times(1)).findByIdWithPessimisticLock(COUPON_ID);
+            verify(couponRepository, times(1)).findByIdWithOptimisticLock(COUPON_ID);
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
         }
 
@@ -198,20 +198,20 @@ class CouponServiceTest {
             Coupon insufficientCoupon1 = new Coupon(1000L, 0L);
             Coupon insufficientCoupon2 = new Coupon(1000L, -1L);
 
-            when(couponRepository.findByIdWithPessimisticLock(1L)).thenReturn(insufficientCoupon1);
-            when(couponRepository.findByIdWithPessimisticLock(2L)).thenReturn(insufficientCoupon2);
+            when(couponRepository.findByIdWithOptimisticLock(1L)).thenReturn(insufficientCoupon1);
+            when(couponRepository.findByIdWithOptimisticLock(2L)).thenReturn(insufficientCoupon2);
 
             // Act & Assert
             GlobalException exception1 = assertThrows(GlobalException.class,
                     () -> couponService.issue(new CouponCommand.Issue(USER_ID, 1L)));
 
-            verify(couponRepository, times(1)).findByIdWithPessimisticLock(1L);
+            verify(couponRepository, times(1)).findByIdWithOptimisticLock(1L);
             assertThat(exception1.getErrorCode()).isEqualTo(ErrorCode.OUT_OF_STOCK_COUPON);
 
             GlobalException exception2 = assertThrows(GlobalException.class,
                     () -> couponService.issue(new CouponCommand.Issue(USER_ID, 2L)));
 
-            verify(couponRepository, times(1)).findByIdWithPessimisticLock(2L);
+            verify(couponRepository, times(1)).findByIdWithOptimisticLock(2L);
             assertThat(exception2.getErrorCode()).isEqualTo(ErrorCode.OUT_OF_STOCK_COUPON);
         }
     }

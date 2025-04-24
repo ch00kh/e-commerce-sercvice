@@ -46,7 +46,7 @@ public class CouponService {
     public IssuedCoupon issue(CouponCommand.Issue command) {
 
         // 잔여 쿠폰 조회 및 쿠폰 수량 차감
-        Coupon coupon = couponRepository.findByIdWithPessimisticLock(command.couponId());
+        Coupon coupon = couponRepository.findByIdWithOptimisticLock(command.couponId());
 
         coupon.issue();
 

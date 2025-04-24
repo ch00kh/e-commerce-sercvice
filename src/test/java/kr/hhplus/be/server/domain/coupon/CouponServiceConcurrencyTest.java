@@ -41,7 +41,7 @@ class CouponServiceConcurrencyTest {
     }
 
     @Test
-    @DisplayName("[비관적 락] 선착순 쿠폰 발급 -> 모든 요청은 성공하거나 OUT_OF_STOCK_COUPON 예외가 발생")
+    @DisplayName("[낙관적 락] 선착순 쿠폰 발급 -> 모든 요청은 성공하거나 실패하며 쿠폰이 부족한 경우 OUT_OF_STOCK_COUPON 예외가 발생")
     void issue_ok() throws InterruptedException {
 
         // Arrange
