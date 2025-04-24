@@ -21,6 +21,11 @@ public class ProductOptionRepositoryImpl implements ProductOptionRepository {
     }
 
     @Override
+    public ProductOption findByIdWithPessimisticLock(Long optionId) {
+        return jpaRepository.findByIdWithPessimisticLock(optionId).orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+    }
+
+    @Override
     public List<ProductOption> findByProductId(Long productId) {
         return jpaRepository.findByProductId(productId);
     }

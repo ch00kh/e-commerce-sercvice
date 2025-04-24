@@ -56,7 +56,7 @@ public class ProductService {
     public ProductInfo.Order reduceStock(List<OrderCommand.OrderItem> command) {
 
         return new ProductInfo.Order(command.stream().map(i -> {
-            ProductOption productOption = productOptionRepository.findById(i.productOptionId());
+            ProductOption productOption = productOptionRepository.findByIdWithPessimisticLock(i.productOptionId());
 
             if (productOption.canPurchase(i.quantity())) {
                 Long remainingStock = productOption.reduceStock(i.quantity());

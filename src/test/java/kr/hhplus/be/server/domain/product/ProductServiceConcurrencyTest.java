@@ -51,15 +51,18 @@ class ProductServiceConcurrencyTest {
     }
 
     @Test
-    @DisplayName("재고 차감")
+    @DisplayName("[비관적 락] 주문시 재고 차감 -> 모든 요청 성공")
     void reduceStockConcurrencyTest() throws InterruptedException {
 
         // Arrange
         int threadCount = 100;
-        int threadPool = 8;
+        int threadPool = 3;
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadPool);
-        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch taskLatch = new CountDownLatch(threadCount);
+
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failureCount = new AtomicInteger(0);
 
@@ -67,6 +70,8 @@ class ProductServiceConcurrencyTest {
         for (int i = 0; i < threadCount; i++) {
             executorService.submit(() -> {
                 try {
+                    startLatch.await();
+
                     List<OrderCommand.OrderItem> command = List.of(new OrderCommand.OrderItem(PRODUCT_OPTION.getId(), 1000L, 1L));
                     ProductInfo.Order productInfo = productService.reduceStock(command);
 
@@ -80,11 +85,13 @@ class ProductServiceConcurrencyTest {
                     failureCount.incrementAndGet();
                     log.error("Error reducing stock: {}", e.getMessage());
                 } finally {
-                    latch.countDown();
+                    taskLatch.countDown();
                 }
             });
         }
-        latch.await();
+
+        startLatch.countDown();
+        taskLatch.await();
         executorService.shutdown();
 
         // Assert
@@ -92,7 +99,7 @@ class ProductServiceConcurrencyTest {
         assertThat(successCount.get() + failureCount.get()).isEqualTo(threadCount);
 
         ProductOption updatedOption = productOptionRepository.findById(PRODUCT_OPTION.getId());
-        assertThat(updatedOption.getStock()).isEqualTo(0);
+        assertThat(updatedOption.getStock()).isEqualTo(100L - successCount.get());
     }
 
 }

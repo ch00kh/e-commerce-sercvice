@@ -8,6 +8,8 @@ public interface ProductOptionRepository {
 
     ProductOption findById(Long optionId);
 
+    ProductOption findByIdWithPessimisticLock(Long optionId);
+
     List<ProductOption> findByProductId(Long productId);
 
     ProductOption save(ProductOption productOption);

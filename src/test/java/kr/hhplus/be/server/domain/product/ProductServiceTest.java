@@ -154,15 +154,15 @@ class ProductServiceTest {
                     new OrderCommand.OrderItem(102L, 5900L, 9L)
             );
 
-            when(productOptionRepository.findById(101L)).thenReturn(PRODUCT_OPTION1);
-            when(productOptionRepository.findById(102L)).thenReturn(PRODUCT_OPTION2);
+            when(productOptionRepository.findByIdWithPessimisticLock(101L)).thenReturn(PRODUCT_OPTION1);
+            when(productOptionRepository.findByIdWithPessimisticLock(102L)).thenReturn(PRODUCT_OPTION2);
 
             // Act
             ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
 
             // Assert
-            verify(productOptionRepository, times(1)).findById(101L);
-            verify(productOptionRepository, times(1)).findById(102L);
+            verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(101L);
+            verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(102L);
 
             assertThat(actualInfo.checkStocks().size()).isEqualTo(2);
 
@@ -187,15 +187,15 @@ class ProductServiceTest {
                     new OrderCommand.OrderItem(102L, 5900L, 99L)
             );
 
-            when(productOptionRepository.findById(101L)).thenReturn(PRODUCT_OPTION1);
-            when(productOptionRepository.findById(102L)).thenReturn(PRODUCT_OPTION2);
+            when(productOptionRepository.findByIdWithPessimisticLock(101L)).thenReturn(PRODUCT_OPTION1);
+            when(productOptionRepository.findByIdWithPessimisticLock(102L)).thenReturn(PRODUCT_OPTION2);
 
             // Act
             ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
 
             // Assert
-            verify(productOptionRepository, times(1)).findById(101L);
-            verify(productOptionRepository, times(1)).findById(102L);
+            verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(101L);
+            verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(102L);
 
             assertThat(actualInfo.checkStocks().size()).isEqualTo(2);
 
@@ -220,15 +220,15 @@ class ProductServiceTest {
                     new OrderCommand.OrderItem(102L, 5900L, 100L)
             );
 
-            when(productOptionRepository.findById(101L)).thenReturn(PRODUCT_OPTION1);
-            when(productOptionRepository.findById(102L)).thenReturn(PRODUCT_OPTION2);
+            when(productOptionRepository.findByIdWithPessimisticLock(101L)).thenReturn(PRODUCT_OPTION1);
+            when(productOptionRepository.findByIdWithPessimisticLock(102L)).thenReturn(PRODUCT_OPTION2);
 
             // Act
             ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
 
             // Assert
-            verify(productOptionRepository, times(1)).findById(101L);
-            verify(productOptionRepository, times(1)).findById(102L);
+            verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(101L);
+            verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(102L);
 
             assertThat(actualInfo.checkStocks().size()).isEqualTo(2);
 
