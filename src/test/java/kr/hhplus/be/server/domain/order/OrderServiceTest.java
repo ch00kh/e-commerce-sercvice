@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.order;
 
-import kr.hhplus.be.server.domain.coupon.dto.CouponInfo;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.order.dto.OrderInfo;
 import kr.hhplus.be.server.domain.order.entity.Order;
@@ -114,14 +113,16 @@ class OrderServiceTest {
         void useCoupon_couponIsNull() {
 
             // Arrange
-            CouponInfo.CouponAggregate couponInfo = new CouponInfo.CouponAggregate(null, null, null, null, null);
-            OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, couponInfo.couponId(), couponInfo.discountPrice());
+            OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, null, 1000L);
+            Order order = new Order(ORDER_ID, USER_ID, null, OrderStatus.CREATED, 1000L, 0L, 1000L);
+
+            when(orderRepository.findById(anyLong())).thenReturn(order);
 
             // Act
             OrderInfo.Create actualInfo = orderService.applyCoupon(command);
 
             // Assert
-            assertThat(actualInfo).isNull();
+            assertThat(actualInfo.issuedCouponId()).isNull();
         }
 
         @Test
