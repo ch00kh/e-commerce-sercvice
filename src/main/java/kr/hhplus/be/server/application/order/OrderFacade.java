@@ -53,7 +53,7 @@ public class OrderFacade {
         CouponInfo.CouponAggregate couponInfo = couponService.use(new CouponCommand.Use(criteria.userId(), criteria.couponId()));
 
         // 쿠폰 적용
-        orderService.applyCoupon(OrderCommand.UseCoupon.toCommand(order.orderId(), couponInfo.couponId(), couponInfo.discountPrice()));
+        order = orderService.applyCoupon(OrderCommand.UseCoupon.toCommand(order.orderId(), couponInfo.couponId(), couponInfo.discountPrice()));
 
         // 재고 차감 -> 재고 부족시 해당 옵션 상태
         ProductInfo.Order checkProductOrder = productService.reduceStock(orderItemCommand);

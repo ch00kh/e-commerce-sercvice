@@ -4,14 +4,9 @@ import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.order.dto.OrderInfo;
 import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.order.entity.OrderItem;
-import kr.hhplus.be.server.domain.order.entity.OrderStatus;
 import kr.hhplus.be.server.domain.order.repository.OrderItemRepository;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
-import kr.hhplus.be.server.global.exception.ErrorCode;
-import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderService {
 
-    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
 
@@ -79,15 +73,23 @@ public class OrderService {
     @Transactional
     public OrderInfo.Create applyCoupon(OrderCommand.UseCoupon command) {
 
-        if (command.couponId() == null) {
-            return null;
-        }
-
         Order order = orderRepository.findById(command.orderId());
+
+        if (command.couponId() == null) {
+            return new OrderInfo.Create(
+                    order.getId(),
+                    order.getUserId(),
+                    order.getIssuedCouponId(),
+                    order.getStatus(),
+                    order.getTotalAmount(),
+                    order.getDiscountAmount(),
+                    order.getPaymentAmount()
+            );
+        }
 
         order.useCoupon(command.couponId(), command.discountPrice());
 
-        return new OrderInfo.Create(
+        OrderInfo.Create create = new OrderInfo.Create(
                 order.getId(),
                 order.getUserId(),
                 order.getIssuedCouponId(),
@@ -96,6 +98,7 @@ public class OrderService {
                 order.getDiscountAmount(),
                 order.getPaymentAmount()
         );
+        return create;
     }
 
     /**
@@ -103,14 +106,7 @@ public class OrderService {
      */
     @Transactional(readOnly = true)
     public Order findById(OrderCommand.Find command) {
-
-        Order order = orderRepository.findById(command.orderId());
-
-        if (order.getStatus() != OrderStatus.PAYED){
-            throw new GlobalException(ErrorCode.BAD_REQUEST);
-        }
-
-        return order;
+        return orderRepository.findById(command.orderId());
     }
 
     /**

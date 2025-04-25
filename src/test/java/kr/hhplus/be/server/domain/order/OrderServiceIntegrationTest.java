@@ -128,7 +128,7 @@ class OrderServiceIntegrationTest {
             OrderInfo.Create actualInfo = orderService.applyCoupon(command);
 
             // Assert
-            assertThat(actualInfo).isNull();
+            assertThat(actualInfo.issuedCouponId()).isNull();
         }
 
         @Test
