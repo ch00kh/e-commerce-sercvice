@@ -54,7 +54,7 @@ class BalanceServiceConcurrencyTest {
     }
 
     @Test
-    @DisplayName("[낙관적 락] 사용자 잔액 충전 -> 일부 요청은 실패")
+    @DisplayName("사용자 잔액 충전 시 부분적으로 성공한다. 재시도가 없어 일부 요청은 실패한다.")
     void charge_ok() throws InterruptedException {
 
         // Arrange
@@ -107,7 +107,7 @@ class BalanceServiceConcurrencyTest {
     }
 
     @Test
-    @DisplayName("[비관적 락] 결제시 잔고 차감 -> 모든 요청 성공")
+    @DisplayName("결제 중 잔액 차감 시 잔고가 여유가 있는 경우 모든 요청 성공한다.")
     void reduce_ok() throws InterruptedException {
 
         // Arrange

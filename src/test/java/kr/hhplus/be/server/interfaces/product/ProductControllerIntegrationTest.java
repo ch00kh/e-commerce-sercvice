@@ -64,7 +64,7 @@ class ProductControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 상품 목록 조회")
+    @DisplayName("전체 상품 목록을 조회한다.")
     void findProductAll() throws JsonProcessingException {
 
         // Act
@@ -135,7 +135,7 @@ class ProductControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 상품 정보 조회")
+    @DisplayName("상품ID를 입력받아 상품 정보를 조회한다.")
     void findProduct() throws JsonProcessingException {
 
         // Arrange & Act
@@ -169,46 +169,5 @@ class ProductControllerIntegrationTest {
         assertThat(actual).isEqualToIgnoringWhitespace(responseBody);
 
     }
-//
-//    @Test
-//    @DisplayName("[성공] 인기 판매 상품 정보 조회")
-//    void findBest() {
-//
-//        // Arrange
-//        ProductCriteria.FindBest criteria = new ProductCriteria.FindBest(3, 5);
-//
-//        // Act
-//        ProductResult.ProductList productList = productFacade.findBest(criteria);
-//
-//        // Assert
-//        assertThat(productList.products()).satisfies(products -> {
-//            ProductResult.ProductAggregate product1 = products.get(0);
-//            assertThat(product1.productId()).isEqualTo(PRODUCT1.getId());
-//            assertThat(product1.brand()).isEqualTo("맥도날드");
-//            assertThat(product1.name()).isEqualTo("햄버거");
-//
-//            assertThat(product1.options().get(0).optionId()).isEqualTo(PRODUCT1_OPTION1.getId());
-//            assertThat(product1.options().get(0).optionValue()).isEqualTo("빅맥");
-//            assertThat(product1.options().get(0).price()).isEqualTo(1000L);
-//            assertThat(product1.options().get(0).stock()).isEqualTo(100L);
-//
-//            assertThat(product1.options().get(1).optionId()).isEqualTo(PRODUCT1_OPTION2.getId());
-//            assertThat(product1.options().get(1).optionValue()).isEqualTo("맥스파이시");
-//            assertThat(product1.options().get(1).price()).isEqualTo(1000L);
-//            assertThat(product1.options().get(1).stock()).isEqualTo(100L);
-//
-//            ProductResult.ProductAggregate product2 = products.get(1);
-//            assertThat(product2.productId()).isEqualTo(PRODUCT2.getId());
-//            assertThat(product2.brand()).isEqualTo("롯데리아");
-//            assertThat(product2.options().get(0).price()).isEqualTo(1000L);
-//            assertThat(product2.options().get(0).stock()).isEqualTo(100L);
-//
-//            ProductResult.ProductAggregate product3 = products.get(2);
-//            assertThat(product3.productId()).isEqualTo(PRODUCT3.getId());
-//            assertThat(product3.brand()).isEqualTo("맘스터치");
-//            assertThat(product3.options().get(0).price()).isEqualTo(1000L);
-//            assertThat(product3.options().get(0).stock()).isEqualTo(100L);
-//        });
-//
-//    }
+
 }

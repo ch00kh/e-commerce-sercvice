@@ -85,7 +85,7 @@ class PaymentControllerIntegrationTest {
 
 
     @Test
-    @DisplayName("[성공] 결제 금액 전체 결제")
+    @DisplayName("주문ID와 전체 결제금액을 입력받아 전체 결제금액에 대한 결제를 처리한다.")
     void payAllAmount() throws Exception {
 
         // Arrange
@@ -109,7 +109,7 @@ class PaymentControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 결제 금액 일부 결제")
+    @DisplayName("주문ID와 일부 결제금액을 입력받아 일부 결제금액에 대한 결제를 처리한다.")
     void payAnyAmount() throws Exception {
 
         // Arrange

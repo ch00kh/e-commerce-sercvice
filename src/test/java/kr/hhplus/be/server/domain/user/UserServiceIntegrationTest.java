@@ -25,7 +25,7 @@ class UserServiceIntegrationTest {
     private UserService userService;
 
     @Test
-    @DisplayName("[성공] 사용자 생성 및 조회")
+    @DisplayName("사용자를 생성한 후 조회한다.")
     void createAndFindUser() {
 
         // Arrange
@@ -42,7 +42,7 @@ class UserServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("[실패] 사용자 생성 -> 이미 존재하는 사용자(BAD_REQUEST)")
+    @DisplayName("이미 존재하는 사용자는 생성할 수 없다.")
     void create_badRequest() {
 
         // Arrange
@@ -57,7 +57,7 @@ class UserServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("[실패] 사용자 조회 -> 사용자 없음 예외 (NOT_FOUND)")
+    @DisplayName("사용자ID가 없어 사용자를 조회할 수 없다.")
     void findNonExistingUser() {
 
         // Arrange

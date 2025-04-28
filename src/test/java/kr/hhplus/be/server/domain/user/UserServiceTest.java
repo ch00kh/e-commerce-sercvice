@@ -42,7 +42,7 @@ class UserServiceTest {
     class findByUserId {
 
         @Test
-        @DisplayName("[성공] 사용자 조회")
+        @DisplayName("사용자ID로 사용자 조회한다.")
         void findByUserId_ok() {
 
             // Arrange
@@ -56,7 +56,7 @@ class UserServiceTest {
         }
 
         @Test
-        @DisplayName("[실패] 사용자 조회 - 사용자 없음(NOT_FOUND)")
+        @DisplayName("사용자ID가 없어 사용자를 조회할 수 없다.")
         void findByUserId_NotFound() {
 
             // Arrange

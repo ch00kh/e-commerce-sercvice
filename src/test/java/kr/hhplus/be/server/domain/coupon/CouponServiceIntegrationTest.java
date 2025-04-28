@@ -50,7 +50,7 @@ class CouponServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 쿠폰 적용시 상태 변경 (ISSUED -> USED)")
+    @DisplayName("쿠폰 적용시 발급된 쿠폰의 상태가 변경된다.")
     void useCoupon_ok() {
 
         // Arrange
@@ -67,7 +67,7 @@ class CouponServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 쿠폰 발급")
+    @DisplayName("쿠폰 발급에 성공한다.")
     void issue_ok() {
 
         // Arrange
@@ -88,7 +88,7 @@ class CouponServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 쿠폰 변경 및 만료")
+    @DisplayName("유효기간이 끝난 쿠폰은 만료처리 된다.")
     void expireCoupon() throws InterruptedException {
 
         // Act

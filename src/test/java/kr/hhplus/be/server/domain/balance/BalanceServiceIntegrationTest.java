@@ -58,7 +58,7 @@ class BalanceServiceIntegrationTest {
     class findBalance{
 
         @Test
-        @DisplayName("[성공] 잔액 조회")
+        @DisplayName("사용자 ID로 잔액을 조회한다.")
         void findBalance_ok() {
 
             // Arrange
@@ -76,7 +76,7 @@ class BalanceServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[실패] 잔액 조회 - 사용자 없음 예외(NOT_FOUND)")
+        @DisplayName("사용자를 찾을 수 없어 잔액 조회를 할 수 없다.")
         void findBalance_notFound() {
 
             // Arrange
@@ -95,7 +95,7 @@ class BalanceServiceIntegrationTest {
     class charge {
 
         @Test
-        @DisplayName("[성공] 잔액 충전")
+        @DisplayName("사용자ID와 충전금액을 받아 잔액을 충전한다.")
         void charge_ok() {
 
             // Arrange
@@ -115,7 +115,7 @@ class BalanceServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[실패] 잔액 충전 - 없는 잔고(존재하지 않는 사용자) 예외(NOT_FOUND)")
+        @DisplayName("잔고가 없거나 사용자를 찾을 수 없어 잔액 충전을 할 수 없다.")
         void charge_notFound() {
 
             // Arrange
@@ -129,7 +129,7 @@ class BalanceServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[실패] 잔액 충전 - 유효하지 않은 충전 금액 예외 (INVALID_CHARGE_AMOUNT)")
+        @DisplayName("충전 금액은 음수일 수 없어 잔액 충전을 할 수 없다.")
         void charge_invalidChargeAmount() {
 
             // Arrange
@@ -144,11 +144,11 @@ class BalanceServiceIntegrationTest {
     }
 
     @Nested
-    @DisplayName("잔고 차감")
+    @DisplayName("잔액 차감")
     class reduce {
 
         @Test
-        @DisplayName("[성공] 잔고 여유")
+        @DisplayName("잔액이 여유가 있는 경우 잔액을 차감한다.")
         void reduce_ok() {
 
             // Arrange
@@ -168,7 +168,7 @@ class BalanceServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[실패] 잔고 부족 (잔고금액 < 결제금액) -> (INSUFFICIENT_BALANCE)")
+        @DisplayName("잔액이 부족한 경우 잔액을 차감할 수 없다.")
         void reduce_insufficientBalance() {
 
             // Arrange
@@ -182,7 +182,7 @@ class BalanceServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[실패] 잔액 차감 -> 사용자 없음(NOT_FOUND)")
+        @DisplayName("잔고를 찾을 수 없어 잔액 차감을 할 수 없다.")
         void reduceBalance_notFound() {
 
             // Arrange

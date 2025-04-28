@@ -61,7 +61,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("[성공] 주문 생성")
+    @DisplayName("사용자ID와 주문아이템으로 주문을 생성한다.")
     void createOrder_hasNoCoupon_ok() {
 
         // Arrange
@@ -86,7 +86,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("[성공] 주문 후 상품 상태 변경 (CREATE -> PENDING)")
+    @DisplayName("주문 후 재고가 부족한 경우 주문아이템의 상태가 변경(PENDING)된다.")
     void holdOrders() {
 
         // Arrange
@@ -111,7 +111,7 @@ class OrderServiceTest {
     class useCoupon {
 
         @Test
-        @DisplayName("[성공] 쿠폰 미사용")
+        @DisplayName("쿠폰을 사용하지 않고 주문할 수 있다.")
         void useCoupon_couponIsNull() {
 
             // Arrange
@@ -128,7 +128,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("[성공] 쿠폰 적용 시 금액 계산 (주문금액 > 할인금액)")
+        @DisplayName("쿠폰 적용 시 주문의 결제 금액이 변경된다.")
         void useCoupon_totalAmountGtDiscountAmount() {
 
             // Arrange
@@ -149,7 +149,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("[성공] 쿠폰 적용 시 금액 계산 (주문금액 < 할인금액)")
+        @DisplayName("쿠폰 적용 시 주문 주문금액보다 할인금액이 큰 경우 결제금액은 0으로 변경된다.")
         void useCoupon_totalAmountLtDiscountAmount() {
 
             // Arrange
@@ -170,7 +170,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("[성공] 쿠폰 적용 시 금액 계산 (주문금액 < 할인금액)")
+        @DisplayName("쿠폰 적용 시 주문 주문금액과 할인금액이 같은 경우 결제금액은 0으로 변경된다.")
         void useCoupon_totalAmountEqDiscountAmount() {
 
             // Arrange
@@ -196,7 +196,7 @@ class OrderServiceTest {
     class FindById {
 
         @Test
-        @DisplayName("[성공] 주문 조회")
+        @DisplayName("주문ID로 생성된 주문을 조회한다.")
         void findById_ok() {
             // Arrange
             Order order = new Order(USER_ID, COUPON_ID, 10000L);
@@ -218,7 +218,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("[실패] 주문 조회 -> 주문 없음(NOT_FOUND)")
+        @DisplayName("주문이 생성되지 않아 주문을 찾을 수 없다.")
         void findById_NotFound() {
 
             // Arrange
@@ -235,7 +235,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("[성공] 주문 결제")
+    @DisplayName("주문ID로 주문을 결제한다.")
     void pay_ok() {
 
         // Arrange
@@ -262,7 +262,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("[실패] 주문 결제 -> 주문 없음(NOT_FOUND)")
+    @DisplayName("생성된 주문이 없어 주문 결제할 수 없다.")
     void pay_NotFound() {
 
         // Arrange
@@ -278,7 +278,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("[성공] 인기 판매상품 조회")
+    @DisplayName("3일간 상위 5개의 인기 판매상품 조회한다.")
     void findBestSelling_ok() {
 
         // Arrange

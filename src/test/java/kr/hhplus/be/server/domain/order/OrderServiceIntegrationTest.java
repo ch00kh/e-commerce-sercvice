@@ -9,6 +9,7 @@ import kr.hhplus.be.server.domain.order.entity.OrderItem;
 import kr.hhplus.be.server.domain.order.entity.OrderStatus;
 import kr.hhplus.be.server.domain.order.repository.OrderItemRepository;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
+import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.domain.product.entity.Product;
 import kr.hhplus.be.server.domain.product.entity.ProductOption;
 import kr.hhplus.be.server.domain.product.repository.ProductOptionRepository;
@@ -72,7 +73,7 @@ class OrderServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 주문 생성")
+    @DisplayName("사용자ID와 주문아이템으로 주문을 생성한다.")
     void createOrder_hasNoCoupon_ok() {
 
         // Arrange
@@ -94,16 +95,17 @@ class OrderServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 주문 후 상품 상태 변경 (CREATE -> PENDING)")
-    void holdOrder() {
+    @DisplayName("주문 후 재고가 부족한 경우 주문아이템의 상태가 변경(PENDING)된다.")
+    void holdOrders() {
 
         // Arrange
         Long productOptionId = 1L;
         OrderInfo.Create orderInfo = orderService.createOrder(new OrderCommand.Create(USER_ID, ORDER_ITEMS));
-        OrderCommand.HoldOrder command = new OrderCommand.HoldOrder(orderInfo.orderId(), productOptionId);
+        ProductInfo.OptionDetail optionDetail = new ProductInfo.OptionDetail(productOptionId, false, 2L, 1L);
+        OrderCommand.handleOrders command = new OrderCommand.handleOrders(orderInfo.orderId(), List.of(optionDetail));
 
         // Act
-        orderService.holdOrder(command);
+        orderService.holdOrders(command);
 
         // Assert
         OrderItem actual = orderItemRepository.findByOrderIdAndProductOptionId(orderInfo.orderId(), productOptionId);
@@ -115,7 +117,7 @@ class OrderServiceIntegrationTest {
     class useCoupon {
 
         @Test
-        @DisplayName("[성공] 쿠폰 미사용")
+        @DisplayName("쿠폰을 사용하지 않고 주문할 수 있다.")
         void useCoupon_couponIsNull() {
 
             // Arrange
@@ -132,7 +134,7 @@ class OrderServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[성공] 쿠폰 적용 시 금액 계산 (주문금액 > 할인금액)")
+        @DisplayName("쿠폰 적용 시 주문의 결제 금액이 변경된다.")
         void useCoupon_totalAmountGtDiscountAmount() {
 
             // Arrange
@@ -151,7 +153,7 @@ class OrderServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[성공] 쿠폰 적용 시 금액 계산 (주문금액 < 할인금액)")
+        @DisplayName("쿠폰 적용 시 주문 주문금액보다 할인금액이 큰 경우 결제금액은 0으로 변경된다.")
         void useCoupon_totalAmountLtDiscountAmount() {
 
             // Arrange
@@ -175,7 +177,7 @@ class OrderServiceIntegrationTest {
     class FindById {
 
         @Test
-        @DisplayName("[성공] 주문 조회")
+        @DisplayName("주문ID로 생성된 주문을 조회한다.")
         void findById_ok() {
 
             // Arrange
@@ -193,7 +195,7 @@ class OrderServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[실패] 주문 조회 -> 주문 없음(NOT_FOUND)")
+        @DisplayName("주문이 생성되지 않아 주문을 찾을 수 없다.")
         void findById_NotFound() {
 
             // Arrange
@@ -208,7 +210,7 @@ class OrderServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 주문 결제")
+    @DisplayName("주문ID로 주문을 결제한다.")
     void pay_ok() {
 
         // Arrange
@@ -227,7 +229,7 @@ class OrderServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("[실패] 주문 결제 -> 주문 없음(NOT_FOUND)")
+    @DisplayName("생성된 주문이 없어 주문 결제할 수 없다.")
     void pay_NotFound() {
 
         // Arrange
@@ -241,7 +243,7 @@ class OrderServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 인기 판매상품 조회")
+    @DisplayName("3일간 상위 5개의 인기 판매상품 조회한다.")
     void findBestSelling_ok() {
 
         // Arrange

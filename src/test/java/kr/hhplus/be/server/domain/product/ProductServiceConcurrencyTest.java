@@ -51,7 +51,7 @@ class ProductServiceConcurrencyTest {
     }
 
     @Test
-    @DisplayName("[비관적 락] 주문시 재고 차감 -> 모든 요청 성공")
+    @DisplayName("주문 중 재고 차감 시 모든 요청은 성공한다.")
     void reduceStockConcurrencyTest() throws InterruptedException {
 
         // Arrange

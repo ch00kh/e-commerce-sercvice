@@ -41,7 +41,7 @@ class PaymentServiceConcurrencyTest {
     }
 
     @Test
-    @DisplayName("[낙관적 락] 결제시 결제 정보 변경 -> 일부 요청은 실패 (재시도X)")
+    @DisplayName("결제시 부분적으로 성공한다. 재시도가 없어 일부 요청은 실패한다.")
     void payAllAmount_ok() throws InterruptedException {
 
         // Arrange

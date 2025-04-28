@@ -32,7 +32,7 @@ class CouponControllerTest {
     private CouponFacade couponFacade;
 
     @Test
-    @DisplayName("[성공] 선착순 쿠폰 발급")
+    @DisplayName("사용자를 생성한 후 사용자ID와 쿠폰ID를 입력받아 선착순 쿠폰 발급 진행한다.")
     void issueTest() throws Exception {
 
         // Arrange

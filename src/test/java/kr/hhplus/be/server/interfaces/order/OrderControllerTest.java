@@ -31,7 +31,7 @@ class OrderControllerTest {
 
 
     @Test
-    @DisplayName("[성공] 주문 생성")
+    @DisplayName("상품의 옵션ID와 수량을 입력 받아 주문을 생성한다.")
     void order() throws Exception {
 
         // Arrange

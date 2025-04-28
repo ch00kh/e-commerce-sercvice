@@ -54,7 +54,7 @@ class BalanceControllerTest {
     class charge {
 
         @Test
-        @DisplayName("[성공] 잔액 충전")
+        @DisplayName("사용자ID와 충전금액을 입력받아 잔액 충전을한다.")
         void charge_ok() throws Exception {
 
             // Arrange
@@ -82,7 +82,7 @@ class BalanceControllerTest {
         }
 
         @Test
-        @DisplayName("[실패] 잔액 충전 - 충전 금액이 음수(BAD_REQUEST)")
+        @DisplayName("충전 금액은 음수일 수 없어 잔액 충전을 할 수 없다.")
         void charge_BadRequest() throws Exception {
 
             // Arrange

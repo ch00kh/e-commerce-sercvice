@@ -31,7 +31,7 @@ class PaymentControllerTest {
     private PaymentFacade paymentFacade;
 
     @Test
-    @DisplayName("[성공] 결제 처리")
+    @DisplayName("주문ID와 결제금액을 입력받아 결제 처리한다.")
     void processPaymentSuccess() throws Exception {
 
         // Arrange

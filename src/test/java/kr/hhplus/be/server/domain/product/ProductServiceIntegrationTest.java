@@ -65,7 +65,7 @@ class ProductServiceIntegrationTest {
     class findProduct {
 
         @Test
-        @DisplayName("[성공] 상품 목록 조회")
+        @DisplayName("상품 목록을 조회 한다.")
         void findAll() {
 
             // Act
@@ -113,7 +113,7 @@ class ProductServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[성공] 상품 정보 조회")
+        @DisplayName("상품ID로 상품 정보를 조회한다.")
         void findProduct_ok() {
 
             //Arrange
@@ -140,7 +140,7 @@ class ProductServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[실패] 상품 정보 조회 -> 상품 없음 예외(NOT_FOUND)")
+        @DisplayName("상품ID가 없어 상품 정보를 조회할 수 없다.")
         void findProduct_notFound() {
 
             //Arrange
@@ -160,7 +160,7 @@ class ProductServiceIntegrationTest {
     class reduceStock {
 
         @Test
-        @DisplayName("[성공] 재고 차감 - 재고 충분 차감(OPTION1), 부족하면 미차감(OPTION2)")
+        @DisplayName("재고가 충분 차감(OPTION1)하고, 부족하면 차감(OPTION2)하지 않는다.")
         void reduceStockTest() {
 
             // Arrange

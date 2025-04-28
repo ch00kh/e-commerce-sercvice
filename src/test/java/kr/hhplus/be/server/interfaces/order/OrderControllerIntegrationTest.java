@@ -84,7 +84,7 @@ class OrderControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 주문 생성 (쿠폰 사용X)")
+    @DisplayName("상품의 옵션ID와 수량을 입력 받아 주문을 생성한다.(쿠폰 미사용)")
     void order() throws Exception {
 
         // Arrange
@@ -114,7 +114,7 @@ class OrderControllerIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 주문 생성 (쿠폰 사용O)")
+    @DisplayName("상품의 옵션ID, 수량, 쿠폰ID를 입력 받아 주문을 생성한다. (쿠폰 사용)")
     void orderWithCoupon() throws Exception {
 
         // Arrange

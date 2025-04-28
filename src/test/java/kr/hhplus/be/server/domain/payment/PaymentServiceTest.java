@@ -41,7 +41,7 @@ class PaymentServiceTest {
     class findPayment {
 
         @Test
-        @DisplayName("[성공] 결제 조회")
+        @DisplayName("주문ID로 결제를 조회한다.")
         void findPayment_ok() {
 
             // Arrange
@@ -59,7 +59,7 @@ class PaymentServiceTest {
         }
 
         @Test
-        @DisplayName("[실패] 결제 조회 -> 결제 없음(NOT_FOUND)")
+        @DisplayName("주문ID로 결제를 찾을 수 없어 결제 조회를 할 수 없다.")
         void findPayment_NotFound() {
 
             // Arrange
@@ -80,7 +80,7 @@ class PaymentServiceTest {
     class pay {
 
         @Test
-        @DisplayName("[성공] 결제 - 전체 금액 결제")
+        @DisplayName("전체 결제금액에 대한 결제를 한다.")
         void payAllAmount_ok() {
 
             // Arrange
@@ -97,7 +97,7 @@ class PaymentServiceTest {
         }
 
         @Test
-        @DisplayName("[성공] 결제 - 일부 금액 결제")
+        @DisplayName("일부 금액에 대한 결제를 한다. 잔여 결제금액 있어 결제 상태는 유지된다.")
         void paySomeAmount_ok() {
 
             // Arrange
@@ -114,7 +114,7 @@ class PaymentServiceTest {
         }
 
         @Test
-        @DisplayName("[실패] 결제 -> 결제 없음(NOT_FOUND)")
+        @DisplayName("생성된 결제가 없어 결제를 찾을 수 없다.")
         void pay_NotFound() {
 
             // Arrange

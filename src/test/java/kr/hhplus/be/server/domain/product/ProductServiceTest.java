@@ -59,7 +59,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("[성공] 상품 목록 조회")
+    @DisplayName("상품 목록을 조회 한다.")
     void findAll() {
 
         // Arrange
@@ -99,7 +99,7 @@ class ProductServiceTest {
     class findProduct {
 
         @Test
-        @DisplayName("[성공] 상품 정보 조회")
+        @DisplayName("상품ID로 상품 정보를 조회한다.")
         void findProduct_ok() {
 
             // Arrange
@@ -125,7 +125,7 @@ class ProductServiceTest {
         }
 
         @Test
-        @DisplayName("[실패] 상품 정보 조회 -> 상품 없음 예외(NOT_FOUND)")
+        @DisplayName("상품ID가 없어 상품 정보를 조회할 수 없다.")
         void findProduct_NotFound() {
 
             // Arrange
@@ -145,7 +145,7 @@ class ProductServiceTest {
     class reduceStock {
 
         @Test
-        @DisplayName("[성공] 모든 상품 재고 여유 -> CheckStock iscanPurchase 값 검증 true")
+        @DisplayName("모든 상품의 재고가 여유가 있어 재고 차감에 성공한다.")
         void reduceStock_ok() {
 
             // Arrange
@@ -178,7 +178,7 @@ class ProductServiceTest {
         }
 
         @Test
-        @DisplayName("[성공] 모든 상품 재고 여유(경계값)")
+        @DisplayName("주문 상품과 상품의 재고가 동일하여 상품 재고 차감에 성공한다.")
         void reduceStock_ok_BoundaryCheck() {
 
             // Arrange
@@ -211,7 +211,7 @@ class ProductServiceTest {
         }
 
         @Test
-        @DisplayName("[실패] 일부 상품 재고 부족 -> 예외는 아니지만, CheckStock 검증")
+        @DisplayName("일부 상품은 재고 부족하여 재고 차감을 하지 않는다.")
         void reduceStock_ok_anyStockIsNotEnough() {
 
             // Arrange
