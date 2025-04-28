@@ -60,11 +60,13 @@ public class OrderService {
      * 주문 상품 보류 (CREATED -> PENDING)
      */
     @Transactional
-    public void holdOrder(OrderCommand.HoldOrder command) {
-
-        OrderItem orderItem = orderItemRepository.findByOrderIdAndProductOptionId(command.orderId() ,command.productOptionId());
-
-        orderItem.holdStatus();
+    public void holdOrders(OrderCommand.handleOrders command) {
+        command.stockDetails().forEach(stock -> {
+            if (!stock.canPurchase()) {
+                OrderItem orderItem = orderItemRepository.findByOrderIdAndProductOptionId(command.orderId(), stock.optionId());
+                orderItem.holdStatus();
+            }
+        });
     }
 
     /**
@@ -129,7 +131,7 @@ public class OrderService {
     }
 
     /**
-     * 주문 정보 전송 비돟기 처리
+     * 주문 정보 전송 비동기 처리
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void sendOrder(OrderCommand.Send command) {

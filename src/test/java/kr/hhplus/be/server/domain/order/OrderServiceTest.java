@@ -7,6 +7,7 @@ import kr.hhplus.be.server.domain.order.entity.OrderItem;
 import kr.hhplus.be.server.domain.order.entity.OrderStatus;
 import kr.hhplus.be.server.domain.order.repository.OrderItemRepository;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
+import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
 import org.junit.jupiter.api.BeforeEach;
@@ -86,18 +87,19 @@ class OrderServiceTest {
 
     @Test
     @DisplayName("[성공] 주문 후 상품 상태 변경 (CREATE -> PENDING)")
-    void holdOrder() {
+    void holdOrders() {
 
         // Arrange
         Long productOptionId = 1L;
-        OrderCommand.HoldOrder command = new OrderCommand.HoldOrder(1L, productOptionId);
+        OrderItem orderItem = new OrderItem(1L, 1L, 1000L, 101L);
+        List<ProductInfo.OptionDetail> optionDetails = List.of(new ProductInfo.OptionDetail(1L, false, 101L, 100L));
 
-        OrderItem orderItem = new OrderItem(1L, 1L, 1000L, 100L);
+        OrderCommand.handleOrders command = new OrderCommand.handleOrders(1L, optionDetails);
 
         when(orderItemRepository.findByOrderIdAndProductOptionId(1L, productOptionId)).thenReturn(orderItem);
 
         // Act
-        orderService.holdOrder(command);
+        orderService.holdOrders(command);
 
         // Assert
         verify(orderItemRepository, times(1)).findByOrderIdAndProductOptionId(1L, productOptionId);

@@ -75,7 +75,7 @@ class ProductServiceConcurrencyTest {
                     List<OrderCommand.OrderItem> command = List.of(new OrderCommand.OrderItem(PRODUCT_OPTION.getId(), 1000L, 1L));
                     ProductInfo.Order productInfo = productService.reduceStock(command);
 
-                    if (productInfo.checkStocks().get(0).canPurchase()) {
+                    if (productInfo.optionDetails().get(0).canPurchase()) {
                         successCount.incrementAndGet();
                     } else {
                         failureCount.incrementAndGet();

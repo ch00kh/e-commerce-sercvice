@@ -164,17 +164,17 @@ class ProductServiceTest {
             verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(101L);
             verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(102L);
 
-            assertThat(actualInfo.checkStocks().size()).isEqualTo(2);
+            assertThat(actualInfo.optionDetails().size()).isEqualTo(2);
 
-            assertThat(actualInfo.checkStocks().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
-            assertThat(actualInfo.checkStocks().get(0).remainingQuantity()).isEqualTo(90);
-            assertThat(actualInfo.checkStocks().get(0).requestQuantity()).isEqualTo(10);
-            assertThat(actualInfo.checkStocks().get(0).canPurchase()).isEqualTo(true);
+            assertThat(actualInfo.optionDetails().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
+            assertThat(actualInfo.optionDetails().get(0).remainingQuantity()).isEqualTo(90);
+            assertThat(actualInfo.optionDetails().get(0).requestQuantity()).isEqualTo(10);
+            assertThat(actualInfo.optionDetails().get(0).canPurchase()).isEqualTo(true);
 
-            assertThat(actualInfo.checkStocks().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
-            assertThat(actualInfo.checkStocks().get(1).remainingQuantity()).isEqualTo(90);
-            assertThat(actualInfo.checkStocks().get(1).requestQuantity()).isEqualTo(9);
-            assertThat(actualInfo.checkStocks().get(1).canPurchase()).isEqualTo(true);
+            assertThat(actualInfo.optionDetails().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
+            assertThat(actualInfo.optionDetails().get(1).remainingQuantity()).isEqualTo(90);
+            assertThat(actualInfo.optionDetails().get(1).requestQuantity()).isEqualTo(9);
+            assertThat(actualInfo.optionDetails().get(1).canPurchase()).isEqualTo(true);
         }
 
         @Test
@@ -197,17 +197,17 @@ class ProductServiceTest {
             verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(101L);
             verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(102L);
 
-            assertThat(actualInfo.checkStocks().size()).isEqualTo(2);
+            assertThat(actualInfo.optionDetails().size()).isEqualTo(2);
 
-            assertThat(actualInfo.checkStocks().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
-            assertThat(actualInfo.checkStocks().get(0).remainingQuantity()).isEqualTo(1);
-            assertThat(actualInfo.checkStocks().get(0).requestQuantity()).isEqualTo(99);
-            assertThat(actualInfo.checkStocks().get(0).canPurchase()).isEqualTo(true);
+            assertThat(actualInfo.optionDetails().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
+            assertThat(actualInfo.optionDetails().get(0).remainingQuantity()).isEqualTo(1);
+            assertThat(actualInfo.optionDetails().get(0).requestQuantity()).isEqualTo(99);
+            assertThat(actualInfo.optionDetails().get(0).canPurchase()).isEqualTo(true);
 
-            assertThat(actualInfo.checkStocks().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
-            assertThat(actualInfo.checkStocks().get(1).remainingQuantity()).isEqualTo(0);
-            assertThat(actualInfo.checkStocks().get(1).requestQuantity()).isEqualTo(99);
-            assertThat(actualInfo.checkStocks().get(1).canPurchase()).isEqualTo(true);
+            assertThat(actualInfo.optionDetails().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
+            assertThat(actualInfo.optionDetails().get(1).remainingQuantity()).isEqualTo(0);
+            assertThat(actualInfo.optionDetails().get(1).requestQuantity()).isEqualTo(99);
+            assertThat(actualInfo.optionDetails().get(1).canPurchase()).isEqualTo(true);
         }
 
         @Test
@@ -230,17 +230,17 @@ class ProductServiceTest {
             verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(101L);
             verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(102L);
 
-            assertThat(actualInfo.checkStocks().size()).isEqualTo(2);
+            assertThat(actualInfo.optionDetails().size()).isEqualTo(2);
 
-            assertThat(actualInfo.checkStocks().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
-            assertThat(actualInfo.checkStocks().get(0).remainingQuantity()).isEqualTo(100);
-            assertThat(actualInfo.checkStocks().get(0).requestQuantity()).isEqualTo(101);
-            assertThat(actualInfo.checkStocks().get(0).canPurchase()).isEqualTo(false);
+            assertThat(actualInfo.optionDetails().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
+            assertThat(actualInfo.optionDetails().get(0).remainingQuantity()).isEqualTo(100);
+            assertThat(actualInfo.optionDetails().get(0).requestQuantity()).isEqualTo(101);
+            assertThat(actualInfo.optionDetails().get(0).canPurchase()).isEqualTo(false);
 
-            assertThat(actualInfo.checkStocks().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
-            assertThat(actualInfo.checkStocks().get(1).remainingQuantity()).isEqualTo(99);
-            assertThat(actualInfo.checkStocks().get(1).requestQuantity()).isEqualTo(100);
-            assertThat(actualInfo.checkStocks().get(1).canPurchase()).isEqualTo(false);
+            assertThat(actualInfo.optionDetails().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
+            assertThat(actualInfo.optionDetails().get(1).remainingQuantity()).isEqualTo(99);
+            assertThat(actualInfo.optionDetails().get(1).requestQuantity()).isEqualTo(100);
+            assertThat(actualInfo.optionDetails().get(1).canPurchase()).isEqualTo(false);
         }
     }
 }

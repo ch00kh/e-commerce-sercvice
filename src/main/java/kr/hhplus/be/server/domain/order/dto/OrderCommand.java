@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.order.dto;
 
 import kr.hhplus.be.server.domain.order.entity.OrderStatus;
+import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 
 import java.util.List;
 
@@ -17,9 +18,9 @@ public record OrderCommand() {
             Long quantity
     ) {}
 
-    public record HoldOrder(
+    public record handleOrders(
             Long orderId,
-            Long productOptionId
+            List<ProductInfo.OptionDetail> stockDetails
     ) {}
 
     public record UseCoupon(

@@ -173,14 +173,14 @@ class ProductServiceIntegrationTest {
             ProductInfo.Order actual = productService.reduceStock(command);
 
             // Assert
-            assertThat(actual.checkStocks()).hasSize(2);
-            assertThat(actual.checkStocks().get(0).canPurchase()).isTrue();
-            assertThat(actual.checkStocks().get(0).remainingQuantity()).isEqualTo(0);
-            assertThat(actual.checkStocks().get(0).requestQuantity()).isEqualTo(1000);
+            assertThat(actual.optionDetails()).hasSize(2);
+            assertThat(actual.optionDetails().get(0).canPurchase()).isTrue();
+            assertThat(actual.optionDetails().get(0).remainingQuantity()).isEqualTo(0);
+            assertThat(actual.optionDetails().get(0).requestQuantity()).isEqualTo(1000);
 
-            assertThat(actual.checkStocks().get(1).canPurchase()).isFalse();
-            assertThat(actual.checkStocks().get(1).remainingQuantity()).isEqualTo(500L);
-            assertThat(actual.checkStocks().get(1).requestQuantity()).isEqualTo(600L);
+            assertThat(actual.optionDetails().get(1).canPurchase()).isFalse();
+            assertThat(actual.optionDetails().get(1).remainingQuantity()).isEqualTo(500L);
+            assertThat(actual.optionDetails().get(1).requestQuantity()).isEqualTo(600L);
 
             ProductOption option1 = productOptionRepository.findById(PRODUCT1_OPTION1.getId());
             assertThat(option1.getStock()).isEqualTo(0);
