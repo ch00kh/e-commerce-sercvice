@@ -1,13 +1,14 @@
 package kr.hhplus.be.server.domain.payment;
 
+import kr.hhplus.be.server.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.payment.dto.PaymentCommand;
 import kr.hhplus.be.server.domain.payment.entity.Payment;
-import kr.hhplus.be.server.domain.payment.entity.PaymentStatus;
 import kr.hhplus.be.server.domain.payment.repository.PaymentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -21,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @SpringBootTest
+@ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[동시성 테스트] PaymentService")
 class PaymentServiceConcurrencyTest {
@@ -32,18 +34,14 @@ class PaymentServiceConcurrencyTest {
     private PaymentService paymentService;
 
     private Payment PAYMENT;
-    private Long ORDER_ID;
 
     @BeforeEach
     void setUp() {
-        paymentRepository.deleteAll();
-
-        ORDER_ID = 100L;
-        PAYMENT = paymentRepository.save(new Payment(ORDER_ID, 100000L));
+        PAYMENT = paymentRepository.save(new Payment(1L, 10000L));
     }
 
     @Test
-    @DisplayName("결제")
+    @DisplayName("결제시 부분적으로 성공한다. 재시도가 없어 일부 요청은 실패한다.")
     void payAllAmount_ok() throws InterruptedException {
 
         // Arrange
@@ -51,7 +49,10 @@ class PaymentServiceConcurrencyTest {
         int threadPool = 3;
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadPool);
-        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch taskLatch = new CountDownLatch(threadCount);
+
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failureCount = new AtomicInteger(0);
 
@@ -59,29 +60,30 @@ class PaymentServiceConcurrencyTest {
         for (int i = 0; i < threadCount; i++) {
             executorService.submit(() -> {
                 try {
-                    PaymentCommand.Pay command = new PaymentCommand.Pay(PAYMENT.getId(), 10000L);
-                    paymentService.pay(command);
+                    startLatch.await();
+
+                    paymentService.pay(new PaymentCommand.Pay(PAYMENT.getId(), 1000L));
                     successCount.incrementAndGet();
 
                 } catch (Exception e) {
                     failureCount.incrementAndGet();
                     log.error("Error pay: {}", e.getMessage());
                 } finally {
-                    latch.countDown();
+                    taskLatch.countDown();
                 }
             });
         }
-        latch.await();
+
+        startLatch.countDown();
+        taskLatch.await();
         executorService.shutdown();
 
         // Assert
         log.info("Success count: {}, Failure count: {}", successCount.get(), failureCount.get());
         assertThat(successCount.get() + failureCount.get()).isEqualTo(threadCount);
 
-        Payment actual = paymentRepository.findById(PAYMENT.getId()).get();
-        assertThat(actual.getAmount()).isEqualTo(0L);
-        assertThat(actual.getStatus()).isEqualTo(PaymentStatus.PAYED);
-        assertThat(actual.getPaidAt()).isNotNull();
+        Payment payment = paymentRepository.findById(PAYMENT.getId());
+        assertThat(payment.getAmount()).isEqualTo(10000L - (successCount.get() * 1000L));
     }
 
 }

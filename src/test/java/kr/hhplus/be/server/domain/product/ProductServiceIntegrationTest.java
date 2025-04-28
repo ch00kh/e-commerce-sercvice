@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product;
 
+import kr.hhplus.be.server.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.product.dto.ProductCommand;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
@@ -13,10 +14,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-@Transactional
+@ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[통합테스트] ProductService")
 class ProductServiceIntegrationTest {
@@ -49,9 +50,6 @@ class ProductServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        productRepository.deleteAll();
-        productOptionRepository.deleteAll();
-
         PRODUCT1 = productRepository.save(new Product("양반", "김"));
         PRODUCT1_OPTION1 = productOptionRepository.save(new ProductOption(PRODUCT1.getId(), "들기름 김", 1000L, 1000L));
         PRODUCT1_OPTION2 = productOptionRepository.save(new ProductOption(PRODUCT1.getId(), "참기름 김", 1250L, 500L));
@@ -67,7 +65,7 @@ class ProductServiceIntegrationTest {
     class findProduct {
 
         @Test
-        @DisplayName("[성공] 상품 목록 조회")
+        @DisplayName("상품 목록을 조회 한다.")
         void findAll() {
 
             // Act
@@ -115,7 +113,7 @@ class ProductServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[성공] 상품 정보 조회")
+        @DisplayName("상품ID로 상품 정보를 조회한다.")
         void findProduct_ok() {
 
             //Arrange
@@ -142,7 +140,7 @@ class ProductServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[실패] 상품 정보 조회 -> 상품 없음 예외(NOT_FOUND)")
+        @DisplayName("상품ID가 없어 상품 정보를 조회할 수 없다.")
         void findProduct_notFound() {
 
             //Arrange
@@ -162,7 +160,7 @@ class ProductServiceIntegrationTest {
     class reduceStock {
 
         @Test
-        @DisplayName("[성공] 재고 차감 - 재고 충분 차감(OPTION1), 부족하면 미차감(OPTION2)")
+        @DisplayName("재고가 충분 차감(OPTION1)하고, 부족하면 차감(OPTION2)하지 않는다.")
         void reduceStockTest() {
 
             // Arrange
@@ -175,19 +173,19 @@ class ProductServiceIntegrationTest {
             ProductInfo.Order actual = productService.reduceStock(command);
 
             // Assert
-            assertThat(actual.checkStocks()).hasSize(2);
-            assertThat(actual.checkStocks().get(0).canPurchase()).isTrue();
-            assertThat(actual.checkStocks().get(0).remainingQuantity()).isEqualTo(0);
-            assertThat(actual.checkStocks().get(0).requestQuantity()).isEqualTo(1000);
+            assertThat(actual.optionDetails()).hasSize(2);
+            assertThat(actual.optionDetails().get(0).canPurchase()).isTrue();
+            assertThat(actual.optionDetails().get(0).remainingQuantity()).isEqualTo(0);
+            assertThat(actual.optionDetails().get(0).requestQuantity()).isEqualTo(1000);
 
-            assertThat(actual.checkStocks().get(1).canPurchase()).isFalse();
-            assertThat(actual.checkStocks().get(1).remainingQuantity()).isEqualTo(500L);
-            assertThat(actual.checkStocks().get(1).requestQuantity()).isEqualTo(600L);
+            assertThat(actual.optionDetails().get(1).canPurchase()).isFalse();
+            assertThat(actual.optionDetails().get(1).remainingQuantity()).isEqualTo(500L);
+            assertThat(actual.optionDetails().get(1).requestQuantity()).isEqualTo(600L);
 
-            ProductOption option1 = productOptionRepository.findById(PRODUCT1_OPTION1.getId()).get();
+            ProductOption option1 = productOptionRepository.findById(PRODUCT1_OPTION1.getId());
             assertThat(option1.getStock()).isEqualTo(0);
 
-            ProductOption option2 = productOptionRepository.findById(PRODUCT1_OPTION2.getId()).get();
+            ProductOption option2 = productOptionRepository.findById(PRODUCT1_OPTION2.getId());
             assertThat(option2.getStock()).isEqualTo(500);
         }
 

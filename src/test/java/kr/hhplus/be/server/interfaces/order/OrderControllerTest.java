@@ -1,9 +1,10 @@
-package kr.hhplus.be.server.interfaces.order.controller;
+package kr.hhplus.be.server.interfaces.order;
 
 import kr.hhplus.be.server.application.order.OrderFacade;
 import kr.hhplus.be.server.application.order.dto.OrderCriteria;
 import kr.hhplus.be.server.application.order.dto.OrderResult;
 import kr.hhplus.be.server.domain.order.entity.OrderStatus;
+import kr.hhplus.be.server.interfaces.order.controller.OrderController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ class OrderControllerTest {
 
 
     @Test
-    @DisplayName("[성공] 주문 생성")
+    @DisplayName("상품의 옵션ID와 수량을 입력 받아 주문을 생성한다.")
     void order() throws Exception {
 
         // Arrange

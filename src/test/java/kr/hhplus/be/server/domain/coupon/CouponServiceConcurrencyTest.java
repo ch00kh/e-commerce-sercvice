@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.coupon;
 
+import kr.hhplus.be.server.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.coupon.dto.CouponCommand;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
@@ -7,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @SpringBootTest
+@ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[동시성 테스트] CouponService")
 class CouponServiceConcurrencyTest {
@@ -30,18 +33,15 @@ class CouponServiceConcurrencyTest {
     @Autowired
     private CouponService couponService;
 
-    private Long COUPON_ID;
     private Coupon COUPON;
 
     @BeforeEach
     void setUp() {
-        couponRepository.deleteAll();
-        COUPON = couponRepository.save(new Coupon(1000L, 100L));
-        COUPON_ID = COUPON.getId();
+        COUPON = couponRepository.save(new Coupon(1000L, 10L));
     }
 
     @Test
-    @DisplayName("쿠폰 발급")
+    @DisplayName("선착순 쿠폰 발급 시 부분적으로 성공,실패한다. 쿠폰이 부족한 경우 쿠폰발급에 실패한다.")
     void issue_ok() throws InterruptedException {
 
         // Arrange
@@ -49,7 +49,10 @@ class CouponServiceConcurrencyTest {
         int threadPool = 8;
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadPool);
-        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch taskLatch = new CountDownLatch(threadCount);
+
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failureCount = new AtomicInteger(0);
 
@@ -58,26 +61,29 @@ class CouponServiceConcurrencyTest {
             long finalI = i;
             executorService.submit(() -> {
                 try {
+                    startLatch.await();
 
-                    couponService.issue(new CouponCommand.Issue(finalI, COUPON_ID));
+                    couponService.issue(new CouponCommand.Issue(finalI, COUPON.getId()));
                     successCount.incrementAndGet();
 
                 } catch (Exception e) {
                     failureCount.incrementAndGet();
                     log.error("Error coupon issue: {}", e.getMessage());
                 } finally {
-                    latch.countDown();
+                    taskLatch.countDown();
                 }
             });
         }
-        latch.await();
+
+        startLatch.countDown();
+        taskLatch.await();
         executorService.shutdown();
 
         // Assert
         log.info("Success count: {}, Failure count: {}", successCount.get(), failureCount.get());
         assertThat(successCount.get() + failureCount.get()).isEqualTo(threadCount);
 
-        Coupon coupon = couponRepository.findById(COUPON_ID).get();
+        Coupon coupon = couponRepository.findById(COUPON.getId());
         assertThat(coupon.getQuantity()).isEqualTo(0);
 
     }

@@ -2,10 +2,10 @@ package kr.hhplus.be.server.infra.persistence.order;
 
 import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
+import kr.hhplus.be.server.global.exception.ErrorCode;
+import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -19,12 +19,8 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public Optional<Order> findById(Long orderId) {
-        return jpaRepository.findById(orderId);
+    public Order findById(Long orderId) {
+        return jpaRepository.findById(orderId).orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
     }
 
-    @Override
-    public void deleteAll() {
-        jpaRepository.deleteAll();
-    }
 }

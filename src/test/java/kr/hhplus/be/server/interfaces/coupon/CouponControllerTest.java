@@ -1,9 +1,10 @@
-package kr.hhplus.be.server.interfaces.coupon.controller;
+package kr.hhplus.be.server.interfaces.coupon;
 
 import kr.hhplus.be.server.application.coupon.CouponFacade;
 import kr.hhplus.be.server.application.coupon.dto.CouponCriteria;
 import kr.hhplus.be.server.application.coupon.dto.CouponResult;
 import kr.hhplus.be.server.domain.coupon.entity.CouponStatus;
+import kr.hhplus.be.server.interfaces.coupon.controller.CouponController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ class CouponControllerTest {
     private CouponFacade couponFacade;
 
     @Test
-    @DisplayName("[성공] 선착순 쿠폰 발급")
+    @DisplayName("사용자를 생성한 후 사용자ID와 쿠폰ID를 입력받아 선착순 쿠폰 발급 진행한다.")
     void issueTest() throws Exception {
 
         // Arrange

@@ -2,10 +2,10 @@ package kr.hhplus.be.server.infra.persistence.balance;
 
 import kr.hhplus.be.server.domain.balance.entity.Balance;
 import kr.hhplus.be.server.domain.balance.repository.BalanceRepository;
+import kr.hhplus.be.server.global.exception.ErrorCode;
+import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -14,8 +14,18 @@ public class BalanceRepositoryImpl implements BalanceRepository {
     private final BalanceJpaRepository jpaRepository;
 
     @Override
-    public Optional<Balance> findByUserId(Long userId) {
-        return jpaRepository.findByUserId(userId);
+    public Balance findByUserId(Long userId) {
+        return jpaRepository.findByUserId(userId).orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+    }
+
+    @Override
+    public Balance findByUserIdWithOptimisticLock(Long userId) {
+        return jpaRepository.findByUserIdWithOptimisticLock(userId).orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+    }
+
+    @Override
+    public Balance findByUserIdWithPessimisticLock(Long userId) {
+        return jpaRepository.findByUserIdWithPessimisticLock(userId).orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
     }
 
     @Override
@@ -23,8 +33,4 @@ public class BalanceRepositoryImpl implements BalanceRepository {
         return jpaRepository.save(balance);
     }
 
-    @Override
-    public void deleteAll() {
-        jpaRepository.deleteAll();
-    }
 }

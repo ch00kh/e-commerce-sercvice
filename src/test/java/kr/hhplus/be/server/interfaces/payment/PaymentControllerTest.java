@@ -1,10 +1,11 @@
-package kr.hhplus.be.server.interfaces.payment.controller;
+package kr.hhplus.be.server.interfaces.payment;
 
 import kr.hhplus.be.server.application.payment.PaymentFacade;
 import kr.hhplus.be.server.application.payment.dto.PaymentCriteria;
 import kr.hhplus.be.server.application.payment.dto.PaymentResult;
 import kr.hhplus.be.server.domain.order.entity.OrderStatus;
 import kr.hhplus.be.server.domain.payment.entity.PaymentStatus;
+import kr.hhplus.be.server.interfaces.payment.controller.PaymentController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ class PaymentControllerTest {
     private PaymentFacade paymentFacade;
 
     @Test
-    @DisplayName("[성공] 결제 처리")
+    @DisplayName("주문ID와 결제금액을 입력받아 결제 처리한다.")
     void processPaymentSuccess() throws Exception {
 
         // Arrange

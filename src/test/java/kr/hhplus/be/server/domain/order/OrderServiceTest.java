@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.order;
 
-import kr.hhplus.be.server.domain.coupon.dto.CouponInfo;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.order.dto.OrderInfo;
 import kr.hhplus.be.server.domain.order.entity.Order;
@@ -8,6 +7,7 @@ import kr.hhplus.be.server.domain.order.entity.OrderItem;
 import kr.hhplus.be.server.domain.order.entity.OrderStatus;
 import kr.hhplus.be.server.domain.order.repository.OrderItemRepository;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
+import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -62,7 +61,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("[성공] 주문 생성")
+    @DisplayName("사용자ID와 주문아이템으로 주문을 생성한다.")
     void createOrder_hasNoCoupon_ok() {
 
         // Arrange
@@ -87,19 +86,20 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("[성공] 주문 후 상품 상태 변경 (CREATE -> PENDING)")
-    void holdOrder() {
+    @DisplayName("주문 후 재고가 부족한 경우 주문아이템의 상태가 변경(PENDING)된다.")
+    void holdOrders() {
 
         // Arrange
         Long productOptionId = 1L;
-        OrderCommand.HoldOrder command = new OrderCommand.HoldOrder(1L, productOptionId);
+        OrderItem orderItem = new OrderItem(1L, 1L, 1000L, 101L);
+        List<ProductInfo.OptionDetail> optionDetails = List.of(new ProductInfo.OptionDetail(1L, false, 101L, 100L));
 
-        OrderItem orderItem = new OrderItem(1L, 1L, 1000L, 100L);
+        OrderCommand.handleOrders command = new OrderCommand.handleOrders(1L, optionDetails);
 
-        when(orderItemRepository.findByOrderIdAndProductOptionId(1L, productOptionId)).thenReturn(Optional.of(orderItem));
+        when(orderItemRepository.findByOrderIdAndProductOptionId(1L, productOptionId)).thenReturn(orderItem);
 
         // Act
-        orderService.holdOrder(command);
+        orderService.holdOrders(command);
 
         // Assert
         verify(orderItemRepository, times(1)).findByOrderIdAndProductOptionId(1L, productOptionId);
@@ -111,22 +111,24 @@ class OrderServiceTest {
     class useCoupon {
 
         @Test
-        @DisplayName("[성공] 쿠폰 미사용")
+        @DisplayName("쿠폰을 사용하지 않고 주문할 수 있다.")
         void useCoupon_couponIsNull() {
 
             // Arrange
-            CouponInfo.CouponAggregate couponInfo = new CouponInfo.CouponAggregate(null, null, null, null, null);
-            OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, couponInfo.couponId(), couponInfo.discountPrice());
+            OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, null, 1000L);
+            Order order = new Order(ORDER_ID, USER_ID, null, OrderStatus.CREATED, 1000L, 0L, 1000L);
+
+            when(orderRepository.findById(anyLong())).thenReturn(order);
 
             // Act
             OrderInfo.Create actualInfo = orderService.applyCoupon(command);
 
             // Assert
-            assertThat(actualInfo).isNull();
+            assertThat(actualInfo.issuedCouponId()).isNull();
         }
 
         @Test
-        @DisplayName("[성공] 쿠폰 적용 시 금액 계산 (주문금액 > 할인금액)")
+        @DisplayName("쿠폰 적용 시 주문의 결제 금액이 변경된다.")
         void useCoupon_totalAmountGtDiscountAmount() {
 
             // Arrange
@@ -134,7 +136,7 @@ class OrderServiceTest {
 
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, COUPON_ID, 3000L);
 
-            when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
+            when(orderRepository.findById(anyLong())).thenReturn(order);
 
             // Act
             OrderInfo.Create actualInfo = orderService.applyCoupon(command);
@@ -147,7 +149,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("[성공] 쿠폰 적용 시 금액 계산 (주문금액 < 할인금액)")
+        @DisplayName("쿠폰 적용 시 주문 주문금액보다 할인금액이 큰 경우 결제금액은 0으로 변경된다.")
         void useCoupon_totalAmountLtDiscountAmount() {
 
             // Arrange
@@ -155,7 +157,7 @@ class OrderServiceTest {
 
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, COUPON_ID, 20000L);
 
-            when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
+            when(orderRepository.findById(anyLong())).thenReturn(order);
 
             // Act
             OrderInfo.Create actualInfo = orderService.applyCoupon(command);
@@ -168,7 +170,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("[성공] 쿠폰 적용 시 금액 계산 (주문금액 < 할인금액)")
+        @DisplayName("쿠폰 적용 시 주문 주문금액과 할인금액이 같은 경우 결제금액은 0으로 변경된다.")
         void useCoupon_totalAmountEqDiscountAmount() {
 
             // Arrange
@@ -176,7 +178,7 @@ class OrderServiceTest {
 
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(ORDER_ID, COUPON_ID, 10000L);
 
-            when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
+            when(orderRepository.findById(anyLong())).thenReturn(order);
 
             // Act
             OrderInfo.Create actualInfo = orderService.applyCoupon(command);
@@ -194,7 +196,7 @@ class OrderServiceTest {
     class FindById {
 
         @Test
-        @DisplayName("[성공] 주문 조회")
+        @DisplayName("주문ID로 생성된 주문을 조회한다.")
         void findById_ok() {
             // Arrange
             Order order = new Order(USER_ID, COUPON_ID, 10000L);
@@ -202,7 +204,7 @@ class OrderServiceTest {
             order.pay();
 
             // Act
-            when(orderRepository.findById(anyLong())).thenReturn(Optional.of(order));
+            when(orderRepository.findById(anyLong())).thenReturn(order);
 
             Order actual = orderService.findById(new OrderCommand.Find(ORDER_ID));
 
@@ -216,11 +218,11 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("[실패] 주문 조회 -> 주문 없음(NOT_FOUND)")
+        @DisplayName("주문이 생성되지 않아 주문을 찾을 수 없다.")
         void findById_NotFound() {
 
             // Arrange
-            when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.empty());
+            when(orderRepository.findById(ORDER_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
@@ -233,7 +235,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("[성공] 주문 결제")
+    @DisplayName("주문ID로 주문을 결제한다.")
     void pay_ok() {
 
         // Arrange
@@ -242,7 +244,7 @@ class OrderServiceTest {
 
         Order mockOrder = mock(Order.class);
 
-        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(mockOrder));
+        when(orderRepository.findById(ORDER_ID)).thenReturn(mockOrder);
         when(mockOrder.pay()).thenReturn(order);
 
         // Act
@@ -260,11 +262,11 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("[실패] 주문 결제 -> 주문 없음(NOT_FOUND)")
+    @DisplayName("생성된 주문이 없어 주문 결제할 수 없다.")
     void pay_NotFound() {
 
         // Arrange
-        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.empty());
+        when(orderRepository.findById(ORDER_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
         // Act
         GlobalException exception = assertThrows(GlobalException.class,
@@ -276,7 +278,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("[성공] 인기 판매상품 조회")
+    @DisplayName("3일간 상위 5개의 인기 판매상품 조회한다.")
     void findBestSelling_ok() {
 
         // Arrange

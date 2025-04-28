@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.order;
 
+import kr.hhplus.be.server.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.coupon.dto.CouponInfo;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.order.dto.OrderInfo;
@@ -8,6 +9,7 @@ import kr.hhplus.be.server.domain.order.entity.OrderItem;
 import kr.hhplus.be.server.domain.order.entity.OrderStatus;
 import kr.hhplus.be.server.domain.order.repository.OrderItemRepository;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
+import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.domain.product.entity.Product;
 import kr.hhplus.be.server.domain.product.entity.ProductOption;
 import kr.hhplus.be.server.domain.product.repository.ProductOptionRepository;
@@ -19,10 +21,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
 @SpringBootTest
-@Transactional
+@ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[통합테스트] OrderService")
 class OrderServiceIntegrationTest {
@@ -61,11 +63,6 @@ class OrderServiceIntegrationTest {
 
     @BeforeEach
     void setup() {
-        orderRepository.deleteAll();
-        orderItemRepository.deleteAll();
-        productRepository.deleteAll();
-        productOptionRepository.deleteAll();
-
         USER_ID = 1L;
         COUPON_ID = 11L;
         ORDER_ID = 111L;
@@ -76,7 +73,7 @@ class OrderServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 주문 생성")
+    @DisplayName("사용자ID와 주문아이템으로 주문을 생성한다.")
     void createOrder_hasNoCoupon_ok() {
 
         // Arrange
@@ -86,7 +83,7 @@ class OrderServiceIntegrationTest {
         OrderInfo.Create orderInfo = orderService.createOrder(command);
 
         // Assert
-        Order actual = orderRepository.findById(orderInfo.orderId()).get();
+        Order actual = orderRepository.findById(orderInfo.orderId());
         assertThat(actual.getUserId()).isEqualTo(USER_ID);
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.CREATED);
         assertThat(actual.getTotalAmount()).isEqualTo(20000L);
@@ -98,19 +95,20 @@ class OrderServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 주문 후 상품 상태 변경 (CREATE -> PENDING)")
-    void holdOrder() {
+    @DisplayName("주문 후 재고가 부족한 경우 주문아이템의 상태가 변경(PENDING)된다.")
+    void holdOrders() {
 
         // Arrange
         Long productOptionId = 1L;
         OrderInfo.Create orderInfo = orderService.createOrder(new OrderCommand.Create(USER_ID, ORDER_ITEMS));
-        OrderCommand.HoldOrder command = new OrderCommand.HoldOrder(orderInfo.orderId(), productOptionId);
+        ProductInfo.OptionDetail optionDetail = new ProductInfo.OptionDetail(productOptionId, false, 2L, 1L);
+        OrderCommand.handleOrders command = new OrderCommand.handleOrders(orderInfo.orderId(), List.of(optionDetail));
 
         // Act
-        orderService.holdOrder(command);
+        orderService.holdOrders(command);
 
         // Assert
-        OrderItem actual = orderItemRepository.findByOrderIdAndProductOptionId(orderInfo.orderId(), productOptionId).get();
+        OrderItem actual = orderItemRepository.findByOrderIdAndProductOptionId(orderInfo.orderId(), productOptionId);
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.PENDING);
     }
 
@@ -119,7 +117,7 @@ class OrderServiceIntegrationTest {
     class useCoupon {
 
         @Test
-        @DisplayName("[성공] 쿠폰 미사용")
+        @DisplayName("쿠폰을 사용하지 않고 주문할 수 있다.")
         void useCoupon_couponIsNull() {
 
             // Arrange
@@ -132,11 +130,11 @@ class OrderServiceIntegrationTest {
             OrderInfo.Create actualInfo = orderService.applyCoupon(command);
 
             // Assert
-            assertThat(actualInfo).isNull();
+            assertThat(actualInfo.issuedCouponId()).isNull();
         }
 
         @Test
-        @DisplayName("[성공] 쿠폰 적용 시 금액 계산 (주문금액 > 할인금액)")
+        @DisplayName("쿠폰 적용 시 주문의 결제 금액이 변경된다.")
         void useCoupon_totalAmountGtDiscountAmount() {
 
             // Arrange
@@ -147,7 +145,7 @@ class OrderServiceIntegrationTest {
             orderInfo = orderService.applyCoupon(command);
 
             // Assert
-            Order actual = orderRepository.findById(orderInfo.orderId()).get();
+            Order actual = orderRepository.findById(orderInfo.orderId());
             assertThat(actual.getIssuedCouponId()).isEqualTo(COUPON_ID);
             assertThat(actual.getTotalAmount()).isEqualTo(20000L);
             assertThat(actual.getDiscountAmount()).isEqualTo(3000L);
@@ -155,7 +153,7 @@ class OrderServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[성공] 쿠폰 적용 시 금액 계산 (주문금액 < 할인금액)")
+        @DisplayName("쿠폰 적용 시 주문 주문금액보다 할인금액이 큰 경우 결제금액은 0으로 변경된다.")
         void useCoupon_totalAmountLtDiscountAmount() {
 
             // Arrange
@@ -166,7 +164,7 @@ class OrderServiceIntegrationTest {
             orderInfo = orderService.applyCoupon(command);
 
             // Assert
-            Order actual = orderRepository.findById(orderInfo.orderId()).get();
+            Order actual = orderRepository.findById(orderInfo.orderId());
             assertThat(actual.getIssuedCouponId()).isEqualTo(COUPON_ID);
             assertThat(actual.getTotalAmount()).isEqualTo(20000L);
             assertThat(actual.getDiscountAmount()).isEqualTo(20000L);
@@ -179,7 +177,7 @@ class OrderServiceIntegrationTest {
     class FindById {
 
         @Test
-        @DisplayName("[성공] 주문 조회")
+        @DisplayName("주문ID로 생성된 주문을 조회한다.")
         void findById_ok() {
 
             // Arrange
@@ -189,7 +187,7 @@ class OrderServiceIntegrationTest {
             OrderInfo.Create orderInfo = orderService.createOrder(command);
 
             // Assert
-            Order actual = orderRepository.findById(orderInfo.orderId()).get();
+            Order actual = orderRepository.findById(orderInfo.orderId());
 
             assertThat(actual).isNotNull();
             assertThat(actual.getUserId()).isEqualTo(USER_ID);
@@ -197,7 +195,7 @@ class OrderServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[실패] 주문 조회 -> 주문 없음(NOT_FOUND)")
+        @DisplayName("주문이 생성되지 않아 주문을 찾을 수 없다.")
         void findById_NotFound() {
 
             // Arrange
@@ -212,7 +210,7 @@ class OrderServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 주문 결제")
+    @DisplayName("주문ID로 주문을 결제한다.")
     void pay_ok() {
 
         // Arrange
@@ -222,7 +220,7 @@ class OrderServiceIntegrationTest {
         order = orderService.pay(new OrderCommand.Find(order.getId()));
 
         // Assert
-        Order actual = orderRepository.findById(order.getId()).get();
+        Order actual = orderRepository.findById(order.getId());
         assertThat(actual).isNotNull();
         assertThat(actual.getUserId()).isEqualTo(USER_ID);
         assertThat(actual.getIssuedCouponId()).isEqualTo(COUPON_ID);
@@ -231,7 +229,7 @@ class OrderServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("[실패] 주문 결제 -> 주문 없음(NOT_FOUND)")
+    @DisplayName("생성된 주문이 없어 주문 결제할 수 없다.")
     void pay_NotFound() {
 
         // Arrange
@@ -245,7 +243,7 @@ class OrderServiceIntegrationTest {
     }
 
     @Test
-    @DisplayName("[성공] 인기 판매상품 조회")
+    @DisplayName("3일간 상위 5개의 인기 판매상품 조회한다.")
     void findBestSelling_ok() {
 
         // Arrange

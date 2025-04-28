@@ -2,13 +2,15 @@ package kr.hhplus.be.server.domain.coupon.repository;
 
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface IssuedCouponRepository {
 
-    Optional<IssuedCoupon> findByUserIdAndCouponId(Long userId, Long couponId);
+    IssuedCoupon findByUserIdAndCouponId(Long userId, Long couponId);
+
+    boolean existsByUserIdAndCouponId(Long userId, Long couponId);
 
     IssuedCoupon save(IssuedCoupon issuedCoupon);
 
-    void deleteAll();
+    List<IssuedCoupon> findExpiredCoupons();
 }

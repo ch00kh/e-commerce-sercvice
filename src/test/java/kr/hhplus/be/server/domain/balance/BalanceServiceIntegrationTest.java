@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.balance;
 
+import kr.hhplus.be.server.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.balance.dto.BalanceCommand;
 import kr.hhplus.be.server.domain.balance.entity.Balance;
 import kr.hhplus.be.server.domain.balance.entity.BalanceHistory;
@@ -14,10 +15,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,9 +27,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
 @SpringBootTest
+@ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[통합테스트] BalanceService")
-@Transactional
 class BalanceServiceIntegrationTest {
 
     @Autowired
@@ -48,14 +49,8 @@ class BalanceServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        userRepository.deleteAll();
-        balanceRepository.deleteAll();
-
         USER = userRepository.save(new User("추경현"));
         BALANCE = balanceRepository.save(new Balance(USER.getId(), 1000L));
-
-        log.info("USER ID: {}", USER.getId());
-        log.info("BALANCE ID: {}", BALANCE.getId());
     }
 
     @Nested
@@ -63,7 +58,7 @@ class BalanceServiceIntegrationTest {
     class findBalance{
 
         @Test
-        @DisplayName("[성공] 잔액 조회")
+        @DisplayName("사용자 ID로 잔액을 조회한다.")
         void findBalance_ok() {
 
             // Arrange
@@ -75,13 +70,13 @@ class BalanceServiceIntegrationTest {
             // Assert
             assertThat(balance.getBalance()).isEqualTo(1000L);
 
-            Balance actual = balanceRepository.findByUserId(USER.getId()).get();
+            Balance actual = balanceRepository.findByUserId(USER.getId());
             assertThat(actual.getBalance()).isEqualTo(1000L);
 
         }
 
         @Test
-        @DisplayName("[실패] 잔액 조회 - 사용자 없음 예외(NOT_FOUND)")
+        @DisplayName("사용자를 찾을 수 없어 잔액 조회를 할 수 없다.")
         void findBalance_notFound() {
 
             // Arrange
@@ -100,7 +95,7 @@ class BalanceServiceIntegrationTest {
     class charge {
 
         @Test
-        @DisplayName("[성공] 잔액 충전")
+        @DisplayName("사용자ID와 충전금액을 받아 잔액을 충전한다.")
         void charge_ok() {
 
             // Arrange
@@ -112,7 +107,7 @@ class BalanceServiceIntegrationTest {
             // Assert
             assertThat(balance.getBalance()).isEqualTo(2000L); // 1000+1000
 
-            Balance actualBalance = balanceRepository.findByUserId(USER.getId()).get();
+            Balance actualBalance = balanceRepository.findByUserId(USER.getId());
             assertThat(actualBalance.getBalance()).isEqualTo(2000L);
 
             List<BalanceHistory> actualBalanceHistory = balanceHistoryRepository.findByBalanceId(BALANCE.getId());
@@ -120,7 +115,7 @@ class BalanceServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[실패] 잔액 충전 - 없는 잔고(존재하지 않는 사용자) 예외(NOT_FOUND)")
+        @DisplayName("잔고가 없거나 사용자를 찾을 수 없어 잔액 충전을 할 수 없다.")
         void charge_notFound() {
 
             // Arrange
@@ -134,7 +129,7 @@ class BalanceServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[실패] 잔액 충전 - 유효하지 않은 충전 금액 예외 (INVALID_CHARGE_AMOUNT)")
+        @DisplayName("충전 금액은 음수일 수 없어 잔액 충전을 할 수 없다.")
         void charge_invalidChargeAmount() {
 
             // Arrange
@@ -149,11 +144,11 @@ class BalanceServiceIntegrationTest {
     }
 
     @Nested
-    @DisplayName("잔고 차감")
+    @DisplayName("잔액 차감")
     class reduce {
 
         @Test
-        @DisplayName("[성공] 잔고 여유")
+        @DisplayName("잔액이 여유가 있는 경우 잔액을 차감한다.")
         void reduce_ok() {
 
             // Arrange
@@ -165,7 +160,7 @@ class BalanceServiceIntegrationTest {
             // Assert
             assertThat(balance.getBalance()).isEqualTo(0);
 
-            Balance actualBalance = balanceRepository.findByUserId(USER.getId()).get();
+            Balance actualBalance = balanceRepository.findByUserId(USER.getId());
             assertThat(actualBalance.getBalance()).isEqualTo(0);
 
             List<BalanceHistory> actualBalanceHistory = balanceHistoryRepository.findByBalanceId(BALANCE.getId());
@@ -173,7 +168,7 @@ class BalanceServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[실패] 잔고 부족 (잔고금액 < 결제금액) -> (INSUFFICIENT_BALANCE)")
+        @DisplayName("잔액이 부족한 경우 잔액을 차감할 수 없다.")
         void reduce_insufficientBalance() {
 
             // Arrange
@@ -187,7 +182,7 @@ class BalanceServiceIntegrationTest {
         }
 
         @Test
-        @DisplayName("[실패] 잔액 차감 -> 사용자 없음(NOT_FOUND)")
+        @DisplayName("잔고를 찾을 수 없어 잔액 차감을 할 수 없다.")
         void reduceBalance_notFound() {
 
             // Arrange

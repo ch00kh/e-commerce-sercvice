@@ -18,10 +18,8 @@ public class UserService {
     /**
      * 사용자 조회
      */
-    @Transactional(readOnly = true)
     public User findByUserId(UserCommand.Find command) {
-        return userRepository.findById(command.id())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        return userRepository.findById(command.id());
     }
 
     /**
@@ -29,6 +27,11 @@ public class UserService {
      */
     @Transactional
     public User create(UserCommand.Create command) {
+
+        userRepository.findByName(command.name()).ifPresent(user -> {
+            throw new GlobalException(ErrorCode.BAD_REQUEST);
+        });
+
         return userRepository.save(new User(command.name()));
     }
 

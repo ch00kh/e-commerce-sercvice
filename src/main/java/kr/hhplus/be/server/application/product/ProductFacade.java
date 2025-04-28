@@ -17,12 +17,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductFacade {
 
-    ProductService productService;
-    OrderService orderService;
+    private final ProductService productService;
+    private final OrderService orderService;
 
     /**
      * 전체 상품 조회
      */
+    @Transactional
     public ProductResult.ProductList findAll() {
         return ProductResult.ProductList.from(productService.findAll());
     }

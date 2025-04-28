@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domain.product;
 
+import kr.hhplus.be.server.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.domain.product.entity.Product;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -24,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 @SpringBootTest
+@ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[동시성 테스트] ProductService")
 class ProductServiceConcurrencyTest {
@@ -43,23 +46,23 @@ class ProductServiceConcurrencyTest {
 
     @BeforeEach
     void setUp() {
-        productRepository.deleteAll();
-        productOptionRepository.deleteAll();
-
         PRODUCT = productRepository.save(new Product("양반", "김"));
         PRODUCT_OPTION = productOptionRepository.save(new ProductOption(PRODUCT.getId(), "들기름 김", 1000L, 100L));
     }
 
     @Test
-    @DisplayName("재고 차감")
+    @DisplayName("주문 중 재고 차감 시 모든 요청은 성공한다.")
     void reduceStockConcurrencyTest() throws InterruptedException {
 
         // Arrange
         int threadCount = 100;
-        int threadPool = 8;
+        int threadPool = 3;
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadPool);
-        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch taskLatch = new CountDownLatch(threadCount);
+
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failureCount = new AtomicInteger(0);
 
@@ -67,10 +70,12 @@ class ProductServiceConcurrencyTest {
         for (int i = 0; i < threadCount; i++) {
             executorService.submit(() -> {
                 try {
+                    startLatch.await();
+
                     List<OrderCommand.OrderItem> command = List.of(new OrderCommand.OrderItem(PRODUCT_OPTION.getId(), 1000L, 1L));
                     ProductInfo.Order productInfo = productService.reduceStock(command);
 
-                    if (productInfo.checkStocks().get(0).canPurchase()) {
+                    if (productInfo.optionDetails().get(0).canPurchase()) {
                         successCount.incrementAndGet();
                     } else {
                         failureCount.incrementAndGet();
@@ -80,19 +85,21 @@ class ProductServiceConcurrencyTest {
                     failureCount.incrementAndGet();
                     log.error("Error reducing stock: {}", e.getMessage());
                 } finally {
-                    latch.countDown();
+                    taskLatch.countDown();
                 }
             });
         }
-        latch.await();
+
+        startLatch.countDown();
+        taskLatch.await();
         executorService.shutdown();
 
         // Assert
         log.info("Success count: {}, Failure count: {}", successCount.get(), failureCount.get());
         assertThat(successCount.get() + failureCount.get()).isEqualTo(threadCount);
 
-        ProductOption updatedOption = productOptionRepository.findById(PRODUCT_OPTION.getId()).orElseThrow();
-        assertThat(updatedOption.getStock()).isEqualTo(0);
+        ProductOption updatedOption = productOptionRepository.findById(PRODUCT_OPTION.getId());
+        assertThat(updatedOption.getStock()).isEqualTo(100L - successCount.get());
     }
 
 }

@@ -28,4 +28,11 @@ public class CouponFacade {
                 issuedCoupon.getExpiredAt()
         );
     }
+
+    /**
+     * 쿠폰 만료
+     */
+    public void expireCoupon() {
+        couponService.expireCoupon();
+    }
 }

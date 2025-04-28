@@ -57,6 +57,6 @@ public record ProductInfo(){
     ) {}
 
     public record Order(
-            List<OptionDetail> checkStocks
+            List<OptionDetail> optionDetails
     ) {}
 }

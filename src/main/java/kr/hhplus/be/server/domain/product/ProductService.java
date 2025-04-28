@@ -7,8 +7,6 @@ import kr.hhplus.be.server.domain.product.entity.Product;
 import kr.hhplus.be.server.domain.product.entity.ProductOption;
 import kr.hhplus.be.server.domain.product.repository.ProductOptionRepository;
 import kr.hhplus.be.server.domain.product.repository.ProductRepository;
-import kr.hhplus.be.server.global.exception.ErrorCode;
-import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,8 +42,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     public ProductInfo.ProductAggregate findProduct(ProductCommand.Find command) {
 
-        Product product = productRepository.findById(command.productId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        Product product = productRepository.findById(command.productId());
 
         List<ProductOption> productOptions = productOptionRepository.findByProductId(command.productId());
 
@@ -59,8 +56,7 @@ public class ProductService {
     public ProductInfo.Order reduceStock(List<OrderCommand.OrderItem> command) {
 
         return new ProductInfo.Order(command.stream().map(i -> {
-            ProductOption productOption = productOptionRepository.findById(i.productOptionId())
-                    .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+            ProductOption productOption = productOptionRepository.findByIdWithPessimisticLock(i.productOptionId());
 
             if (productOption.canPurchase(i.quantity())) {
                 Long remainingStock = productOption.reduceStock(i.quantity());
@@ -88,11 +84,9 @@ public class ProductService {
     @Transactional(readOnly = true)
     public ProductInfo.ProductAggregate findProductByOptionId(ProductCommand.FindByProductOptionId command) {
 
-        ProductOption productOption = productOptionRepository.findById(command.productOptionId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        ProductOption productOption = productOptionRepository.findById(command.productOptionId());
 
-        Product product = productRepository.findById(productOption.getProductId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        Product product = productRepository.findById(productOption.getProductId());
 
         return ProductInfo.ProductAggregate.from(product, productOption);
     }

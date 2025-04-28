@@ -15,8 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -43,11 +41,11 @@ class PaymentServiceTest {
     class findPayment {
 
         @Test
-        @DisplayName("[성공] 결제 조회")
+        @DisplayName("주문ID로 결제를 조회한다.")
         void findPayment_ok() {
 
             // Arrange
-            when(paymentRepository.findByOrderId(anyLong())).thenReturn(Optional.of(PAYMENT));
+            when(paymentRepository.findByOrderId(anyLong())).thenReturn(PAYMENT);
 
             // Act
             Payment actual = paymentService.findPayment(new PaymentCommand.FindOrder(anyLong()));
@@ -61,11 +59,11 @@ class PaymentServiceTest {
         }
 
         @Test
-        @DisplayName("[실패] 결제 조회 -> 결제 없음(NOT_FOUND)")
+        @DisplayName("주문ID로 결제를 찾을 수 없어 결제 조회를 할 수 없다.")
         void findPayment_NotFound() {
 
             // Arrange
-            when(paymentRepository.findByOrderId(anyLong())).thenReturn(Optional.empty());
+            when(paymentRepository.findByOrderId(anyLong())).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
@@ -82,52 +80,52 @@ class PaymentServiceTest {
     class pay {
 
         @Test
-        @DisplayName("[성공] 결제 - 전체 금액 결제")
+        @DisplayName("전체 결제금액에 대한 결제를 한다.")
         void payAllAmount_ok() {
 
             // Arrange
-            when(paymentRepository.findById(anyLong())).thenReturn(Optional.of(PAYMENT));
+            when(paymentRepository.findByIdWithOptimisticLock(anyLong())).thenReturn(PAYMENT);
 
             // Act
             Payment result = paymentService.pay(new PaymentCommand.Pay(anyLong(), 100000L));
 
             // Assert
-            verify(paymentRepository, times(1)).findById(anyLong());
+            verify(paymentRepository, times(1)).findByIdWithOptimisticLock(anyLong());
             assertThat(result.getStatus()).isEqualTo(PaymentStatus.PAYED);
             assertThat(result.getAmount()).isEqualTo(0L);
             assertThat(result.getPaidAt()).isNotNull();
         }
 
         @Test
-        @DisplayName("[성공] 결제 - 일부 금액 결제")
+        @DisplayName("일부 금액에 대한 결제를 한다. 잔여 결제금액 있어 결제 상태는 유지된다.")
         void paySomeAmount_ok() {
 
             // Arrange
-            when(paymentRepository.findById(anyLong())).thenReturn(Optional.of(PAYMENT));
+            when(paymentRepository.findByIdWithOptimisticLock(anyLong())).thenReturn(PAYMENT);
 
             // Act
             Payment result = paymentService.pay(new PaymentCommand.Pay(anyLong(), 50000L));
 
             // Assert
-            verify(paymentRepository, times(1)).findById(anyLong());
+            verify(paymentRepository, times(1)).findByIdWithOptimisticLock((anyLong()));
             assertThat(result.getStatus()).isEqualTo(PaymentStatus.PENDING);
             assertThat(result.getAmount()).isEqualTo(50000L);
             assertThat(result.getPaidAt()).isNotNull();
         }
 
         @Test
-        @DisplayName("[실패] 결제 -> 결제 없음(NOT_FOUND)")
+        @DisplayName("생성된 결제가 없어 결제를 찾을 수 없다.")
         void pay_NotFound() {
 
             // Arrange
-            when(paymentRepository.findById(anyLong())).thenReturn(Optional.empty());
+            when(paymentRepository.findByIdWithOptimisticLock(anyLong())).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
                     () -> paymentService.pay(new PaymentCommand.Pay(anyLong(), 10000L)));
 
             // Assert
-            verify(paymentRepository).findById(anyLong());
+            verify(paymentRepository).findByIdWithOptimisticLock(anyLong());
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
         }
     }

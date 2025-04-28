@@ -4,15 +4,17 @@ import jakarta.persistence.*;
 import kr.hhplus.be.server.domain.BaseCreatedTimeEntity;
 import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = {
         @Index(name = "idx_user_id", columnList = "userId"),
         @Index(name = "idx_coupon_id", columnList = "couponId")
@@ -44,8 +46,9 @@ public class IssuedCoupon extends BaseCreatedTimeEntity {
         this.userId = userId;
         this.couponId = couponId;
         this.status = CouponStatus.ISSUED;
-        this.expiredAt = LocalDateTime.now().plusDays(90);
+        this.expiredAt = LocalDate.now().plusDays(30).atStartOfDay();
     }
+
 
     public void use() {
         if (this.status != CouponStatus.ISSUED) {
@@ -53,5 +56,13 @@ public class IssuedCoupon extends BaseCreatedTimeEntity {
         }
         this.status = CouponStatus.USED;
         this.usedAt = LocalDateTime.now();
+    }
+
+    public void expireCoupon() {
+        this.status = CouponStatus.EXPIRED;
+    }
+
+    public void changeExpiredAt(LocalDateTime expiredAt) {
+        this.expiredAt = expiredAt;
     }
 }

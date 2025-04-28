@@ -1,8 +1,9 @@
-package kr.hhplus.be.server.interfaces.product.controller;
+package kr.hhplus.be.server.interfaces.product;
 
 import kr.hhplus.be.server.application.product.ProductFacade;
 import kr.hhplus.be.server.application.product.dto.ProductCriteria;
 import kr.hhplus.be.server.application.product.dto.ProductResult;
+import kr.hhplus.be.server.interfaces.product.controller.ProductController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("[성공] 상품 목록 조회")
+    @DisplayName("전체 상품 목록을 조회한다.")
     void findProductAll() throws Exception {
 
         // Arrange
@@ -104,7 +105,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("[성공] 상품 정보 조회")
+    @DisplayName("상품ID를 입력받아 상품 정보를 조회한다.")
     void findProduct() throws Exception {
 
         // Arrange

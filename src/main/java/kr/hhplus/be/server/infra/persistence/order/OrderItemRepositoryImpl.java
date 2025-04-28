@@ -3,13 +3,14 @@ package kr.hhplus.be.server.infra.persistence.order;
 import kr.hhplus.be.server.domain.order.dto.OrderInfo;
 import kr.hhplus.be.server.domain.order.entity.OrderItem;
 import kr.hhplus.be.server.domain.order.repository.OrderItemRepository;
+import kr.hhplus.be.server.global.exception.ErrorCode;
+import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 
 @Repository
@@ -19,8 +20,9 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
     private final OrderItemJpaRepository jpaRepository;
 
     @Override
-    public Optional<OrderItem> findByOrderIdAndProductOptionId(Long orderId, Long productOptionId) {
-        return jpaRepository.findByOrderIdAndProductOptionId(orderId, productOptionId);
+    public OrderItem findByOrderIdAndProductOptionId(Long orderId, Long productOptionId) {
+        return jpaRepository.findByOrderIdAndProductOptionId(orderId, productOptionId)
+                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
     }
 
     @Override
@@ -49,8 +51,4 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
         return jpaRepository.findByProductOptionId(productOptionId);
     }
 
-    @Override
-    public void deleteAll() {
-        jpaRepository.deleteAll();
-    }
 }

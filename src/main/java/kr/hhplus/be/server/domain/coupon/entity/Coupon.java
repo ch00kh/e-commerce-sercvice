@@ -22,6 +22,9 @@ public class Coupon extends BaseTimeEntity {
     @Column(nullable = false)
     private Long quantity;
 
+    @Version
+    Long version;
+
     public Coupon(Long discountPrice, Long quantity) {
         this.discountPrice = discountPrice;
         this.quantity = quantity;

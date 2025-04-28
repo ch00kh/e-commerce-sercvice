@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static kr.hhplus.be.server.domain.coupon.dto.CouponInfo.CouponAggregate;
 
 @Service
@@ -30,11 +32,9 @@ public class CouponService {
             return CouponAggregate.from();
         }
 
-        Coupon coupon = couponRepository.findById(command.couponId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        Coupon coupon = couponRepository.findById(command.couponId());
 
-        IssuedCoupon issuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(command.userId(), command.couponId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        IssuedCoupon issuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(command.userId(), command.couponId());
 
         issuedCoupon.use();
 
@@ -48,18 +48,33 @@ public class CouponService {
     public IssuedCoupon issue(CouponCommand.Issue command) {
 
         // 잔여 쿠폰 조회 및 쿠폰 수량 차감
-        Coupon coupon = couponRepository.findById(command.couponId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        Coupon coupon = couponRepository.findByIdWithOptimisticLock(command.couponId());
 
         coupon.issue();
 
-        // 기발급 검증 및 쿠폰 저장
-        issuedCouponRepository.findByUserIdAndCouponId(command.userId(), command.couponId())
-                .ifPresent(issuedCoupon -> {
-                    throw new GlobalException(ErrorCode.ALREADY_ISSUED_COUPON);
-                });
+        // 기발급 검증
+        if (issuedCouponRepository.existsByUserIdAndCouponId(command.userId(), command.couponId())) {
+            throw new GlobalException(ErrorCode.ALREADY_ISSUED_COUPON);
+        }
 
         return issuedCouponRepository.save(new IssuedCoupon(command.userId(), command.couponId()));
     }
 
+    /**
+     * 쿠폰 만료 처리
+     */
+    @Transactional
+    public void expireCoupon() {
+        List<IssuedCoupon> expiredCoupons = issuedCouponRepository.findExpiredCoupons();
+        expiredCoupons.forEach(IssuedCoupon::expireCoupon);
+    }
+
+    /**
+     * 발급 쿠폰 만료일 변경
+     */
+    @Transactional
+    public void changeExpiredAt(CouponCommand.ChangeExpiredAt command) {
+        IssuedCoupon issuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(command.userId(), command.couponId());
+        issuedCoupon.changeExpiredAt(command.expiredAt());
+    }
 }

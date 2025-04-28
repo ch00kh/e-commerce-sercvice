@@ -19,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -60,7 +59,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("[성공] 상품 목록 조회")
+    @DisplayName("상품 목록을 조회 한다.")
     void findAll() {
 
         // Arrange
@@ -100,11 +99,11 @@ class ProductServiceTest {
     class findProduct {
 
         @Test
-        @DisplayName("[성공] 상품 정보 조회")
+        @DisplayName("상품ID로 상품 정보를 조회한다.")
         void findProduct_ok() {
 
             // Arrange
-            when(productRepository.findById(PRODUCT_ID1)).thenReturn(Optional.of(PRODUCT1));
+            when(productRepository.findById(PRODUCT_ID1)).thenReturn(PRODUCT1);
             when(productOptionRepository.findByProductId(PRODUCT_ID1)).thenReturn(List.of(PRODUCT_OPTION1, PRODUCT_OPTION2));
 
             // Act
@@ -126,11 +125,11 @@ class ProductServiceTest {
         }
 
         @Test
-        @DisplayName("[실패] 상품 정보 조회 -> 상품 없음 예외(NOT_FOUND)")
+        @DisplayName("상품ID가 없어 상품 정보를 조회할 수 없다.")
         void findProduct_NotFound() {
 
             // Arrange
-            when(productRepository.findById(PRODUCT_ID1)).thenReturn(Optional.empty());
+            when(productRepository.findById(PRODUCT_ID1)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class, () -> productService.findProduct(new ProductCommand.Find(PRODUCT_ID1)));
@@ -146,7 +145,7 @@ class ProductServiceTest {
     class reduceStock {
 
         @Test
-        @DisplayName("[성공] 모든 상품 재고 여유 -> CheckStock iscanPurchase 값 검증 true")
+        @DisplayName("모든 상품의 재고가 여유가 있어 재고 차감에 성공한다.")
         void reduceStock_ok() {
 
             // Arrange
@@ -155,31 +154,31 @@ class ProductServiceTest {
                     new OrderCommand.OrderItem(102L, 5900L, 9L)
             );
 
-            when(productOptionRepository.findById(101L)).thenReturn(Optional.of(PRODUCT_OPTION1));
-            when(productOptionRepository.findById(102L)).thenReturn(Optional.of(PRODUCT_OPTION2));
+            when(productOptionRepository.findByIdWithPessimisticLock(101L)).thenReturn(PRODUCT_OPTION1);
+            when(productOptionRepository.findByIdWithPessimisticLock(102L)).thenReturn(PRODUCT_OPTION2);
 
             // Act
             ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
 
             // Assert
-            verify(productOptionRepository, times(1)).findById(101L);
-            verify(productOptionRepository, times(1)).findById(102L);
+            verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(101L);
+            verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(102L);
 
-            assertThat(actualInfo.checkStocks().size()).isEqualTo(2);
+            assertThat(actualInfo.optionDetails().size()).isEqualTo(2);
 
-            assertThat(actualInfo.checkStocks().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
-            assertThat(actualInfo.checkStocks().get(0).remainingQuantity()).isEqualTo(90);
-            assertThat(actualInfo.checkStocks().get(0).requestQuantity()).isEqualTo(10);
-            assertThat(actualInfo.checkStocks().get(0).canPurchase()).isEqualTo(true);
+            assertThat(actualInfo.optionDetails().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
+            assertThat(actualInfo.optionDetails().get(0).remainingQuantity()).isEqualTo(90);
+            assertThat(actualInfo.optionDetails().get(0).requestQuantity()).isEqualTo(10);
+            assertThat(actualInfo.optionDetails().get(0).canPurchase()).isEqualTo(true);
 
-            assertThat(actualInfo.checkStocks().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
-            assertThat(actualInfo.checkStocks().get(1).remainingQuantity()).isEqualTo(90);
-            assertThat(actualInfo.checkStocks().get(1).requestQuantity()).isEqualTo(9);
-            assertThat(actualInfo.checkStocks().get(1).canPurchase()).isEqualTo(true);
+            assertThat(actualInfo.optionDetails().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
+            assertThat(actualInfo.optionDetails().get(1).remainingQuantity()).isEqualTo(90);
+            assertThat(actualInfo.optionDetails().get(1).requestQuantity()).isEqualTo(9);
+            assertThat(actualInfo.optionDetails().get(1).canPurchase()).isEqualTo(true);
         }
 
         @Test
-        @DisplayName("[성공] 모든 상품 재고 여유(경계값)")
+        @DisplayName("주문 상품과 상품의 재고가 동일하여 상품 재고 차감에 성공한다.")
         void reduceStock_ok_BoundaryCheck() {
 
             // Arrange
@@ -188,31 +187,31 @@ class ProductServiceTest {
                     new OrderCommand.OrderItem(102L, 5900L, 99L)
             );
 
-            when(productOptionRepository.findById(101L)).thenReturn(Optional.of(PRODUCT_OPTION1));
-            when(productOptionRepository.findById(102L)).thenReturn(Optional.of(PRODUCT_OPTION2));
+            when(productOptionRepository.findByIdWithPessimisticLock(101L)).thenReturn(PRODUCT_OPTION1);
+            when(productOptionRepository.findByIdWithPessimisticLock(102L)).thenReturn(PRODUCT_OPTION2);
 
             // Act
             ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
 
             // Assert
-            verify(productOptionRepository, times(1)).findById(101L);
-            verify(productOptionRepository, times(1)).findById(102L);
+            verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(101L);
+            verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(102L);
 
-            assertThat(actualInfo.checkStocks().size()).isEqualTo(2);
+            assertThat(actualInfo.optionDetails().size()).isEqualTo(2);
 
-            assertThat(actualInfo.checkStocks().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
-            assertThat(actualInfo.checkStocks().get(0).remainingQuantity()).isEqualTo(1);
-            assertThat(actualInfo.checkStocks().get(0).requestQuantity()).isEqualTo(99);
-            assertThat(actualInfo.checkStocks().get(0).canPurchase()).isEqualTo(true);
+            assertThat(actualInfo.optionDetails().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
+            assertThat(actualInfo.optionDetails().get(0).remainingQuantity()).isEqualTo(1);
+            assertThat(actualInfo.optionDetails().get(0).requestQuantity()).isEqualTo(99);
+            assertThat(actualInfo.optionDetails().get(0).canPurchase()).isEqualTo(true);
 
-            assertThat(actualInfo.checkStocks().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
-            assertThat(actualInfo.checkStocks().get(1).remainingQuantity()).isEqualTo(0);
-            assertThat(actualInfo.checkStocks().get(1).requestQuantity()).isEqualTo(99);
-            assertThat(actualInfo.checkStocks().get(1).canPurchase()).isEqualTo(true);
+            assertThat(actualInfo.optionDetails().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
+            assertThat(actualInfo.optionDetails().get(1).remainingQuantity()).isEqualTo(0);
+            assertThat(actualInfo.optionDetails().get(1).requestQuantity()).isEqualTo(99);
+            assertThat(actualInfo.optionDetails().get(1).canPurchase()).isEqualTo(true);
         }
 
         @Test
-        @DisplayName("[실패] 일부 상품 재고 부족 -> 예외는 아니지만, CheckStock 검증")
+        @DisplayName("일부 상품은 재고 부족하여 재고 차감을 하지 않는다.")
         void reduceStock_ok_anyStockIsNotEnough() {
 
             // Arrange
@@ -221,27 +220,27 @@ class ProductServiceTest {
                     new OrderCommand.OrderItem(102L, 5900L, 100L)
             );
 
-            when(productOptionRepository.findById(101L)).thenReturn(Optional.of(PRODUCT_OPTION1));
-            when(productOptionRepository.findById(102L)).thenReturn(Optional.of(PRODUCT_OPTION2));
+            when(productOptionRepository.findByIdWithPessimisticLock(101L)).thenReturn(PRODUCT_OPTION1);
+            when(productOptionRepository.findByIdWithPessimisticLock(102L)).thenReturn(PRODUCT_OPTION2);
 
             // Act
             ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
 
             // Assert
-            verify(productOptionRepository, times(1)).findById(101L);
-            verify(productOptionRepository, times(1)).findById(102L);
+            verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(101L);
+            verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(102L);
 
-            assertThat(actualInfo.checkStocks().size()).isEqualTo(2);
+            assertThat(actualInfo.optionDetails().size()).isEqualTo(2);
 
-            assertThat(actualInfo.checkStocks().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
-            assertThat(actualInfo.checkStocks().get(0).remainingQuantity()).isEqualTo(100);
-            assertThat(actualInfo.checkStocks().get(0).requestQuantity()).isEqualTo(101);
-            assertThat(actualInfo.checkStocks().get(0).canPurchase()).isEqualTo(false);
+            assertThat(actualInfo.optionDetails().get(0).optionId()).isEqualTo(PRODUCT_OPTION1.getId());
+            assertThat(actualInfo.optionDetails().get(0).remainingQuantity()).isEqualTo(100);
+            assertThat(actualInfo.optionDetails().get(0).requestQuantity()).isEqualTo(101);
+            assertThat(actualInfo.optionDetails().get(0).canPurchase()).isEqualTo(false);
 
-            assertThat(actualInfo.checkStocks().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
-            assertThat(actualInfo.checkStocks().get(1).remainingQuantity()).isEqualTo(99);
-            assertThat(actualInfo.checkStocks().get(1).requestQuantity()).isEqualTo(100);
-            assertThat(actualInfo.checkStocks().get(1).canPurchase()).isEqualTo(false);
+            assertThat(actualInfo.optionDetails().get(1).optionId()).isEqualTo(PRODUCT_OPTION2.getId());
+            assertThat(actualInfo.optionDetails().get(1).remainingQuantity()).isEqualTo(99);
+            assertThat(actualInfo.optionDetails().get(1).requestQuantity()).isEqualTo(100);
+            assertThat(actualInfo.optionDetails().get(1).canPurchase()).isEqualTo(false);
         }
     }
 }

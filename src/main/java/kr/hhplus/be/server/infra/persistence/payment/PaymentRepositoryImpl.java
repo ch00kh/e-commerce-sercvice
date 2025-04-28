@@ -2,10 +2,10 @@ package kr.hhplus.be.server.infra.persistence.payment;
 
 import kr.hhplus.be.server.domain.payment.entity.Payment;
 import kr.hhplus.be.server.domain.payment.repository.PaymentRepository;
+import kr.hhplus.be.server.global.exception.ErrorCode;
+import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -19,17 +19,19 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     }
 
     @Override
-    public Optional<Payment> findById(Long paymentId) {
-        return jpaRepository.findById(paymentId);
+    public Payment findById(Long paymentId) {
+        return jpaRepository.findById(paymentId).orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
     }
 
     @Override
-    public Optional<Payment> findByOrderId(Long orderId) {
-        return jpaRepository.findByOrderId(orderId);
+    public Payment findByIdWithOptimisticLock(Long paymentId) {
+        return jpaRepository.findByIdWithOptimisticLock(paymentId).orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
     }
 
     @Override
-    public void deleteAll() {
-        jpaRepository.deleteAll();
+    public Payment findByOrderId(Long orderId) {
+        return jpaRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
     }
+
 }

@@ -2,6 +2,8 @@ package kr.hhplus.be.server.infra.persistence.user;
 
 import kr.hhplus.be.server.domain.user.entity.User;
 import kr.hhplus.be.server.domain.user.repository.UserRepository;
+import kr.hhplus.be.server.global.exception.ErrorCode;
+import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -14,8 +16,8 @@ public class UserRepositoryImpl implements UserRepository {
     private final UserJpaRepository jpaRepository;
 
     @Override
-    public Optional<User> findById(Long userId) {
-        return jpaRepository.findById(userId);
+    public User findById(Long userId) {
+        return jpaRepository.findById(userId).orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
     }
 
     @Override
@@ -24,7 +26,8 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void deleteAll() {
-        jpaRepository.deleteAll();
+    public Optional<User> findByName(String name) {
+        return jpaRepository.findByName(name);
     }
+
 }

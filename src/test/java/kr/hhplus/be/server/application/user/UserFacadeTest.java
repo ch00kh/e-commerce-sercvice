@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.application.user;
 
+import kr.hhplus.be.server.DatabaseClearExtension;
 import kr.hhplus.be.server.application.user.dto.UserCriteria;
 import kr.hhplus.be.server.application.user.dto.UserResult;
 import kr.hhplus.be.server.domain.balance.entity.Balance;
@@ -8,6 +9,7 @@ import kr.hhplus.be.server.domain.user.entity.User;
 import kr.hhplus.be.server.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -15,7 +17,9 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
+@DisplayName("[통합테스트] UserFacade")
 public class UserFacadeTest {
 
     @Autowired
@@ -42,10 +46,10 @@ public class UserFacadeTest {
         assertThat(result.name()).isEqualTo("추경현");
         assertThat(result.balance()).isEqualTo(0);
 
-        User user = userRepository.findById(result.id()).get();
+        User user = userRepository.findById(result.id());
         assertThat(user.getName()).isEqualTo("추경현");
 
-        Balance balance = balanceRepository.findByUserId(result.id()).get();
+        Balance balance = balanceRepository.findByUserId(result.id());
         assertThat(balance.getBalance()).isEqualTo(0);
     }
 

@@ -6,8 +6,6 @@ import kr.hhplus.be.server.domain.balance.entity.BalanceHistory;
 import kr.hhplus.be.server.domain.balance.entity.TransactionType;
 import kr.hhplus.be.server.domain.balance.repository.BalanceHistoryRepository;
 import kr.hhplus.be.server.domain.balance.repository.BalanceRepository;
-import kr.hhplus.be.server.global.exception.ErrorCode;
-import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,8 +23,7 @@ public class BalanceService {
     @Transactional(readOnly = true)
     public Balance find(BalanceCommand.Find command) {
 
-        return balanceRepository.findByUserId(command.userId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        return balanceRepository.findByUserId(command.userId());
     }
 
     /**
@@ -35,8 +32,7 @@ public class BalanceService {
     @Transactional
     public Balance charge(BalanceCommand.Charge command) {
 
-        Balance balance = balanceRepository.findByUserId(command.userId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        Balance balance = balanceRepository.findByUserIdWithOptimisticLock(command.userId());
 
         balance.charge(command.amount());
 
@@ -51,8 +47,7 @@ public class BalanceService {
     @Transactional
     public Balance reduce(BalanceCommand.Reduce command) {
 
-        Balance balance = balanceRepository.findByUserId(command.userId())
-                .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+        Balance balance = balanceRepository.findByUserIdWithPessimisticLock(command.userId());
 
         balanceHistoryRepository.save(new BalanceHistory(balance.getId(), command.issuedCouponId(), command.paymentAmount(), TransactionType.USE));
 

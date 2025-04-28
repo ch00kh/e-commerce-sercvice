@@ -39,7 +39,7 @@ public class PaymentFacade {
         Balance balance = balanceService.reduce(new BalanceCommand.Reduce(order.getUserId(),criteria.amount(), order.getIssuedCouponId()));
 
         // 결제 완료
-        Payment pay = paymentService.pay(new PaymentCommand.Pay(payment.getId(), order.getPaymentAmount()));
+        Payment pay = paymentService.pay(new PaymentCommand.Pay(payment.getId(), criteria.amount()));
 
         // 주문 상태 변경
         order = orderService.pay(new OrderCommand.Find(payment.getOrderId()));
