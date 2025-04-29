@@ -40,6 +40,12 @@ dependencies {
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
 
+    // redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+    // redisson
+    implementation("org.redisson:redisson-spring-boot-starter:3.37.0")
+
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.boot:spring-boot-testcontainers")
@@ -67,6 +73,7 @@ tasks.withType<Test> {
 
 tasks.named<JacocoReport>("jacocoTestReport") {  // 타입을 명시적으로 지정
     dependsOn(tasks.named("test"))
+
     reports {
         xml.required.set(true)  // set 메서드 사용
         csv.required.set(false)
