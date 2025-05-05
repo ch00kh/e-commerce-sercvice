@@ -2,6 +2,7 @@ package kr.hhplus.be.server.global.aop;
 
 import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
+import kr.hhplus.be.server.global.util.CustomSpelExpressionParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -12,13 +13,10 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ParserContext;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 @Slf4j
 @Aspect
@@ -28,7 +26,6 @@ import java.lang.reflect.Method;
 public class RedissonDistributedLockAspect {
 
     private final RedissonClient redissonClient;
-    private final SpelExpressionParser parser = new SpelExpressionParser();
 
     @Around("@annotation(DistributedLock)")
     public Object handleRedissonPubSubLock(ProceedingJoinPoint joinPoint) {
@@ -36,22 +33,24 @@ public class RedissonDistributedLockAspect {
         Method method = signature.getMethod();
         DistributedLock distributedLock = method.getAnnotation(DistributedLock.class);
 
-        String lockName = getLockName(joinPoint);
-        RLock lock = redissonClient.getLock(lockName);
+        List<String> lockNames = CustomSpelExpressionParser.parseKey(joinPoint);
+        RLock lock = generateLocks(lockNames);
 
         try {
-            boolean isLocked = lock.tryLock(distributedLock.waitTime(), distributedLock.leaseTime(), distributedLock.timeUnit());
+            boolean isLock = lock.tryLock(distributedLock.waitTime(), distributedLock.leaseTime(), distributedLock.timeUnit());
 
-            if (!isLocked) {
+            if (!isLock) {
                 throw new GlobalException(ErrorCode.LOCK_ACQUIRED_FAILED);
             }
 
             return joinPoint.proceed();
 
         } catch (GlobalException e) {
+            log.error("Already Locked Cannot Acquire Lock: {}", e.getMessage());
             throw e;
 
         } catch (Throwable e) {
+            log.error("Failed to acquire lock: {}", e.getMessage());
             throw new GlobalException(ErrorCode.INTERNAL_LOCK_ERROR);
 
         } finally {
@@ -61,22 +60,11 @@ public class RedissonDistributedLockAspect {
         }
     }
 
-    private String getLockName(ProceedingJoinPoint joinPoint) {
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        DistributedLock distributedLock = signature.getMethod().getAnnotation(DistributedLock.class);
-        String value = distributedLock.value();
+    protected RLock generateLocks(List<String> lockNames) {
+        RLock[] lockArray = lockNames.stream()
+                .map(redissonClient::getLock)
+                .toArray(RLock[]::new);
 
-        StandardEvaluationContext context = new StandardEvaluationContext();
-
-        String[] parameterNames = signature.getParameterNames();
-        Object[] args = joinPoint.getArgs();
-
-        for (int i = 0; i < parameterNames.length; i++) {
-            context.setVariable(parameterNames[i], args[i]);
-        }
-
-        Expression expression = parser.parseExpression(value, ParserContext.TEMPLATE_EXPRESSION);
-        return expression.getValue(context, String.class);
+        return redissonClient.getMultiLock(lockArray);
     }
-
 }
