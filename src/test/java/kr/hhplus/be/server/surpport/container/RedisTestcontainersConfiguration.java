@@ -1,4 +1,4 @@
-package kr.hhplus.be.server;
+package kr.hhplus.be.server.surpport.container;
 
 import jakarta.annotation.PreDestroy;
 import org.springframework.context.annotation.Configuration;

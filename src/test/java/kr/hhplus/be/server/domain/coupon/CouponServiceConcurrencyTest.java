@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.coupon;
 
-import kr.hhplus.be.server.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.coupon.dto.CouponCommand;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
@@ -56,7 +56,7 @@ class CouponServiceConcurrencyTest {
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failureCount = new AtomicInteger(0);
 
-        // Assert
+        // Act
         for (int i = 0; i < threadCount; i++) {
             long finalI = i;
             executorService.submit(() -> {

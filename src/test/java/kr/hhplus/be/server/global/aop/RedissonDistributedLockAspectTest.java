@@ -57,7 +57,7 @@ class RedissonDistributedLockAspectTest {
         @DisplayName("단일 락을 획득 후 메서드 실행 후 락을 해제한다.")
         void DistributedSingleLockSuccess() throws Throwable {
             // Arrange
-            Method method = TestService.class.getMethod("doSomething", TestCriteria.SingleLockCriteria.class);
+            Method method = DistributedLockTestService.class.getMethod("doSomething", DistributedLockTestCriteria.SingleLockCriteria.class);
 
             RedissonDistributedLockAspect aspect = new RedissonDistributedLockAspect(redissonClient) {
                 @Override
@@ -86,7 +86,7 @@ class RedissonDistributedLockAspectTest {
         @DisplayName("멀티 락을 획득 후 메서드 실행 후 락을 해제한다.")
         void DistributedMultiLockSuccess() throws Throwable {
             // Arrange
-            Method method = TestService.class.getMethod("doSomething", TestCriteria.MultiLockCriteria.class);
+            Method method = DistributedLockTestService.class.getMethod("doSomething", DistributedLockTestCriteria.MultiLockCriteria.class);
 
             RedissonDistributedLockAspect aspect = new RedissonDistributedLockAspect(redissonClient) {
                 @Override
@@ -120,7 +120,7 @@ class RedissonDistributedLockAspectTest {
         @DisplayName("이미 락이 걸려 있어 락 획득에 실패한다.")
         void DistributedSingleLockSuccess() throws Throwable {
             // Arrange
-            Method method = TestService.class.getMethod("doSomething", TestCriteria.SingleLockCriteria.class);
+            Method method = DistributedLockTestService.class.getMethod("doSomething", DistributedLockTestCriteria.SingleLockCriteria.class);
 
             RedissonDistributedLockAspect aspect = new RedissonDistributedLockAspect(redissonClient) {
                 @Override

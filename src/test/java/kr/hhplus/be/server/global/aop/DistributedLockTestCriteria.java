@@ -2,7 +2,7 @@ package kr.hhplus.be.server.global.aop;
 
 import java.util.List;
 
-public record TestCriteria() {
+public record DistributedLockTestCriteria() {
     record SingleLockCriteria(
             Long id
     ) {}
