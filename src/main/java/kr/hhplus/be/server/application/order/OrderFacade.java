@@ -13,6 +13,7 @@ import kr.hhplus.be.server.domain.payment.dto.PaymentCommand;
 import kr.hhplus.be.server.domain.product.ProductService;
 import kr.hhplus.be.server.domain.product.dto.ProductCommand;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
+import kr.hhplus.be.server.global.aop.DistributedLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -33,6 +34,7 @@ public class OrderFacade {
     /**
      * 주문
      */
+    @DistributedLock(value = "order:stock:#{#criteria.items[*].productOptionId}", waitTime = 30, leaseTime = 10)
     @Transactional
     public OrderResult.Create order(OrderCriteria.Create criteria) {
 
@@ -56,7 +58,7 @@ public class OrderFacade {
         order = orderService.applyCoupon(OrderCommand.UseCoupon.toCommand(order.orderId(), couponInfo.couponId(), couponInfo.discountPrice()));
 
         // 재고 차감 -> 재고 부족시 해당 옵션 상태
-        ProductInfo.Order reducedProductOrder = productService.reduceStock(orderItemCommand);
+        ProductInfo.Order reducedProductOrder = productService.reduceStock(new OrderCommand.OrderItemList(orderItemCommand));
 
         // 재고 부족시 -> 생성된 주문아이템 상태 변경(보류)
         orderService.holdOrders(new OrderCommand.handleOrders(order.orderId(), reducedProductOrder.optionDetails()));

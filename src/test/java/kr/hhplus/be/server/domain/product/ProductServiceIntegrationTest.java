@@ -170,7 +170,7 @@ class ProductServiceIntegrationTest {
             );
 
             // Act
-            ProductInfo.Order actual = productService.reduceStock(command);
+            ProductInfo.Order actual = productService.reduceStock(new OrderCommand.OrderItemList(command));
 
             // Assert
             assertThat(actual.optionDetails()).hasSize(2);
