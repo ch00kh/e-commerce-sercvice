@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.payment;
 
-import kr.hhplus.be.server.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.payment.dto.PaymentCommand;
 import kr.hhplus.be.server.domain.payment.entity.Payment;
 import kr.hhplus.be.server.domain.payment.repository.PaymentRepository;

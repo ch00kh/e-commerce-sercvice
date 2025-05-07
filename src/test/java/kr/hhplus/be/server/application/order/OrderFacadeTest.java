@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.application.order;
 
-import kr.hhplus.be.server.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import kr.hhplus.be.server.application.order.dto.OrderCriteria;
 import kr.hhplus.be.server.application.user.UserFacade;
 import kr.hhplus.be.server.application.user.dto.UserCriteria;

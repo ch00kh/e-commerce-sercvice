@@ -1,4 +1,4 @@
-package kr.hhplus.be.server;
+package kr.hhplus.be.server.surpport.database;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
