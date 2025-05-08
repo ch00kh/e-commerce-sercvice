@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.interfaces.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.hhplus.be.server.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import kr.hhplus.be.server.application.balance.BalanceFacade;
 import kr.hhplus.be.server.application.balance.dto.BalanceCriteria;
 import kr.hhplus.be.server.application.order.OrderFacade;
@@ -25,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
@@ -33,7 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @SpringBootTest
 @ExtendWith(DatabaseClearExtension.class)
-@DisplayName("[단위테스트] PaymentController")
+@ActiveProfiles("test")
+@DisplayName("[통합테스트] PaymentController")
 class PaymentControllerIntegrationTest {
 
     @Autowired

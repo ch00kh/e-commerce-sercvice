@@ -4,6 +4,7 @@ import kr.hhplus.be.server.application.coupon.dto.CouponCriteria;
 import kr.hhplus.be.server.application.coupon.dto.CouponResult;
 import kr.hhplus.be.server.domain.coupon.CouponService;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
+import kr.hhplus.be.server.global.aop.DistributedLock;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,7 @@ public class CouponFacade {
     /**
      * 선착순 쿠폰 발급
      */
+    @DistributedLock(value = "coupon:issue:#{#criteria.couponId}", waitTime = 30, leaseTime = 10)
     public CouponResult.Issued firstComeFirstIssue(CouponCriteria.Issue criteria) {
 
         IssuedCoupon issuedCoupon = couponService.issue(criteria.toCommand());

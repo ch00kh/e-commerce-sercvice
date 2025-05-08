@@ -158,7 +158,7 @@ class ProductServiceTest {
             when(productOptionRepository.findByIdWithPessimisticLock(102L)).thenReturn(PRODUCT_OPTION2);
 
             // Act
-            ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
+            ProductInfo.Order actualInfo = productService.reduceStock(new OrderCommand.OrderItemList(orderItems));
 
             // Assert
             verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(101L);
@@ -191,7 +191,7 @@ class ProductServiceTest {
             when(productOptionRepository.findByIdWithPessimisticLock(102L)).thenReturn(PRODUCT_OPTION2);
 
             // Act
-            ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
+            ProductInfo.Order actualInfo = productService.reduceStock(new OrderCommand.OrderItemList(orderItems));
 
             // Assert
             verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(101L);
@@ -224,7 +224,7 @@ class ProductServiceTest {
             when(productOptionRepository.findByIdWithPessimisticLock(102L)).thenReturn(PRODUCT_OPTION2);
 
             // Act
-            ProductInfo.Order actualInfo = productService.reduceStock(orderItems);
+            ProductInfo.Order actualInfo = productService.reduceStock(new OrderCommand.OrderItemList(orderItems));
 
             // Assert
             verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(101L);
