@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.user;
 
-import kr.hhplus.be.server.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.user.dto.UserCommand;
 import kr.hhplus.be.server.domain.user.entity.User;
 import kr.hhplus.be.server.global.exception.ErrorCode;

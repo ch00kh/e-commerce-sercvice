@@ -2,6 +2,7 @@ package kr.hhplus.be.server.interfaces.order.dto;
 
 import kr.hhplus.be.server.application.order.dto.OrderCriteria;
 
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -17,12 +18,13 @@ public record OrderRequest() {
             return new OrderCriteria.Create(
                     userId,
                     productId,
-                    items.stream().map(item -> new OrderCriteria.OrderItem(item.optionId, item.quantity)).toList(),
+                    items.stream()
+                            .map(item -> new OrderCriteria.OrderItem(item.optionId, item.quantity))
+                            .sorted(Comparator.comparing(OrderCriteria.OrderItem::productOptionId))
+                            .toList(),
                     couponId
-
             );
         }
-
     }
 
     public record Item(

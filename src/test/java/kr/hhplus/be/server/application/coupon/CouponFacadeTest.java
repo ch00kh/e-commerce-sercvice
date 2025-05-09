@@ -1,7 +1,7 @@
-package kr.hhplus.be.server.domain.coupon;
+package kr.hhplus.be.server.application.coupon;
 
 import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
-import kr.hhplus.be.server.domain.coupon.dto.CouponCommand;
+import kr.hhplus.be.server.application.coupon.dto.CouponCriteria;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -24,29 +24,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @ExtendWith(DatabaseClearExtension.class)
 @ActiveProfiles("test")
-@DisplayName("[동시성 테스트] CouponService")
-class CouponServiceConcurrencyTest {
+@DisplayName("[동시성 테스트] CouponFacadeTest")
+class CouponFacadeTest {
 
     @Autowired
     private CouponRepository couponRepository;
 
     @Autowired
-    private CouponService couponService;
+    private CouponFacade couponFacade;
 
     private Coupon COUPON;
 
     @BeforeEach
     void setUp() {
-        COUPON = couponRepository.save(new Coupon(1000L, 10L));
+        COUPON = couponRepository.save(new Coupon(1000L, 100L));
     }
 
     @Test
-    @DisplayName("선착순 쿠폰 발급 시 부분적으로 성공,실패한다. 쿠폰이 부족한 경우 쿠폰발급에 실패한다.")
-    void issue_ok() throws InterruptedException {
-
+    @DisplayName("동시에 여러 요청에 의한 선착순 쿠폰 발급은 먼저 온 100명은 성공하며, 나머지는 실패한다.")
+    void firstComeFirstIssue() throws InterruptedException {
         // Arrange
-        int threadCount = 100;
-        int threadPool = 8;
+        int threadCount = 200;
+        int threadPool = 100;
 
         ExecutorService executorService = Executors.newFixedThreadPool(threadPool);
 
@@ -63,7 +62,7 @@ class CouponServiceConcurrencyTest {
                 try {
                     startLatch.await();
 
-                    couponService.issue(new CouponCommand.Issue(finalI, COUPON.getId()));
+                    couponFacade.firstComeFirstIssue(new CouponCriteria.Issue(finalI, 1L));
                     successCount.incrementAndGet();
 
                 } catch (Exception e) {
@@ -74,7 +73,6 @@ class CouponServiceConcurrencyTest {
                 }
             });
         }
-
         startLatch.countDown();
         taskLatch.await();
         executorService.shutdown();
@@ -85,6 +83,5 @@ class CouponServiceConcurrencyTest {
 
         Coupon coupon = couponRepository.findById(COUPON.getId());
         assertThat(coupon.getQuantity()).isEqualTo(0);
-
     }
 }

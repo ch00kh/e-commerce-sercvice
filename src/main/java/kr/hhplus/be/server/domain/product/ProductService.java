@@ -53,9 +53,9 @@ public class ProductService {
      * 재고 차감
      */
     @Transactional
-    public ProductInfo.Order reduceStock(List<OrderCommand.OrderItem> command) {
+    public ProductInfo.Order reduceStock(OrderCommand.OrderItemList command) {
 
-        return new ProductInfo.Order(command.stream().map(i -> {
+        return new ProductInfo.Order(command.orderItems().stream().map(i -> {
             ProductOption productOption = productOptionRepository.findByIdWithPessimisticLock(i.productOptionId());
 
             if (productOption.canPurchase(i.quantity())) {
