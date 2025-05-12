@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.interfaces.order;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.hhplus.be.server.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import kr.hhplus.be.server.application.coupon.CouponFacade;
 import kr.hhplus.be.server.application.coupon.dto.CouponCriteria;
 import kr.hhplus.be.server.application.coupon.dto.CouponResult;
@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
@@ -36,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @SpringBootTest
 @ExtendWith(DatabaseClearExtension.class)
+@ActiveProfiles("test")
 @DisplayName("[통합테스트] OrderController")
 class OrderControllerIntegrationTest {
 

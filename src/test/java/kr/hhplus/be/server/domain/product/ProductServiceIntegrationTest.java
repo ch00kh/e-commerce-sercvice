@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.product;
 
-import kr.hhplus.be.server.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.product.dto.ProductCommand;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
@@ -170,7 +170,7 @@ class ProductServiceIntegrationTest {
             );
 
             // Act
-            ProductInfo.Order actual = productService.reduceStock(command);
+            ProductInfo.Order actual = productService.reduceStock(new OrderCommand.OrderItemList(command));
 
             // Assert
             assertThat(actual.optionDetails()).hasSize(2);

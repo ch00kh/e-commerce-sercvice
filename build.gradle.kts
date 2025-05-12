@@ -37,8 +37,15 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
+
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
+
+    // redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+    // redisson
+    implementation("org.redisson:redisson-spring-boot-starter:3.37.0")
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -50,12 +57,14 @@ dependencies {
 
     // Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
-
     // Lombok
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
+
+    // prometheus
+    implementation ("io.micrometer:micrometer-registry-prometheus")
 
 }
 
@@ -67,6 +76,7 @@ tasks.withType<Test> {
 
 tasks.named<JacocoReport>("jacocoTestReport") {  // 타입을 명시적으로 지정
     dependsOn(tasks.named("test"))
+
     reports {
         xml.required.set(true)  // set 메서드 사용
         csv.required.set(false)
