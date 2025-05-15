@@ -46,7 +46,7 @@ class CouponControllerTest {
             }
             """;
 
-        when(couponFacade.firstComeFirstIssue(new CouponCriteria.Issue(1L, 100L)))
+        when(couponFacade.firstComeFirstIssue(new CouponCriteria.Enqueue(1L, 100L)))
                 .thenReturn(new CouponResult.Enqueue(100L));
 
         mockMvc.perform(post("/api/v1/coupon/issue")
