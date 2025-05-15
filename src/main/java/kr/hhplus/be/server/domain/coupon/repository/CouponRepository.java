@@ -9,4 +9,9 @@ public interface CouponRepository {
     Coupon findByIdWithOptimisticLock(Long couponId);
 
     Coupon save(Coupon coupon);
+
+    void enqueue(Long couponId, Long userId);
+
+    Long getCouponQueueSize(Long couponId);
+
 }

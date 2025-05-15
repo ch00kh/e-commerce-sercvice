@@ -4,7 +4,7 @@ import kr.hhplus.be.server.application.coupon.dto.CouponCriteria;
 
 public record CouponRequest() {
 
-    public record Issue(
+    public record Enqueue(
             Long userId,
             Long couponId
     ) {

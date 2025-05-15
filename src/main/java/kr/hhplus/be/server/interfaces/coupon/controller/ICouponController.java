@@ -29,6 +29,6 @@ public interface ICouponController {
                     mediaType = "application/json",
                     schema = @Schema(example = "{\"code\":500,\"message\":\"INTERNAL_SERVER_ERROR\"}")))
     })
-    ResponseEntity<CouponResponse> issue(@RequestBody CouponRequest.Issue couponRequest);
+    ResponseEntity<CouponResponse> issue(@RequestBody CouponRequest.Enqueue couponRequest);
 
 }

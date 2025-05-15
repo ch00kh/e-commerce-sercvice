@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.coupon;
 
 import kr.hhplus.be.server.domain.coupon.dto.CouponCommand;
+import kr.hhplus.be.server.domain.coupon.dto.CouponInfo;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
@@ -8,12 +9,14 @@ import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
 import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static kr.hhplus.be.server.domain.coupon.dto.CouponInfo.CouponAggregate;
+import static kr.hhplus.be.server.infra.cache.CacheType.CacheName.COUPON;
 
 @Service
 @RequiredArgsConstructor
@@ -77,4 +80,21 @@ public class CouponService {
         IssuedCoupon issuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(command.userId(), command.couponId());
         issuedCoupon.changeExpiredAt(command.expiredAt());
     }
+
+    /**
+     * 쿠폰 찾기
+     */
+    @Cacheable(value = COUPON, key = "'couponId:' + #command.couponId()")
+    public CouponInfo.Cache findCoupon(CouponCommand.Find command) {
+        Coupon coupon = couponRepository.findById(command.couponId());
+        return new CouponInfo.Cache(coupon);
+    }
+
+    /**
+     * 쿠폰 발급 대기열 등록
+     */
+    public void enqueue(CouponCommand.Issue command) {
+        couponRepository.enqueue(command.couponId(), command.userId());
+    }
+
 }
