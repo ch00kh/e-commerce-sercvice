@@ -8,8 +8,8 @@ public record CouponRequest() {
             Long userId,
             Long couponId
     ) {
-        public CouponCriteria.Issue toCriteria() {
-            return new CouponCriteria.Issue(userId, couponId);
+        public CouponCriteria.Enqueue toCriteria() {
+            return new CouponCriteria.Enqueue(userId, couponId);
         }
     }
 }

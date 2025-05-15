@@ -2,6 +2,8 @@ package kr.hhplus.be.server.domain.coupon;
 
 import kr.hhplus.be.server.domain.coupon.dto.CouponCommand;
 import kr.hhplus.be.server.domain.coupon.dto.CouponInfo;
+import kr.hhplus.be.server.domain.coupon.dto.CouponQueueCommand;
+import kr.hhplus.be.server.domain.coupon.dto.CouponQueueInfo;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
@@ -9,6 +11,7 @@ import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
 import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +23,7 @@ import static kr.hhplus.be.server.infra.cache.CacheType.CacheName.COUPON;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CouponService {
 
     private final CouponRepository couponRepository;
@@ -97,4 +101,17 @@ public class CouponService {
         couponRepository.enqueue(command.couponId(), command.userId());
     }
 
+    /**
+     * 캐시되어있는 모든 쿠폰 가져오기
+     */
+    public CouponQueueInfo.Keys getCouponKeys() {
+        return new CouponQueueInfo.Keys(couponRepository.getCouponKeys());
+    }
+
+    /**
+     * 쿠폰 대기열에서 사용자 ID 목록 가져오기
+     */
+    public CouponQueueInfo.UserIds dequeueUsers(CouponQueueCommand.Dequeue command) {
+        return new CouponQueueInfo.UserIds(couponRepository.dequeueUsers(command.couponId(), command.quantity()));
+    }
 }

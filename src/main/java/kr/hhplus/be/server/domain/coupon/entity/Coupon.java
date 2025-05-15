@@ -23,7 +23,7 @@ public class Coupon extends BaseTimeEntity {
     private Long quantity;
 
     @Version
-    Long version;
+    Long version = 0L;
 
     public Coupon(Long discountPrice, Long quantity) {
         this.discountPrice = discountPrice;

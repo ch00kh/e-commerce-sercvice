@@ -5,8 +5,12 @@ import kr.hhplus.be.server.application.coupon.dto.CouponResult;
 import kr.hhplus.be.server.domain.coupon.CouponService;
 import kr.hhplus.be.server.domain.coupon.dto.CouponCommand;
 import kr.hhplus.be.server.domain.coupon.dto.CouponInfo;
+import kr.hhplus.be.server.domain.coupon.dto.CouponQueueCommand;
+import kr.hhplus.be.server.domain.coupon.dto.CouponQueueInfo;
+import kr.hhplus.be.server.infra.cache.CacheType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -17,13 +21,14 @@ public class CouponFacade {
     /**
      * 쿠폰 발급
      */
-    public CouponResult.Enqueue firstComeFirstIssue(CouponCriteria.Issue criteria) {
+    public CouponResult.Enqueue firstComeFirstIssue(CouponCriteria.Enqueue criteria) {
 
         // 쿠폰 캐싱
         CouponInfo.Cache coupon = couponService.findCoupon(new CouponCommand.Find(criteria.couponId()));
 
         // 쿠폰 대기열 등록
         couponService.enqueue(criteria.toCommand());
+
 
         return new CouponResult.Enqueue(coupon.id());
 
@@ -36,4 +41,23 @@ public class CouponFacade {
         couponService.expireCoupon();
     }
 
+    /**
+     * 대기열로부터 선착순 쿠폰 발급 저장
+     */
+    @Transactional
+    public void processCouponQueue() {
+
+        CouponQueueInfo.Keys keysInfo = couponService.getCouponKeys();
+
+        for (String couponKey : keysInfo.couponKeys()) {
+            Long couponId = Long.parseLong(couponKey.substring((CacheType.CacheName.COUPON + "::couponId:").length()));
+
+            CouponInfo.Cache coupon = couponService.findCoupon(new CouponCommand.Find(couponId));
+
+            CouponQueueInfo.UserIds userIds = couponService.dequeueUsers(new CouponQueueCommand.Dequeue(couponId, coupon.quantity()));
+
+            userIds.userIds().forEach(userId -> couponService.issue(new CouponCommand.Issue(userId, couponId)));
+        }
+
+    }
 }
