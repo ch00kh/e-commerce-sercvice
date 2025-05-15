@@ -4,6 +4,7 @@ import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import kr.hhplus.be.server.application.coupon.dto.CouponCriteria;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
+import kr.hhplus.be.server.surpport.database.RedisClearExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @SpringBootTest
 @ExtendWith(DatabaseClearExtension.class)
+@ExtendWith(RedisClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[동시성 테스트] CouponFacadeTest")
 class CouponFacadeTest {
@@ -41,7 +43,7 @@ class CouponFacadeTest {
     }
 
     @Test
-    @DisplayName("동시에 여러 요청에 의한 선착순 쿠폰 발급은 먼저 온 100명은 성공하며, 나머지는 실패한다.")
+    @DisplayName("동시에 여러 요청에 의한 선착순 쿠폰 발급은 쿠폰 발급 대기열에 들어가게된다.")
     void firstComeFirstIssue() throws InterruptedException {
         // Arrange
         int threadCount = 200;
@@ -81,7 +83,7 @@ class CouponFacadeTest {
         log.info("Success count: {}, Failure count: {}", successCount.get(), failureCount.get());
         assertThat(successCount.get() + failureCount.get()).isEqualTo(threadCount);
 
-        Coupon coupon = couponRepository.findById(COUPON.getId());
-        assertThat(coupon.getQuantity()).isEqualTo(0);
+        Long couponQueueSize = couponRepository.getCouponQueueSize(COUPON.getId());
+        assertThat(couponQueueSize).isEqualTo(threadCount) ;
     }
 }
