@@ -13,7 +13,7 @@ import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import kr.hhplus.be.server.infra.cache.CacheType;
 import kr.hhplus.be.server.surpport.container.RedisTestcontainersConfiguration;
 import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
-import kr.hhplus.be.server.surpport.database.RedisCacheClearExtension;
+import kr.hhplus.be.server.surpport.database.RedisClearExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @SpringBootTest
 @ExtendWith(DatabaseClearExtension.class)
-@ExtendWith(RedisCacheClearExtension.class)
+@ExtendWith(RedisClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[통합테스트] ProductFacadeCacheTest")
 class ProductFacadeCacheTest extends RedisTestcontainersConfiguration {

@@ -4,12 +4,12 @@ import kr.hhplus.be.server.application.coupon.dto.CouponCriteria;
 
 public record CouponRequest() {
 
-    public record Issue(
+    public record Enqueue(
             Long userId,
             Long couponId
     ) {
-        public CouponCriteria.Issue toCriteria() {
-            return new CouponCriteria.Issue(userId, couponId);
+        public CouponCriteria.Enqueue toCriteria() {
+            return new CouponCriteria.Enqueue(userId, couponId);
         }
     }
 }

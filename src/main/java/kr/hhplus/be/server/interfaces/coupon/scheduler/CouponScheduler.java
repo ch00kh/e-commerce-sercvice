@@ -16,4 +16,9 @@ public class CouponScheduler {
     public void scheduleExpireCoupon() {
         couponFacade.expireCoupon();
     }
+
+    @Scheduled(fixedRate = 1000)
+    public void scheduleSaveIssuedCoupon() {
+        couponFacade.processCouponQueue();
+    }
 }
