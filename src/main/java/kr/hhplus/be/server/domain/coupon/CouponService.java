@@ -52,19 +52,22 @@ public class CouponService {
      * 쿠폰 발급
      */
     @Transactional
-    public IssuedCoupon issue(CouponCommand.Issue command) {
+    public void issue(CouponCommand.Issue command) {
 
         // 잔여 쿠폰 조회 및 쿠폰 수량 차감
         Coupon coupon = couponRepository.findByIdWithOptimisticLock(command.couponId());
 
-        coupon.issue();
+        try {
+            coupon.issue();
 
-        // 기발급 검증
-        if (issuedCouponRepository.existsByUserIdAndCouponId(command.userId(), command.couponId())) {
-            throw new GlobalException(ErrorCode.ALREADY_ISSUED_COUPON);
+            issuedCouponRepository.save(new IssuedCoupon(command.userId(), command.couponId()));
+
+        } catch (GlobalException e) {
+            if (e.getErrorCode().equals(ErrorCode.OUT_OF_STOCK_COUPON)) {
+                log.error("Coupon Issue Error : {}, Coupon Id: {}", e.getMessage(), command.couponId());
+                couponRepository.deleteQueue(command.couponId());
+            }
         }
-
-        return issuedCouponRepository.save(new IssuedCoupon(command.userId(), command.couponId()));
     }
 
     /**

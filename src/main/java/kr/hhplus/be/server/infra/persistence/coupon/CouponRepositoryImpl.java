@@ -68,4 +68,10 @@ public class CouponRepositoryImpl implements CouponRepository {
 
     }
 
+    @Override
+    public Boolean deleteQueue(Long couponId) {
+        String key = CacheType.CacheName.COUPON_QUEUE + couponId;
+        return redisTemplate.delete(key);
+    }
+
 }

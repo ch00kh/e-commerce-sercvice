@@ -21,4 +21,6 @@ public interface CouponRepository {
     
     List<Long> dequeueUsers(Long couponId, Long limit);
 
+    Boolean deleteQueue(Long couponId);
+
 }
