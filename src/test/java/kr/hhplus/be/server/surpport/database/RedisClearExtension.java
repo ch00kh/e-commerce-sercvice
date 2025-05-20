@@ -5,22 +5,22 @@ import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-public class RedisCacheClearExtension implements AfterEachCallback, BeforeEachCallback {
+public class RedisClearExtension implements AfterEachCallback, BeforeEachCallback {
 
     @Override
     public void afterEach(ExtensionContext context) {
-        RedisCacheCleaner redisCacheCleaner = getDataCleaner(context);
-        redisCacheCleaner.clear();
+        RedisCleaner redisCleaner = getDataCleaner(context);
+        redisCleaner.clear();
     }
 
     @Override
     public void beforeEach(ExtensionContext context) {
-        RedisCacheCleaner redisCacheCleaner = getDataCleaner(context);
-        redisCacheCleaner.clear();
+        RedisCleaner redisCleaner = getDataCleaner(context);
+        redisCleaner.clear();
     }
 
-    private RedisCacheCleaner getDataCleaner(ExtensionContext extensionContext) {
+    private RedisCleaner getDataCleaner(ExtensionContext extensionContext) {
         return SpringExtension.getApplicationContext(extensionContext)
-                .getBean(RedisCacheCleaner.class);
+                .getBean(RedisCleaner.class);
     }
 }

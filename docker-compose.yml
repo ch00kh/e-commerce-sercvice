@@ -45,7 +45,8 @@ services:
     container_name: k6
     volumes:
       - ./k6:/scripts
-    command: run /scripts/product-best-test.js
+#    command: run /scripts/product-best-test.js
+    command: run /scripts/coupon-issue-test.js
     depends_on:
       - influxdb
     environment:

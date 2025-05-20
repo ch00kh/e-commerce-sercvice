@@ -14,4 +14,8 @@ public record CouponResult() {
             CouponStatus status,
             LocalDateTime expiredAt
     ) {}
+
+    public record Enqueue (
+        Long couponId
+    ) {}
 }

@@ -1,13 +1,11 @@
 package kr.hhplus.be.server.interfaces.order;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
-import kr.hhplus.be.server.application.coupon.CouponFacade;
-import kr.hhplus.be.server.application.coupon.dto.CouponCriteria;
-import kr.hhplus.be.server.application.coupon.dto.CouponResult;
 import kr.hhplus.be.server.application.user.UserFacade;
 import kr.hhplus.be.server.application.user.dto.UserCriteria;
 import kr.hhplus.be.server.application.user.dto.UserResult;
+import kr.hhplus.be.server.domain.coupon.CouponService;
+import kr.hhplus.be.server.domain.coupon.dto.CouponCommand;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.CouponStatus;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
@@ -20,6 +18,8 @@ import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import kr.hhplus.be.server.interfaces.order.controller.OrderController;
 import kr.hhplus.be.server.interfaces.order.dto.OrderRequest;
 import kr.hhplus.be.server.interfaces.order.dto.OrderResponse;
+import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.database.RedisClearExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @SpringBootTest
 @ExtendWith(DatabaseClearExtension.class)
+@ExtendWith(RedisClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[통합테스트] OrderController")
 class OrderControllerIntegrationTest {
@@ -51,9 +52,6 @@ class OrderControllerIntegrationTest {
     private UserFacade userFacade;
 
     @Autowired
-    private CouponFacade couponFacade;
-
-    @Autowired
     private ProductRepository productRepository;
 
     @Autowired
@@ -63,11 +61,14 @@ class OrderControllerIntegrationTest {
     private CouponRepository couponRepository;
 
     @Autowired
+    private CouponService couponService;
+
+    @Autowired
     private IssuedCouponRepository issuedCouponRepository;
 
     private UserResult.Create USER_RESULT;
     private Coupon COUPON;
-    private CouponResult.Issued COUPON_RESULT;
+    private IssuedCoupon ISSUED_COUPON;
 
     private Product PRODUCT;
     private ProductOption PRODUCT_OPTION1;
@@ -78,7 +79,7 @@ class OrderControllerIntegrationTest {
         USER_RESULT = userFacade.createUser(new UserCriteria.Create("추경현"));
 
         COUPON = couponRepository.save(new Coupon(5000L, 100L));
-        COUPON_RESULT = couponFacade.firstComeFirstIssue(new CouponCriteria.Issue(USER_RESULT.id(), COUPON.getId()));
+        ISSUED_COUPON = couponService.issue(new CouponCommand.Issue(USER_RESULT.id(), COUPON.getId()));
 
         PRODUCT = productRepository.save(new Product("맥도날드", "햄버거"));
         PRODUCT_OPTION1 = productOptionRepository.save(new ProductOption(PRODUCT.getId(), "빅맥", 1000L, 100L));
@@ -126,7 +127,7 @@ class OrderControllerIntegrationTest {
         );
 
         // Act
-        OrderRequest.Create request = new OrderRequest.Create(USER_RESULT.id(), PRODUCT.getId(), items, COUPON_RESULT.couponId());
+        OrderRequest.Create request = new OrderRequest.Create(USER_RESULT.id(), PRODUCT.getId(), items, ISSUED_COUPON.getCouponId());
         ResponseEntity<OrderResponse.Create> response = orderController.order(request);
 
         // Assert
@@ -144,7 +145,7 @@ class OrderControllerIntegrationTest {
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(actual).isEqualToIgnoringWhitespace(responseBody);
 
-        IssuedCoupon issuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(USER_RESULT.id(), COUPON_RESULT.couponId());
+        IssuedCoupon issuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(USER_RESULT.id(), ISSUED_COUPON.getCouponId());
         assertThat(issuedCoupon.getStatus()).isEqualTo(CouponStatus.USED);
     }
 }

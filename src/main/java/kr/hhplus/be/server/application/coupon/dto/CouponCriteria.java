@@ -5,7 +5,7 @@ import kr.hhplus.be.server.domain.coupon.dto.CouponCommand;
 public record CouponCriteria() {
 
 
-    public record Issue(
+    public record Enqueue(
             Long userId,
             Long couponId
     ) {

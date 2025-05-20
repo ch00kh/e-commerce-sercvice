@@ -30,4 +30,16 @@ public record CouponInfo() {
         }
 
     }
+
+    public record Cache(
+            Long id,
+            Long discountPrice,
+            Long quantity
+    ) {
+        public Cache(Coupon coupon) {
+            this(coupon.getId(), coupon.getDiscountPrice(), coupon.getQuantity());
+        }
+    }
+
+
 }
