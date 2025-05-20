@@ -68,7 +68,7 @@ class CouponFacadeTest {
                 try {
                     startLatch.await();
 
-                    couponFacade.firstComeFirstIssue(new CouponCriteria.Enqueue(userId, COUPON.getId()));
+                    couponFacade.apply(new CouponCriteria.Enqueue(userId, COUPON.getId()));
                     successCount.incrementAndGet();
 
                 } catch (Exception e) {

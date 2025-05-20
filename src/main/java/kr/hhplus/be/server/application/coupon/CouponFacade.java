@@ -19,16 +19,15 @@ public class CouponFacade {
     private final CouponService couponService;
 
     /**
-     * 쿠폰 발급
+     * 쿠폰 대기열 등록
      */
-    public CouponResult.Enqueue firstComeFirstIssue(CouponCriteria.Enqueue criteria) {
+    public CouponResult.Enqueue apply(CouponCriteria.Enqueue criteria) {
 
         // 쿠폰 캐싱
-        CouponInfo.Cache coupon = couponService.findCoupon(new CouponCommand.Find(criteria.couponId()));
+        CouponInfo.Cache coupon = couponService.getCoupon(new CouponCommand.Find(criteria.couponId()));
 
         // 쿠폰 대기열 등록
-        couponService.enqueue(criteria.toCommand());
-
+        couponService.apply(criteria.toCommand());
 
         return new CouponResult.Enqueue(coupon.id());
 
@@ -52,11 +51,10 @@ public class CouponFacade {
         for (String couponKey : keysInfo.couponKeys()) {
             Long couponId = Long.parseLong(couponKey.substring((CacheType.CacheName.COUPON + "::couponId:").length()));
 
-            CouponInfo.Cache coupon = couponService.findCoupon(new CouponCommand.Find(couponId));
+            CouponInfo.Cache coupon = couponService.getCoupon(new CouponCommand.Find(couponId));
 
-            CouponQueueInfo.UserIds userIds = couponService.dequeueUsers(new CouponQueueCommand.Dequeue(couponId, coupon.quantity()));
-
-            userIds.userIds().forEach(userId -> couponService.issue(new CouponCommand.Issue(userId, couponId)));
+            CouponQueueInfo.UserIds couponQueueInfo = couponService.dequeueUsers(new CouponQueueCommand.Dequeue(couponId, coupon.quantity()));
+            couponQueueInfo.userIds().forEach(userId -> couponService.issue(new CouponCommand.Issue(userId, couponId)));
         }
 
     }

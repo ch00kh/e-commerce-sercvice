@@ -22,7 +22,7 @@ public class CouponController implements ICouponController {
             @RequestBody CouponRequest.Enqueue request
     ) {
         return ResponseEntity.ok()
-                .body(CouponResponse.from(couponFacade.firstComeFirstIssue(request.toCriteria())));
+                .body(CouponResponse.from(couponFacade.apply(request.toCriteria())));
     }
 
 }

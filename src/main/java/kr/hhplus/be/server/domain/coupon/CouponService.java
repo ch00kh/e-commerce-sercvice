@@ -92,7 +92,7 @@ public class CouponService {
      * 쿠폰 찾기
      */
     @Cacheable(value = COUPON, key = "'couponId:' + #command.couponId()")
-    public CouponInfo.Cache findCoupon(CouponCommand.Find command) {
+    public CouponInfo.Cache getCoupon(CouponCommand.Find command) {
         Coupon coupon = couponRepository.findById(command.couponId());
         return new CouponInfo.Cache(coupon);
     }
@@ -100,7 +100,7 @@ public class CouponService {
     /**
      * 쿠폰 발급 대기열 등록
      */
-    public void enqueue(CouponCommand.Issue command) {
+    public void apply(CouponCommand.Issue command) {
         couponRepository.enqueue(command.couponId(), command.userId());
     }
 
