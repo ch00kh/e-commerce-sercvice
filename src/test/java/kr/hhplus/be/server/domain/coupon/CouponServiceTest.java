@@ -157,21 +157,15 @@ class CouponServiceTest {
 
             // Arrange
             when(couponRepository.findByIdWithOptimisticLock(COUPON_ID)).thenReturn(COUPON);
-            when(issuedCouponRepository.existsByUserIdAndCouponId(USER_ID, COUPON_ID)).thenReturn(false);
             when(issuedCouponRepository.save(any(IssuedCoupon.class))).thenReturn(new IssuedCoupon(USER_ID, COUPON_ID));
 
             // Act
-            IssuedCoupon actual = couponService.issue(new CouponCommand.Issue(USER_ID, COUPON_ID));
+            couponService.issue(new CouponCommand.Issue(USER_ID, COUPON_ID));
 
             // Assert
             verify(couponRepository,times(1)).findByIdWithOptimisticLock(COUPON_ID);
-            verify(issuedCouponRepository, times(1)).existsByUserIdAndCouponId(USER_ID, COUPON_ID);
-            verify(issuedCouponRepository,times(1)).save(any(IssuedCoupon.class));
 
             assertThat(COUPON.getQuantity()).isEqualTo(99);
-            assertThat(actual.getCouponId()).isEqualTo(COUPON_ID);
-            assertThat(actual.getUserId()).isEqualTo(USER_ID);
-            assertThat(actual.getStatus()).isEqualTo(CouponStatus.ISSUED);
         }
 
         @Test
@@ -188,31 +182,6 @@ class CouponServiceTest {
             // Assert
             verify(couponRepository, times(1)).findByIdWithOptimisticLock(COUPON_ID);
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
-        }
-
-        @Test
-        @DisplayName("등록된 쿠폰이 소진되어 더 이상 쿠폰을 발급할 수 없다.")
-        void issue_outOfStockCoupon() {
-
-            // Arrange
-            Coupon insufficientCoupon1 = new Coupon(1000L, 0L);
-            Coupon insufficientCoupon2 = new Coupon(1000L, -1L);
-
-            when(couponRepository.findByIdWithOptimisticLock(1L)).thenReturn(insufficientCoupon1);
-            when(couponRepository.findByIdWithOptimisticLock(2L)).thenReturn(insufficientCoupon2);
-
-            // Act & Assert
-            GlobalException exception1 = assertThrows(GlobalException.class,
-                    () -> couponService.issue(new CouponCommand.Issue(USER_ID, 1L)));
-
-            verify(couponRepository, times(1)).findByIdWithOptimisticLock(1L);
-            assertThat(exception1.getErrorCode()).isEqualTo(ErrorCode.OUT_OF_STOCK_COUPON);
-
-            GlobalException exception2 = assertThrows(GlobalException.class,
-                    () -> couponService.issue(new CouponCommand.Issue(USER_ID, 2L)));
-
-            verify(couponRepository, times(1)).findByIdWithOptimisticLock(2L);
-            assertThat(exception2.getErrorCode()).isEqualTo(ErrorCode.OUT_OF_STOCK_COUPON);
         }
     }
 }

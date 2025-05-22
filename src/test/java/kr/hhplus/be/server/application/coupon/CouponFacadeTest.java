@@ -89,7 +89,7 @@ class CouponFacadeTest {
         assertThat(successCount.get() + failureCount.get()).isEqualTo(threadCount);
 
         // Act2 - 발급
-        couponFacade.processCouponQueue();
+        couponFacade.processIssuedCouponApply();
 
         // Assert
         int issuedCount = 0;

@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domain.order.dto;
 
 import kr.hhplus.be.server.domain.order.entity.OrderStatus;
+import kr.hhplus.be.server.domain.order.event.OrderEvent;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 
 import java.util.List;
@@ -46,14 +47,26 @@ public record OrderCommand() {
     ) {}
 
     public record Send(
-            Long id,
+            Long orderId,
             Long userId,
             Long issuedCouponId,
             OrderStatus status,
             Long paymentAmount,
             Long totalAmount,
             Long discountAmount
-    ) {}
+    ) {
+        public static Send of(OrderEvent.OrderComplete event) {
+            return new Send(
+                    event.orderId(),
+                    event.userId(),
+                    event.issuedCouponId(),
+                    event.status(),
+                    event.paymentAmount(),
+                    event.totalAmount(),
+                    event.discountAmount()
+            );
+        }
+    }
 
     public record FindBest(
             Integer days,

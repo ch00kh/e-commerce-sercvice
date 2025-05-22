@@ -62,7 +62,7 @@ class OrderFacadeTest {
     @BeforeEach
     void setUp() {
         USER = userFacade.createUser(new UserCriteria.Create("추경현"));
-        INITIAL_STOCK = 1000L;
+        INITIAL_STOCK = 100L;
 
         PRODUCT1 = productRepository.save(new Product("양반", "김"));
         PRODUCT_OPTION1 = productOptionRepository.save(new ProductOption(PRODUCT1.getId(), "들기름 김", 1000L, INITIAL_STOCK));

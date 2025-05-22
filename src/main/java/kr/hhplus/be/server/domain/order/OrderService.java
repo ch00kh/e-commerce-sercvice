@@ -4,21 +4,25 @@ import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.order.dto.OrderInfo;
 import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.order.entity.OrderItem;
+import kr.hhplus.be.server.domain.order.event.OrderEvent;
+import kr.hhplus.be.server.domain.order.event.OrderEventPublisher;
 import kr.hhplus.be.server.domain.order.repository.OrderItemRepository;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
+    private final OrderEventPublisher eventPublish;
 
     /**
      * 주문 생성
@@ -119,6 +123,18 @@ public class OrderService {
 
         Order order = orderRepository.findById(command.orderId());
 
+        eventPublish.publishOrderComplete(
+                new OrderEvent.OrderComplete(
+                        order.getId(),
+                        order.getUserId(),
+                        order.getIssuedCouponId(),
+                        order.getStatus(),
+                        order.getPaymentAmount(),
+                        order.getTotalAmount(),
+                        order.getDiscountAmount()
+                )
+        );
+
         return order.pay();
     }
 
@@ -133,7 +149,7 @@ public class OrderService {
     /**
      * 주문 정보 전송 비동기 처리
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void sendOrder(OrderCommand.Send command) {
+        log.info("Send OrderData to DataPlatform : {}", command);
     }
 }

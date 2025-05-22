@@ -8,6 +8,7 @@ import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
+import kr.hhplus.be.server.global.aop.DistributedLock;
 import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,7 @@ public class CouponService {
      * 쿠폰 발급
      */
     @Transactional
+    @DistributedLock(value = "order:#{#command.couponId}", waitTime = 60, leaseTime = 30)
     public void issue(CouponCommand.Issue command) {
 
         // 잔여 쿠폰 조회 및 쿠폰 수량 차감
@@ -69,6 +71,7 @@ public class CouponService {
             }
         }
     }
+
 
     /**
      * 쿠폰 만료 처리

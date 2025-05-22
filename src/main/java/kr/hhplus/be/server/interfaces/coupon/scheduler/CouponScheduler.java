@@ -19,6 +19,6 @@ public class CouponScheduler {
 
     @Scheduled(fixedRate = 1000)
     public void scheduleSaveIssuedCoupon() {
-        couponFacade.processCouponQueue();
+        couponFacade.processIssuedCouponApply();
     }
 }

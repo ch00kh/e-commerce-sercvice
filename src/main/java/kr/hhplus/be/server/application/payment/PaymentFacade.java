@@ -44,19 +44,6 @@ public class PaymentFacade {
         // 주문 상태 변경
         order = orderService.pay(new OrderCommand.Find(payment.getOrderId()));
 
-        // 주문 정보 전송
-        orderService.sendOrder(
-                new OrderCommand.Send(
-                        order.getId(),
-                        order.getUserId(),
-                        order.getIssuedCouponId(),
-                        order.getStatus(),
-                        order.getPaymentAmount(),
-                        order.getTotalAmount(),
-                        order.getDiscountAmount()
-                )
-        );
-
         return new PaymentResult.Pay(
                 pay.getId(),
                 pay.getOrderId(),

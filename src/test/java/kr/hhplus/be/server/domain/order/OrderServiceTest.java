@@ -5,6 +5,8 @@ import kr.hhplus.be.server.domain.order.dto.OrderInfo;
 import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.order.entity.OrderItem;
 import kr.hhplus.be.server.domain.order.entity.OrderStatus;
+import kr.hhplus.be.server.domain.order.event.OrderEvent;
+import kr.hhplus.be.server.domain.order.event.OrderEventPublisher;
 import kr.hhplus.be.server.domain.order.repository.OrderItemRepository;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
@@ -38,6 +40,9 @@ class OrderServiceTest {
 
     @InjectMocks
     private OrderService orderService;
+
+    @Mock
+    private OrderEventPublisher eventPublish;
 
     private Long USER_ID;
     private Long COUPON_ID;
@@ -259,6 +264,8 @@ class OrderServiceTest {
 
         verify(orderRepository).findById(ORDER_ID);
         verify(mockOrder).pay();
+
+        verify(eventPublish).publishOrderComplete(any(OrderEvent.OrderComplete.class));
     }
 
     @Test

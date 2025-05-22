@@ -5,7 +5,6 @@ import kr.hhplus.be.server.application.user.UserFacade;
 import kr.hhplus.be.server.application.user.dto.UserCriteria;
 import kr.hhplus.be.server.application.user.dto.UserResult;
 import kr.hhplus.be.server.domain.coupon.CouponService;
-import kr.hhplus.be.server.domain.coupon.dto.CouponCommand;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.CouponStatus;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
@@ -79,7 +78,7 @@ class OrderControllerIntegrationTest {
         USER_RESULT = userFacade.createUser(new UserCriteria.Create("추경현"));
 
         COUPON = couponRepository.save(new Coupon(5000L, 100L));
-        ISSUED_COUPON = couponService.issue(new CouponCommand.Issue(USER_RESULT.id(), COUPON.getId()));
+        ISSUED_COUPON = issuedCouponRepository.save(new IssuedCoupon(USER_RESULT.id(), COUPON.getId()));
 
         PRODUCT = productRepository.save(new Product("맥도날드", "햄버거"));
         PRODUCT_OPTION1 = productOptionRepository.save(new ProductOption(PRODUCT.getId(), "빅맥", 1000L, 100L));

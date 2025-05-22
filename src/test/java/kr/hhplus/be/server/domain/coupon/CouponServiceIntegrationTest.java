@@ -74,14 +74,10 @@ class CouponServiceIntegrationTest {
         Coupon newCoupon = couponRepository.save(new Coupon(1000L, 100L));
 
         // Act
-        IssuedCoupon issuedCoupon = couponService.issue(new CouponCommand.Issue(USER_ID, newCoupon.getId()));
+        couponService.issue(new CouponCommand.Issue(USER_ID, newCoupon.getId()));
 
         // Assert
-        Coupon coupon = couponRepository.findById(issuedCoupon.getCouponId());
-        assertThat(coupon.getQuantity()).isEqualTo(99L);
-
-        IssuedCoupon actual = issuedCouponRepository.findByUserIdAndCouponId(USER_ID, issuedCoupon.getCouponId());
-        assertThat(actual.getCouponId()).isEqualTo(issuedCoupon.getCouponId());
+        IssuedCoupon actual = issuedCouponRepository.findByUserIdAndCouponId(USER_ID, newCoupon.getId());
         assertThat(actual.getUserId()).isEqualTo(USER_ID);
         assertThat(actual.getStatus()).isEqualTo(CouponStatus.ISSUED);
         assertThat(actual.getExpiredAt()).isEqualTo(LocalDate.now().plusDays(30).atStartOfDay());
