@@ -22,7 +22,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final OrderEventPublisher eventPublish;
+    private final OrderEventPublisher eventPublisher;
 
     /**
      * 주문 생성
@@ -38,15 +38,24 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        command.orderItems().forEach(item -> {
-            orderItemRepository.save(
-                    new OrderItem(
-                            savedOrder.getId(),
-                            item.productOptionId(),
-                            item.unitPrice(),
-                            item.quantity()
-                    ));
-                }
+        List<OrderItem> orderItems = command.orderItems().stream()
+                .map(item ->
+                        orderItemRepository.save(
+                                new OrderItem(
+                                        savedOrder.getId(),
+                                        item.productOptionId(),
+                                        item.unitPrice(),
+                                        item.quantity()
+                                ))
+                ).toList();
+
+        eventPublisher.publishOrderCreateEvent(
+                new OrderEvent.OrderCreate(
+                        order.getId(),
+                        order.getUserId(),
+                        command.couponId(),
+                        command.orderItems()
+                )
         );
 
         return new OrderInfo.Create(
@@ -95,7 +104,7 @@ public class OrderService {
 
         order.useCoupon(command.couponId(), command.discountPrice());
 
-        OrderInfo.Create create = new OrderInfo.Create(
+        OrderInfo.Create orderInfo = new OrderInfo.Create(
                 order.getId(),
                 order.getUserId(),
                 order.getIssuedCouponId(),
@@ -104,7 +113,21 @@ public class OrderService {
                 order.getDiscountAmount(),
                 order.getPaymentAmount()
         );
-        return create;
+
+        eventPublisher.publishCouponApplyEvent(
+                new OrderEvent.OrderCouponApply(
+                        order.getId(),
+                        order.getUserId(),
+                        command.couponId(),
+                        order.getIssuedCouponId(),
+                        order.getStatus(),
+                        order.getTotalAmount(),
+                        order.getDiscountAmount(),
+                        order.getPaymentAmount()
+                )
+        );
+
+        return orderInfo;
     }
 
     /**
@@ -123,7 +146,7 @@ public class OrderService {
 
         Order order = orderRepository.findById(command.orderId());
 
-        eventPublish.publishOrderComplete(
+        eventPublisher.publishOrderCompleteEvent(
                 new OrderEvent.OrderComplete(
                         order.getId(),
                         order.getUserId(),

@@ -6,6 +6,8 @@ import kr.hhplus.be.server.domain.coupon.dto.CouponQueueCommand;
 import kr.hhplus.be.server.domain.coupon.dto.CouponQueueInfo;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
+import kr.hhplus.be.server.domain.coupon.event.CouponEvent;
+import kr.hhplus.be.server.domain.coupon.event.CouponEventPublisher;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
 import kr.hhplus.be.server.global.aop.DistributedLock;
@@ -29,6 +31,7 @@ public class CouponService {
 
     private final CouponRepository couponRepository;
     private final IssuedCouponRepository issuedCouponRepository;
+    private final CouponEventPublisher eventPublisher;
 
     /**
      * 쿠폰 사용
@@ -40,11 +43,22 @@ public class CouponService {
             return CouponAggregate.from();
         }
 
-        Coupon coupon = couponRepository.findById(command.couponId());
-
+        // 사용자가 해당 쿠폰을 발급받았는지 확인
         IssuedCoupon issuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(command.userId(), command.couponId());
 
+        Coupon coupon = couponRepository.findById(command.couponId());
+
         issuedCoupon.use();
+
+        eventPublisher.publishUseCouponEvent(
+                new CouponEvent.UseCoupon(
+                        command.userId(),
+                        command.orderId(),
+                        coupon.getId(),
+                        issuedCoupon.getId(),
+                        coupon.getDiscountPrice()
+                )
+        );
 
         return CouponAggregate.from(coupon, issuedCoupon);
     }

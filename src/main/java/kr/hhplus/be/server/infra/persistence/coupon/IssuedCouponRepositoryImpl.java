@@ -37,4 +37,9 @@ import java.util.List;
         return jpaRepository.findByStatusAndExpiredAtBefore(CouponStatus.ISSUED, LocalDateTime.now());
     }
 
+    @Override
+    public IssuedCoupon findById(Long issuedCouponId) {
+        return jpaRepository.findById(issuedCouponId).orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND));
+    }
+
 }

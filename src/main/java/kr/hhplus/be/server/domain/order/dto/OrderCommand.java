@@ -10,8 +10,17 @@ public record OrderCommand() {
 
     public record Create(
             Long userId,
+            Long couponId,
             List<OrderItem> orderItems
-    ) {}
+    ) {
+        public static Create of(OrderEvent.OrderCreate event) {
+            return new Create(
+                    event.userId(),
+                    event.couponId(),
+                    event.orderItems()
+            );
+        }
+    }
 
     public record OrderItem (
             Long productOptionId,
@@ -19,13 +28,10 @@ public record OrderCommand() {
             Long quantity
     ) {}
 
-    public record OrderItemList (
+    public record Reduce(
+            Long orderId,
             List<OrderItem> orderItems
-    ) {
-        public static OrderItemList toCommand(List<OrderItem> orderItems) {
-            return new OrderItemList(orderItems);
-        }
-    }
+    ) {}
 
     public record handleOrders(
             Long orderId,
