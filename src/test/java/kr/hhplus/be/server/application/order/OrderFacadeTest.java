@@ -1,16 +1,17 @@
 package kr.hhplus.be.server.application.order;
 
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
-import kr.hhplus.be.server.application.order.dto.OrderCriteria;
 import kr.hhplus.be.server.application.user.UserFacade;
 import kr.hhplus.be.server.application.user.dto.UserCriteria;
 import kr.hhplus.be.server.application.user.dto.UserResult;
+import kr.hhplus.be.server.domain.order.OrderService;
+import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.order.entity.OrderItem;
 import kr.hhplus.be.server.domain.product.entity.Product;
 import kr.hhplus.be.server.domain.product.entity.ProductOption;
 import kr.hhplus.be.server.domain.product.repository.ProductOptionRepository;
 import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import kr.hhplus.be.server.infra.persistence.order.OrderItemJpaRepository;
+import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,7 +40,7 @@ class OrderFacadeTest {
     private UserFacade userFacade;
 
     @Autowired
-    private OrderFacade orderFacade;
+    private OrderService orderService;
 
     @Autowired
     private ProductRepository productRepository;
@@ -78,26 +79,26 @@ class OrderFacadeTest {
     void order() throws InterruptedException {
 
         // Arrange
-        List<OrderCriteria.OrderItem> cart1 = List.of(
-                new OrderCriteria.OrderItem(PRODUCT_OPTION1.getId(), 1L),
-                new OrderCriteria.OrderItem(PRODUCT_OPTION2.getId(), 1L)
+        List<OrderCommand.OrderItem> cart1 = List.of(
+                new OrderCommand.OrderItem(PRODUCT_OPTION1.getId(), 1000L, 1L),
+                new OrderCommand.OrderItem(PRODUCT_OPTION2.getId(), 1000L, 1L)
         );
-        List<OrderCriteria.OrderItem> cart2 = List.of(
-                new OrderCriteria.OrderItem(PRODUCT_OPTION2.getId(), 1L),
-                new OrderCriteria.OrderItem(PRODUCT_OPTION3.getId(), 1L)
+        List<OrderCommand.OrderItem> cart2 = List.of(
+                new OrderCommand.OrderItem(PRODUCT_OPTION2.getId(), 1000L, 1L),
+                new OrderCommand.OrderItem(PRODUCT_OPTION3.getId(), 1000L, 1L)
         );
-        List<OrderCriteria.OrderItem> cart3 = List.of(
-                new OrderCriteria.OrderItem(PRODUCT_OPTION1.getId(), 1L),
-                new OrderCriteria.OrderItem(PRODUCT_OPTION3.getId(), 1L)
+        List<OrderCommand.OrderItem> cart3 = List.of(
+                new OrderCommand.OrderItem(PRODUCT_OPTION1.getId(), 1000L, 1L),
+                new OrderCommand.OrderItem(PRODUCT_OPTION3.getId(), 1000L, 1L)
         );
-        List<OrderCriteria.OrderItem> cart4 = List.of(
-                new OrderCriteria.OrderItem(PRODUCT_OPTION4.getId(), 1L)
+        List<OrderCommand.OrderItem> cart4 = List.of(
+                new OrderCommand.OrderItem(PRODUCT_OPTION4.getId(), 1000L, 1L)
         );
 
-        OrderCriteria.Create criteria1 = new OrderCriteria.Create(USER.id(), PRODUCT1.getId(), cart1, null);
-        OrderCriteria.Create criteria2 = new OrderCriteria.Create(USER.id(), PRODUCT1.getId(), cart2, null);
-        OrderCriteria.Create criteria3 = new OrderCriteria.Create(USER.id(), PRODUCT1.getId(), cart3, null);
-        OrderCriteria.Create criteria4 = new OrderCriteria.Create(USER.id(), PRODUCT2.getId(), cart4, null);
+        OrderCommand.Create command1 = new OrderCommand.Create(USER.id(), PRODUCT1.getId(), cart1);
+        OrderCommand.Create command2 = new OrderCommand.Create(USER.id(), PRODUCT1.getId(), cart2);
+        OrderCommand.Create command3 = new OrderCommand.Create(USER.id(), PRODUCT1.getId(), cart3);
+        OrderCommand.Create command4 = new OrderCommand.Create(USER.id(), PRODUCT2.getId(), cart4);
 
         // Act
         int threadCount = INITIAL_STOCK.intValue();
@@ -122,19 +123,19 @@ class OrderFacadeTest {
                     startLatch.await();
 
                     if (finalI % 4 == 0) {
-                        orderFacade.order(criteria1);
+                        orderService.createOrder(command1);
                         successCount1.incrementAndGet();
                     }
                     if (finalI % 4 == 1) {
-                        orderFacade.order(criteria2);
+                        orderService.createOrder(command2);
                         successCount2.incrementAndGet();
                     }
                     if (finalI % 4 == 2) {
-                        orderFacade.order(criteria3);
+                        orderService.createOrder(command3);
                         successCount3.incrementAndGet();
                     }
                     if (finalI % 4 == 3) {
-                        orderFacade.order(criteria4);
+                        orderService.createOrder(command4);
                         successCount4.incrementAndGet();
                     }
 

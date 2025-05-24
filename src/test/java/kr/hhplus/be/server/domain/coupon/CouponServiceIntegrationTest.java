@@ -1,13 +1,14 @@
 package kr.hhplus.be.server.domain.coupon;
 
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.coupon.dto.CouponCommand;
-import kr.hhplus.be.server.domain.coupon.dto.CouponInfo;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.CouponStatus;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
+import kr.hhplus.be.server.domain.order.entity.Order;
+import kr.hhplus.be.server.domain.order.repository.OrderRepository;
+import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,9 @@ class CouponServiceIntegrationTest {
     @Autowired
     private CouponService couponService;
 
+    @Autowired
+    private OrderRepository orderRepository;
+
     private Long USER_ID;
     private Long COUPON_ID;
     private Coupon COUPON;
@@ -54,10 +58,11 @@ class CouponServiceIntegrationTest {
     void useCoupon_ok() {
 
         // Arrange
-        CouponCommand.Use command = new CouponCommand.Use(USER_ID, COUPON_ID);
+        CouponCommand.Use command = new CouponCommand.Use(USER_ID, COUPON_ID, 1L);
+        orderRepository.save(new Order(1L, ISSUED_COUPON.getId(), 1000L));
 
         // Act
-        CouponInfo.CouponAggregate couponInfo = couponService.use(command);
+        couponService.use(command);
 
         // Assert
         IssuedCoupon actual = issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID);

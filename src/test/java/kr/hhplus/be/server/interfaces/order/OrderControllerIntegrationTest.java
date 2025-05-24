@@ -91,8 +91,8 @@ class OrderControllerIntegrationTest {
 
         // Arrange
         List<OrderRequest.Item> items = List.of(
-                new OrderRequest.Item(PRODUCT_OPTION1.getId(), 10L),
-                new OrderRequest.Item(PRODUCT_OPTION2.getId(), 5L)
+                new OrderRequest.Item(PRODUCT_OPTION1.getId(), 10L, 1000L),
+                new OrderRequest.Item(PRODUCT_OPTION2.getId(), 5L, 1000L)
         );
 
         // Act
@@ -105,10 +105,7 @@ class OrderControllerIntegrationTest {
         {
             "orderId": 1,
             "userId": 1,
-            "status": "CREATED",
-            "totalAmount": 15000,
-            "discountAmount": 0,
-            "paymentAmount": 15000
+            "status": "CREATED"
         }
         """;
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -121,8 +118,8 @@ class OrderControllerIntegrationTest {
 
         // Arrange
         List<OrderRequest.Item> items = List.of(
-                new OrderRequest.Item(PRODUCT_OPTION1.getId(), 10L),
-                new OrderRequest.Item(PRODUCT_OPTION2.getId(), 5L)
+                new OrderRequest.Item(PRODUCT_OPTION1.getId(), 10L, 1000L),
+                new OrderRequest.Item(PRODUCT_OPTION2.getId(), 5L, 1000L)
         );
 
         // Act
@@ -135,16 +132,13 @@ class OrderControllerIntegrationTest {
         {
             "orderId": 1,
             "userId": 1,
-            "status": "CREATED",
-            "totalAmount": 15000,
-            "discountAmount": 5000,
-            "paymentAmount": 10000
+            "status": "CREATED"
         }
         """;
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-        assertThat(actual).isEqualToIgnoringWhitespace(responseBody);
-
         IssuedCoupon issuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(USER_RESULT.id(), ISSUED_COUPON.getCouponId());
         assertThat(issuedCoupon.getStatus()).isEqualTo(CouponStatus.USED);
+        assertThat(actual).isEqualToIgnoringWhitespace(responseBody);
+
     }
 }

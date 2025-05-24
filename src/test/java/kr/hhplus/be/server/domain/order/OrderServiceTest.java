@@ -42,7 +42,7 @@ class OrderServiceTest {
     private OrderService orderService;
 
     @Mock
-    private OrderEventPublisher eventPublish;
+    private OrderEventPublisher eventPublisher;
 
     private Long USER_ID;
     private Long COUPON_ID;
@@ -72,7 +72,7 @@ class OrderServiceTest {
         // Arrange
         Order order = new Order(USER_ID, 20000L);
 
-        OrderCommand.Create command = new OrderCommand.Create(USER_ID, ORDER_ITEMS);
+        OrderCommand.Create command = new OrderCommand.Create(USER_ID, null, ORDER_ITEMS);
 
         when(orderRepository.save(any(Order.class))).thenReturn(order);
 
@@ -265,7 +265,7 @@ class OrderServiceTest {
         verify(orderRepository).findById(ORDER_ID);
         verify(mockOrder).pay();
 
-        verify(eventPublish).publishOrderComplete(any(OrderEvent.OrderComplete.class));
+        verify(eventPublisher).publishOrderCompleteEvent(any(OrderEvent.OrderComplete.class));
     }
 
     @Test

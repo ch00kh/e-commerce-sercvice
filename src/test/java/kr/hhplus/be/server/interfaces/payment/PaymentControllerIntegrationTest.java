@@ -1,15 +1,16 @@
 package kr.hhplus.be.server.interfaces.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import kr.hhplus.be.server.application.balance.BalanceFacade;
 import kr.hhplus.be.server.application.balance.dto.BalanceCriteria;
-import kr.hhplus.be.server.application.order.OrderFacade;
-import kr.hhplus.be.server.application.order.dto.OrderCriteria;
-import kr.hhplus.be.server.application.order.dto.OrderResult;
 import kr.hhplus.be.server.application.user.UserFacade;
 import kr.hhplus.be.server.application.user.dto.UserCriteria;
 import kr.hhplus.be.server.application.user.dto.UserResult;
+import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
+import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
+import kr.hhplus.be.server.domain.order.OrderService;
+import kr.hhplus.be.server.domain.order.dto.OrderCommand;
+import kr.hhplus.be.server.domain.order.dto.OrderInfo;
 import kr.hhplus.be.server.domain.product.entity.Product;
 import kr.hhplus.be.server.domain.product.entity.ProductOption;
 import kr.hhplus.be.server.domain.product.repository.ProductOptionRepository;
@@ -17,6 +18,7 @@ import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import kr.hhplus.be.server.interfaces.payment.controller.PaymentController;
 import kr.hhplus.be.server.interfaces.payment.dto.PaymentRequest;
 import kr.hhplus.be.server.interfaces.payment.dto.PaymentResponse;
+import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +53,7 @@ class PaymentControllerIntegrationTest {
     private BalanceFacade balanceFacade;
 
     @Autowired
-    private OrderFacade orderFacade;
+    private OrderService orderService;
 
     @Autowired
     private ProductRepository productRepository;
@@ -59,8 +61,14 @@ class PaymentControllerIntegrationTest {
     @Autowired
     private ProductOptionRepository productOptionRepository;
 
+    @Autowired
+    private CouponRepository couponRepository;
+
+    @Autowired
+    private IssuedCouponRepository issuedCouponRepository;
+
     private UserResult.Create USER_RESULT;
-    private OrderResult.Create ORDER_RESULT;
+    private OrderInfo.Create ORDER_INFO;
 
     private Product PRODUCT;
     private ProductOption PRODUCT_OPTION1;
@@ -77,12 +85,12 @@ class PaymentControllerIntegrationTest {
         PRODUCT_OPTION1 = productOptionRepository.save(new ProductOption(PRODUCT.getId(), "빅맥", 1000L, 100L));
         PRODUCT_OPTION2 = productOptionRepository.save(new ProductOption(PRODUCT.getId(), "맥스파이시", 1000L, 100L));
 
-        List<OrderCriteria.OrderItem> items = List.of(
-                new OrderCriteria.OrderItem(PRODUCT_OPTION1.getId(), 10L),
-                new OrderCriteria.OrderItem(PRODUCT_OPTION2.getId(), 5L)
+        List<OrderCommand.OrderItem> items = List.of(
+                new OrderCommand.OrderItem(PRODUCT_OPTION1.getId(), 1000L, 10L),
+                new OrderCommand.OrderItem(PRODUCT_OPTION2.getId(), 1000L, 5L)
         );
 
-        ORDER_RESULT = orderFacade.order(new OrderCriteria.Create(USER_RESULT.id(), PRODUCT.getId(), items, null));
+        ORDER_INFO = orderService.createOrder(new OrderCommand.Create(USER_RESULT.id(), null, items));
     }
 
 
@@ -91,7 +99,7 @@ class PaymentControllerIntegrationTest {
     void payAllAmount() throws Exception {
 
         // Arrange
-        PaymentRequest request = new PaymentRequest(ORDER_RESULT.orderId(), 15000L);
+        PaymentRequest request = new PaymentRequest(ORDER_INFO.orderId(), 15000L);
 
         // Act
         ResponseEntity<PaymentResponse> response = paymentController.pay(request);
@@ -115,7 +123,7 @@ class PaymentControllerIntegrationTest {
     void payAnyAmount() throws Exception {
 
         // Arrange
-        PaymentRequest request = new PaymentRequest(ORDER_RESULT.orderId(), 10000L);
+        PaymentRequest request = new PaymentRequest(ORDER_INFO.orderId(), 10000L);
 
         // Act
         ResponseEntity<PaymentResponse> response = paymentController.pay(request);
