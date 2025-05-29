@@ -10,7 +10,8 @@ public record CouponCommand() {
 
     public record Use(
             Long userId,
-            Long couponId
+            Long couponId,  // 사용하려는 쿠폰 ID로 변경
+            Long orderId
     ) {}
 
     public record Issue(

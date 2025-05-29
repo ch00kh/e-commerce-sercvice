@@ -1,12 +1,12 @@
 package kr.hhplus.be.server.domain.order;
 
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.coupon.dto.CouponInfo;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.order.dto.OrderInfo;
 import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.order.entity.OrderItem;
 import kr.hhplus.be.server.domain.order.entity.OrderStatus;
+import kr.hhplus.be.server.domain.order.event.OrderEventPublisher;
 import kr.hhplus.be.server.domain.order.repository.OrderItemRepository;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
@@ -16,6 +16,7 @@ import kr.hhplus.be.server.domain.product.repository.ProductOptionRepository;
 import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
+import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
 
@@ -37,6 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ActiveProfiles("test")
 @DisplayName("[통합테스트] OrderService")
 class OrderServiceIntegrationTest {
+
+    @MockitoBean
+    private OrderEventPublisher publisher;
 
     @Autowired
     private OrderRepository orderRepository;
@@ -77,7 +82,7 @@ class OrderServiceIntegrationTest {
     void createOrder_hasNoCoupon_ok() {
 
         // Arrange
-        OrderCommand.Create command = new OrderCommand.Create(USER_ID, ORDER_ITEMS);
+        OrderCommand.Create command = new OrderCommand.Create(USER_ID, COUPON_ID, ORDER_ITEMS);
 
         // Act
         OrderInfo.Create orderInfo = orderService.createOrder(command);
@@ -100,7 +105,7 @@ class OrderServiceIntegrationTest {
 
         // Arrange
         Long productOptionId = 1L;
-        OrderInfo.Create orderInfo = orderService.createOrder(new OrderCommand.Create(USER_ID, ORDER_ITEMS));
+        OrderInfo.Create orderInfo = orderService.createOrder(new OrderCommand.Create(USER_ID, COUPON_ID, ORDER_ITEMS));
         ProductInfo.OptionDetail optionDetail = new ProductInfo.OptionDetail(productOptionId, false, 2L, 1L);
         OrderCommand.handleOrders command = new OrderCommand.handleOrders(orderInfo.orderId(), List.of(optionDetail));
 
@@ -121,7 +126,7 @@ class OrderServiceIntegrationTest {
         void useCoupon_couponIsNull() {
 
             // Arrange
-            OrderInfo.Create orderInfo = orderService.createOrder(new OrderCommand.Create(USER_ID, ORDER_ITEMS));
+            OrderInfo.Create orderInfo = orderService.createOrder(new OrderCommand.Create(USER_ID, COUPON_ID, ORDER_ITEMS));
 
             CouponInfo.CouponAggregate couponInfo = new CouponInfo.CouponAggregate(null, null, null, null, null);
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(orderInfo.orderId(), couponInfo.couponId(), couponInfo.discountPrice());
@@ -138,7 +143,7 @@ class OrderServiceIntegrationTest {
         void useCoupon_totalAmountGtDiscountAmount() {
 
             // Arrange
-            OrderInfo.Create orderInfo = orderService.createOrder(new OrderCommand.Create(USER_ID, ORDER_ITEMS)); // 20000L
+            OrderInfo.Create orderInfo = orderService.createOrder(new OrderCommand.Create(USER_ID, COUPON_ID, ORDER_ITEMS)); // 20000L
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(orderInfo.orderId(), COUPON_ID, 3000L);
 
             // Act
@@ -157,7 +162,7 @@ class OrderServiceIntegrationTest {
         void useCoupon_totalAmountLtDiscountAmount() {
 
             // Arrange
-            OrderInfo.Create orderInfo = orderService.createOrder(new OrderCommand.Create(USER_ID, ORDER_ITEMS)); // 20000L
+            OrderInfo.Create orderInfo = orderService.createOrder(new OrderCommand.Create(USER_ID, COUPON_ID, ORDER_ITEMS)); // 20000L
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(orderInfo.orderId(), COUPON_ID, 30000L);
 
             // Act
@@ -181,7 +186,7 @@ class OrderServiceIntegrationTest {
         void findById_ok() {
 
             // Arrange
-            OrderCommand.Create command = new OrderCommand.Create(USER_ID, ORDER_ITEMS);
+            OrderCommand.Create command = new OrderCommand.Create(USER_ID, COUPON_ID, ORDER_ITEMS);
 
             // Act
             OrderInfo.Create orderInfo = orderService.createOrder(command);

@@ -5,6 +5,8 @@ import kr.hhplus.be.server.domain.product.dto.ProductCommand;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.domain.product.entity.Product;
 import kr.hhplus.be.server.domain.product.entity.ProductOption;
+import kr.hhplus.be.server.domain.product.event.ProductEvent;
+import kr.hhplus.be.server.domain.product.event.ProductEventPublisher;
 import kr.hhplus.be.server.domain.product.repository.ProductOptionRepository;
 import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductOptionRepository productOptionRepository;
+    private final ProductEventPublisher eventPublisher;
 
     /**
      * 전체 상품 조회
@@ -53,9 +56,9 @@ public class ProductService {
      * 재고 차감
      */
     @Transactional
-    public ProductInfo.Order reduceStock(OrderCommand.OrderItemList command) {
+    public ProductInfo.Order reduceStock(OrderCommand.Reduce command) {
 
-        return new ProductInfo.Order(command.orderItems().stream().map(i -> {
+        ProductInfo.Order productInfo = new ProductInfo.Order(command.orderItems().stream().map(i -> {
             ProductOption productOption = productOptionRepository.findByIdWithPessimisticLock(i.productOptionId());
 
             if (productOption.canPurchase(i.quantity())) {
@@ -68,6 +71,8 @@ public class ProductService {
                         remainingStock
                 );
             } else {
+
+
                 return new ProductInfo.OptionDetail(
                         productOption.getId(),
                         false,
@@ -76,6 +81,14 @@ public class ProductService {
                 );
             }
         }).toList());
+
+        eventPublisher.publishReduceProductEvent(
+                new ProductEvent.ReduceStock(
+                        command.orderId(),
+                        productInfo.optionDetails()
+                )
+        );
+        return productInfo;
     }
 
     /**

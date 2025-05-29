@@ -44,7 +44,7 @@ public class CouponFacade {
      * 대기열로부터 선착순 쿠폰 발급 저장
      */
     @Transactional
-    public void processCouponQueue() {
+    public void processIssuedCouponApply() {
 
         CouponQueueInfo.Keys keysInfo = couponService.getCouponKeys();
 

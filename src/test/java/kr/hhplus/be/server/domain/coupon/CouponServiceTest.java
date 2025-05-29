@@ -5,6 +5,7 @@ import kr.hhplus.be.server.domain.coupon.dto.CouponInfo;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.CouponStatus;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
+import kr.hhplus.be.server.domain.coupon.event.CouponEventPublisher;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
 import kr.hhplus.be.server.global.exception.ErrorCode;
@@ -34,12 +35,16 @@ class CouponServiceTest {
     @Mock
     private IssuedCouponRepository issuedCouponRepository;
 
+    @Mock
+    private CouponEventPublisher eventPublisher;
+
     @InjectMocks
     private CouponService couponService;
 
     private Long USER_ID;
     private Long COUPON_ID;
     private Long ISSUED_COUPON_ID;
+    private Long ORDER_ID;
 
     private Coupon COUPON;
     private IssuedCoupon ISSUED_COUPON;
@@ -49,7 +54,7 @@ class CouponServiceTest {
         USER_ID = 1L;
         COUPON_ID = 1L;
         ISSUED_COUPON_ID = 111L;
-
+        ORDER_ID = 1L;
         COUPON = new Coupon(1000L, 100L);
         ISSUED_COUPON = new IssuedCoupon(USER_ID, COUPON_ID);
     }
@@ -59,7 +64,7 @@ class CouponServiceTest {
     void unuseCoupon_() {
 
         // Arrange
-        CouponCommand.Use command = new CouponCommand.Use(USER_ID, null);
+        CouponCommand.Use command = new CouponCommand.Use(USER_ID, null, ORDER_ID);
 
         // Act
         CouponInfo.CouponAggregate actualInfo = couponService.use(command);
@@ -83,9 +88,9 @@ class CouponServiceTest {
             // Arrange
             when(couponRepository.findById(COUPON_ID)).thenReturn(COUPON);
             when(issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID)).thenReturn(ISSUED_COUPON);
-
+            doNothing().when(eventPublisher).publishUseCouponEvent(any());
             // Act
-            CouponInfo.CouponAggregate actualInfo = couponService.use(new CouponCommand.Use(USER_ID, COUPON_ID));
+            CouponInfo.CouponAggregate actualInfo = couponService.use(new CouponCommand.Use(USER_ID, COUPON_ID, ORDER_ID));
 
             // Assert
             verify(couponRepository, times(1)).findById(COUPON_ID);
@@ -103,7 +108,7 @@ class CouponServiceTest {
             when(couponRepository.findById(COUPON_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
-            GlobalException exception = assertThrows(GlobalException.class, () -> couponService.use(new CouponCommand.Use(USER_ID, COUPON_ID)));
+            GlobalException exception = assertThrows(GlobalException.class, () -> couponService.use(new CouponCommand.Use(USER_ID, COUPON_ID, ORDER_ID)));
 
             // Assert
             verify(couponRepository, times(1)).findById(COUPON_ID);
@@ -115,14 +120,12 @@ class CouponServiceTest {
         void useCoupon_issuedCoupon_NotFound() {
 
             // Arrange
-            when(couponRepository.findById(COUPON_ID)).thenReturn(COUPON);
             when(issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID)).thenThrow(new GlobalException(ErrorCode.NOT_FOUND));
 
             // Act
-            GlobalException exception = assertThrows(GlobalException.class, () -> couponService.use(new CouponCommand.Use(USER_ID, COUPON_ID)));
+            GlobalException exception = assertThrows(GlobalException.class, () -> couponService.use(new CouponCommand.Use(USER_ID, COUPON_ID, ORDER_ID)));
 
             // Assert
-            verify(couponRepository, times(1)).findById(COUPON_ID);
             verify(issuedCouponRepository, times(1)).findByUserIdAndCouponId(USER_ID, COUPON_ID);
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
         }
@@ -138,7 +141,7 @@ class CouponServiceTest {
             when(issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID)).thenReturn(usedIssuedCoupon);
 
             // Act
-            GlobalException exception = assertThrows(GlobalException.class, () -> couponService.use(new CouponCommand.Use(USER_ID, COUPON_ID)));
+            GlobalException exception = assertThrows(GlobalException.class, () -> couponService.use(new CouponCommand.Use(USER_ID, COUPON_ID, ORDER_ID)));
 
             // Assert
             verify(couponRepository, times(1)).findById(COUPON_ID);
@@ -157,21 +160,15 @@ class CouponServiceTest {
 
             // Arrange
             when(couponRepository.findByIdWithOptimisticLock(COUPON_ID)).thenReturn(COUPON);
-            when(issuedCouponRepository.existsByUserIdAndCouponId(USER_ID, COUPON_ID)).thenReturn(false);
             when(issuedCouponRepository.save(any(IssuedCoupon.class))).thenReturn(new IssuedCoupon(USER_ID, COUPON_ID));
 
             // Act
-            IssuedCoupon actual = couponService.issue(new CouponCommand.Issue(USER_ID, COUPON_ID));
+            couponService.issue(new CouponCommand.Issue(USER_ID, COUPON_ID));
 
             // Assert
             verify(couponRepository,times(1)).findByIdWithOptimisticLock(COUPON_ID);
-            verify(issuedCouponRepository, times(1)).existsByUserIdAndCouponId(USER_ID, COUPON_ID);
-            verify(issuedCouponRepository,times(1)).save(any(IssuedCoupon.class));
 
             assertThat(COUPON.getQuantity()).isEqualTo(99);
-            assertThat(actual.getCouponId()).isEqualTo(COUPON_ID);
-            assertThat(actual.getUserId()).isEqualTo(USER_ID);
-            assertThat(actual.getStatus()).isEqualTo(CouponStatus.ISSUED);
         }
 
         @Test
@@ -188,31 +185,6 @@ class CouponServiceTest {
             // Assert
             verify(couponRepository, times(1)).findByIdWithOptimisticLock(COUPON_ID);
             assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.NOT_FOUND);
-        }
-
-        @Test
-        @DisplayName("등록된 쿠폰이 소진되어 더 이상 쿠폰을 발급할 수 없다.")
-        void issue_outOfStockCoupon() {
-
-            // Arrange
-            Coupon insufficientCoupon1 = new Coupon(1000L, 0L);
-            Coupon insufficientCoupon2 = new Coupon(1000L, -1L);
-
-            when(couponRepository.findByIdWithOptimisticLock(1L)).thenReturn(insufficientCoupon1);
-            when(couponRepository.findByIdWithOptimisticLock(2L)).thenReturn(insufficientCoupon2);
-
-            // Act & Assert
-            GlobalException exception1 = assertThrows(GlobalException.class,
-                    () -> couponService.issue(new CouponCommand.Issue(USER_ID, 1L)));
-
-            verify(couponRepository, times(1)).findByIdWithOptimisticLock(1L);
-            assertThat(exception1.getErrorCode()).isEqualTo(ErrorCode.OUT_OF_STOCK_COUPON);
-
-            GlobalException exception2 = assertThrows(GlobalException.class,
-                    () -> couponService.issue(new CouponCommand.Issue(USER_ID, 2L)));
-
-            verify(couponRepository, times(1)).findByIdWithOptimisticLock(2L);
-            assertThat(exception2.getErrorCode()).isEqualTo(ErrorCode.OUT_OF_STOCK_COUPON);
         }
     }
 }

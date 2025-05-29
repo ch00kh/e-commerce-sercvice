@@ -13,4 +13,6 @@ public interface IssuedCouponRepository {
     IssuedCoupon save(IssuedCoupon issuedCoupon);
 
     List<IssuedCoupon> findExpiredCoupons();
+
+    IssuedCoupon findById(Long issuedCouponId);
 }

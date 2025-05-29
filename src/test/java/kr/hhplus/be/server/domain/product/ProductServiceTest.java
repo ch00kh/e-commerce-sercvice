@@ -5,6 +5,8 @@ import kr.hhplus.be.server.domain.product.dto.ProductCommand;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.domain.product.entity.Product;
 import kr.hhplus.be.server.domain.product.entity.ProductOption;
+import kr.hhplus.be.server.domain.product.event.ProductEvent;
+import kr.hhplus.be.server.domain.product.event.ProductEventPublisher;
 import kr.hhplus.be.server.domain.product.repository.ProductOptionRepository;
 import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import kr.hhplus.be.server.global.exception.ErrorCode;
@@ -33,6 +35,9 @@ class ProductServiceTest {
 
     @Mock
     private ProductOptionRepository productOptionRepository;
+
+    @Mock
+    private ProductEventPublisher eventPublisher;
 
     @InjectMocks
     ProductService productService;
@@ -158,7 +163,7 @@ class ProductServiceTest {
             when(productOptionRepository.findByIdWithPessimisticLock(102L)).thenReturn(PRODUCT_OPTION2);
 
             // Act
-            ProductInfo.Order actualInfo = productService.reduceStock(new OrderCommand.OrderItemList(orderItems));
+            ProductInfo.Order actualInfo = productService.reduceStock(new OrderCommand.Reduce(1L, orderItems));
 
             // Assert
             verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(101L);
@@ -191,7 +196,7 @@ class ProductServiceTest {
             when(productOptionRepository.findByIdWithPessimisticLock(102L)).thenReturn(PRODUCT_OPTION2);
 
             // Act
-            ProductInfo.Order actualInfo = productService.reduceStock(new OrderCommand.OrderItemList(orderItems));
+            ProductInfo.Order actualInfo = productService.reduceStock(new OrderCommand.Reduce(1L, orderItems));
 
             // Assert
             verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(101L);
@@ -222,9 +227,10 @@ class ProductServiceTest {
 
             when(productOptionRepository.findByIdWithPessimisticLock(101L)).thenReturn(PRODUCT_OPTION1);
             when(productOptionRepository.findByIdWithPessimisticLock(102L)).thenReturn(PRODUCT_OPTION2);
+            doNothing().when(eventPublisher).publishReduceProductEvent(new ProductEvent.ReduceStock(any(), List.of()));
 
             // Act
-            ProductInfo.Order actualInfo = productService.reduceStock(new OrderCommand.OrderItemList(orderItems));
+            ProductInfo.Order actualInfo = productService.reduceStock(new OrderCommand.Reduce(1L, orderItems));
 
             // Assert
             verify(productOptionRepository, times(1)).findByIdWithPessimisticLock(101L);

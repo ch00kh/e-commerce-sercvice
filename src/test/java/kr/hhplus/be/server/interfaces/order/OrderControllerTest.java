@@ -1,8 +1,8 @@
 package kr.hhplus.be.server.interfaces.order;
 
-import kr.hhplus.be.server.application.order.OrderFacade;
-import kr.hhplus.be.server.application.order.dto.OrderCriteria;
-import kr.hhplus.be.server.application.order.dto.OrderResult;
+import kr.hhplus.be.server.domain.order.OrderService;
+import kr.hhplus.be.server.domain.order.dto.OrderCommand;
+import kr.hhplus.be.server.domain.order.dto.OrderInfo;
 import kr.hhplus.be.server.domain.order.entity.OrderStatus;
 import kr.hhplus.be.server.interfaces.order.controller.OrderController;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +27,7 @@ class OrderControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private OrderFacade orderFacade;
+    private OrderService orderService;
 
 
     @Test
@@ -42,7 +42,8 @@ class OrderControllerTest {
             "items": [
                 {
                     "optionId": 101,
-                    "quantity": 10
+                    "quantity": 10,
+                    "unitPrice": 2000
                 }
             ],
             "couponId": null
@@ -53,16 +54,13 @@ class OrderControllerTest {
         {
             "orderId": 10,
             "userId": 1,
-            "status": "CREATED",
-            "totalAmount": 20000,
-            "discountAmount": 0,
-            "paymentAmount": 20000
+            "status": "CREATED"
         }
         """;
 
 
-        when(orderFacade.order(any(OrderCriteria.Create.class)))
-                .thenReturn(new OrderResult.Create(10L, 1L, OrderStatus.CREATED, 20000L, 0L, 20000L));
+        when(orderService.createOrder(any(OrderCommand.Create.class)))
+                .thenReturn(new OrderInfo.Create(10L, 1L, null, OrderStatus.CREATED, 20000L, 0L, 20000L));
 
         // Act & Assert
         mockMvc.perform(post("/api/v1/order")

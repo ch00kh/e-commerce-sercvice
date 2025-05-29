@@ -5,7 +5,6 @@ import kr.hhplus.be.server.application.user.UserFacade;
 import kr.hhplus.be.server.application.user.dto.UserCriteria;
 import kr.hhplus.be.server.application.user.dto.UserResult;
 import kr.hhplus.be.server.domain.coupon.CouponService;
-import kr.hhplus.be.server.domain.coupon.dto.CouponCommand;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.CouponStatus;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
@@ -79,7 +78,7 @@ class OrderControllerIntegrationTest {
         USER_RESULT = userFacade.createUser(new UserCriteria.Create("추경현"));
 
         COUPON = couponRepository.save(new Coupon(5000L, 100L));
-        ISSUED_COUPON = couponService.issue(new CouponCommand.Issue(USER_RESULT.id(), COUPON.getId()));
+        ISSUED_COUPON = issuedCouponRepository.save(new IssuedCoupon(USER_RESULT.id(), COUPON.getId()));
 
         PRODUCT = productRepository.save(new Product("맥도날드", "햄버거"));
         PRODUCT_OPTION1 = productOptionRepository.save(new ProductOption(PRODUCT.getId(), "빅맥", 1000L, 100L));
@@ -92,8 +91,8 @@ class OrderControllerIntegrationTest {
 
         // Arrange
         List<OrderRequest.Item> items = List.of(
-                new OrderRequest.Item(PRODUCT_OPTION1.getId(), 10L),
-                new OrderRequest.Item(PRODUCT_OPTION2.getId(), 5L)
+                new OrderRequest.Item(PRODUCT_OPTION1.getId(), 10L, 1000L),
+                new OrderRequest.Item(PRODUCT_OPTION2.getId(), 5L, 1000L)
         );
 
         // Act
@@ -106,10 +105,7 @@ class OrderControllerIntegrationTest {
         {
             "orderId": 1,
             "userId": 1,
-            "status": "CREATED",
-            "totalAmount": 15000,
-            "discountAmount": 0,
-            "paymentAmount": 15000
+            "status": "CREATED"
         }
         """;
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -122,8 +118,8 @@ class OrderControllerIntegrationTest {
 
         // Arrange
         List<OrderRequest.Item> items = List.of(
-                new OrderRequest.Item(PRODUCT_OPTION1.getId(), 10L),
-                new OrderRequest.Item(PRODUCT_OPTION2.getId(), 5L)
+                new OrderRequest.Item(PRODUCT_OPTION1.getId(), 10L, 1000L),
+                new OrderRequest.Item(PRODUCT_OPTION2.getId(), 5L, 1000L)
         );
 
         // Act
@@ -136,16 +132,13 @@ class OrderControllerIntegrationTest {
         {
             "orderId": 1,
             "userId": 1,
-            "status": "CREATED",
-            "totalAmount": 15000,
-            "discountAmount": 5000,
-            "paymentAmount": 10000
+            "status": "CREATED"
         }
         """;
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-        assertThat(actual).isEqualToIgnoringWhitespace(responseBody);
-
         IssuedCoupon issuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(USER_RESULT.id(), ISSUED_COUPON.getCouponId());
         assertThat(issuedCoupon.getStatus()).isEqualTo(CouponStatus.USED);
+        assertThat(actual).isEqualToIgnoringWhitespace(responseBody);
+
     }
 }

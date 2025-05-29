@@ -1,7 +1,8 @@
 package kr.hhplus.be.server.domain.product;
 
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
+import kr.hhplus.be.server.domain.order.OrderService;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
+import kr.hhplus.be.server.domain.order.dto.OrderInfo;
 import kr.hhplus.be.server.domain.product.dto.ProductCommand;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.domain.product.entity.Product;
@@ -10,6 +11,7 @@ import kr.hhplus.be.server.domain.product.repository.ProductOptionRepository;
 import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
+import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -38,6 +41,9 @@ class ProductServiceIntegrationTest {
 
     @Autowired
     private ProductOptionRepository productOptionRepository;
+
+    @Autowired
+    private OrderService orderService;
 
     private Product PRODUCT1;
     private ProductOption PRODUCT1_OPTION1;
@@ -161,16 +167,19 @@ class ProductServiceIntegrationTest {
 
         @Test
         @DisplayName("재고가 충분 차감(OPTION1)하고, 부족하면 차감(OPTION2)하지 않는다.")
+        @Transactional  // 트랜잭션 추가
         void reduceStockTest() {
 
-            // Arrange
-            List<OrderCommand.OrderItem> command = List.of(
+            // Arrange - 먼저 주문을 생성
+            List<OrderCommand.OrderItem> orderItems = List.of(
                     new OrderCommand.OrderItem(PRODUCT1_OPTION1.getId(), 1000L, 1000L),
-                    new OrderCommand.OrderItem(PRODUCT1_OPTION2.getId(), 1000L, 600L)
+                    new OrderCommand.OrderItem(PRODUCT1_OPTION2.getId(), 1250L, 600L)
             );
+            
+            OrderInfo.Create order = orderService.createOrder(new OrderCommand.Create(1L, null, orderItems));
 
-            // Act
-            ProductInfo.Order actual = productService.reduceStock(new OrderCommand.OrderItemList(command));
+            // Act - 재고 차감 직접 호출
+            ProductInfo.Order actual = productService.reduceStock(new OrderCommand.Reduce(order.orderId(), orderItems));
 
             // Assert
             assertThat(actual.optionDetails()).hasSize(2);
