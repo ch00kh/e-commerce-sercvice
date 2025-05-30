@@ -10,7 +10,6 @@ import kr.hhplus.be.server.domain.coupon.event.CouponEvent;
 import kr.hhplus.be.server.domain.coupon.event.CouponEventPublisher;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
-import kr.hhplus.be.server.global.aop.DistributedLock;
 import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -50,8 +49,8 @@ public class CouponService {
 
         issuedCoupon.use();
 
-        eventPublisher.publishUseCouponEvent(
-                new CouponEvent.UseCoupon(
+        eventPublisher.publish(
+                new CouponEvent.Use(
                         command.userId(),
                         command.orderId(),
                         coupon.getId(),
@@ -67,23 +66,19 @@ public class CouponService {
      * 쿠폰 발급
      */
     @Transactional
-    @DistributedLock(value = "order:#{#command.couponId}", waitTime = 60, leaseTime = 30)
-    public void issue(CouponCommand.Issue command) {
+    public void issue(CouponCommand.Apply command) {
+
+        // 기발급 검증
+        if (issuedCouponRepository.existsByUserIdAndCouponId(command.userId(), command.couponId())) {
+            throw new GlobalException(ErrorCode.ALREADY_ISSUED_COUPON);
+        }
 
         // 잔여 쿠폰 조회 및 쿠폰 수량 차감
         Coupon coupon = couponRepository.findByIdWithOptimisticLock(command.couponId());
+        log.info("Coupon : {}", coupon);
+        coupon.issue();
 
-        try {
-            coupon.issue();
-
-            issuedCouponRepository.save(new IssuedCoupon(command.userId(), command.couponId()));
-
-        } catch (GlobalException e) {
-            if (e.getErrorCode().equals(ErrorCode.OUT_OF_STOCK_COUPON)) {
-                log.error("Coupon Issue Error : {}, Coupon Id: {}", e.getMessage(), command.couponId());
-                couponRepository.deleteQueue(command.couponId());
-            }
-        }
+        issuedCouponRepository.save(new IssuedCoupon(command.userId(), command.couponId()));
     }
 
 
@@ -117,8 +112,10 @@ public class CouponService {
     /**
      * 쿠폰 발급 대기열 등록
      */
-    public void apply(CouponCommand.Issue command) {
-        couponRepository.enqueue(command.couponId(), command.userId());
+    public Coupon apply(CouponCommand.Apply command) {
+        Coupon coupon = couponRepository.findById(command.couponId());
+        eventPublisher.publish(new CouponEvent.Apply(command.couponId(), command.userId()));
+        return coupon;
     }
 
     /**

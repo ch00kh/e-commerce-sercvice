@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.interfaces.coupon.controller;
 
-import kr.hhplus.be.server.application.coupon.CouponFacade;
+import kr.hhplus.be.server.domain.coupon.CouponService;
 import kr.hhplus.be.server.interfaces.coupon.dto.CouponRequest;
 import kr.hhplus.be.server.interfaces.coupon.dto.CouponResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,14 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CouponController implements ICouponController {
 
-    private final CouponFacade couponFacade;
+    private final CouponService couponService;
 
     @PostMapping("/issue")
     public ResponseEntity<CouponResponse> issue(
-            @RequestBody CouponRequest.Enqueue request
+            @RequestBody CouponRequest.Apply request
     ) {
         return ResponseEntity.ok()
-                .body(CouponResponse.from(couponFacade.apply(request.toCriteria())));
+                .body(CouponResponse.from(couponService.apply(request.toCommand())));
     }
+
 
 }
