@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.balance;
 
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.cleaner.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.balance.dto.BalanceCommand;
 import kr.hhplus.be.server.domain.balance.entity.Balance;
 import kr.hhplus.be.server.domain.balance.entity.BalanceHistory;

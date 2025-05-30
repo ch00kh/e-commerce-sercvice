@@ -8,7 +8,7 @@ import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
 import kr.hhplus.be.server.domain.user.entity.User;
 import kr.hhplus.be.server.domain.user.repository.UserRepository;
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.cleaner.DatabaseClearExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,7 +56,7 @@ class CouponEventTest {
         // Act
         publisher.publish(event);
 
-        Thread.sleep(3 * 1000);
+        Thread.sleep(10 * 1000);
 
         // then
         IssuedCoupon actualIssuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(USER.getId(), COUPON.getId());

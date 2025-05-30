@@ -1,9 +1,10 @@
 package kr.hhplus.be.server.domain.coupon;
 
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.cleaner.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.coupon.dto.CouponCommand;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
+import kr.hhplus.be.server.surpport.cleaner.KafkaClearExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @SpringBootTest
 @ExtendWith(DatabaseClearExtension.class)
+@ExtendWith(KafkaClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[동시성 테스트] CouponService")
 class CouponServiceConcurrencyTest {
@@ -63,7 +65,7 @@ class CouponServiceConcurrencyTest {
                 try {
                     startLatch.await();
 
-                    couponService.issue(new CouponCommand.Issue(finalI, COUPON.getId()));
+                    couponService.issue(new CouponCommand.Apply(finalI, COUPON.getId()));
                     successCount.incrementAndGet();
 
                 } catch (Exception e) {

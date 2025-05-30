@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.interfaces.balance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.cleaner.DatabaseClearExtension;
 import kr.hhplus.be.server.application.user.UserFacade;
 import kr.hhplus.be.server.application.user.dto.UserCriteria;
 import kr.hhplus.be.server.application.user.dto.UserResult;
