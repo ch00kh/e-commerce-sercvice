@@ -18,7 +18,7 @@ public class PaymentService {
      * 결제 정보 저장
      */
     @Transactional
-    public Payment save(PaymentCommand.Save command) {
+    public Payment paymentCreate(PaymentCommand.Create command) {
         return paymentRepository.save(new Payment(command.orderId(), command.amount()));
     }
 

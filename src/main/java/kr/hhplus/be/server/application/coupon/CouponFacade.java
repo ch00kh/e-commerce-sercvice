@@ -45,7 +45,6 @@ public class CouponFacade {
      */
     @Transactional
     public void processIssuedCouponApply() {
-
         CouponQueueInfo.Keys keysInfo = couponService.getCouponKeys();
 
         for (String couponKey : keysInfo.couponKeys()) {
@@ -54,7 +53,7 @@ public class CouponFacade {
             CouponInfo.Cache coupon = couponService.getCoupon(new CouponCommand.Find(couponId));
 
             CouponQueueInfo.UserIds couponQueueInfo = couponService.dequeueUsers(new CouponQueueCommand.Dequeue(couponId, coupon.quantity()));
-            couponQueueInfo.userIds().forEach(userId -> couponService.issue(new CouponCommand.Issue(userId, couponId)));
+            couponQueueInfo.userIds().forEach(userId -> couponService.issue(new CouponCommand.Apply(userId, couponId)));
         }
 
     }
