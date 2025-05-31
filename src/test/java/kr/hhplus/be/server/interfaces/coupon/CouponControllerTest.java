@@ -1,8 +1,8 @@
 package kr.hhplus.be.server.interfaces.coupon;
 
-import kr.hhplus.be.server.application.coupon.CouponFacade;
-import kr.hhplus.be.server.application.coupon.dto.CouponCriteria;
-import kr.hhplus.be.server.application.coupon.dto.CouponResult;
+import kr.hhplus.be.server.domain.coupon.CouponService;
+import kr.hhplus.be.server.domain.coupon.dto.CouponCommand;
+import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.interfaces.coupon.controller.CouponController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ class CouponControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private CouponFacade couponFacade;
+    private CouponService couponService;
 
     @Test
     @DisplayName("사용자를 생성한 후 사용자ID와 쿠폰ID를 입력받아 선착순 쿠폰 발급 대기열에 들어간다.")
@@ -46,8 +46,8 @@ class CouponControllerTest {
             }
             """;
 
-        when(couponFacade.apply(new CouponCriteria.Enqueue(1L, 100L)))
-                .thenReturn(new CouponResult.Enqueue(100L));
+        when(couponService.apply(new CouponCommand.Apply(1L, 100L)))
+                .thenReturn(new Coupon(100L, 10000L, 100L, 1L));
 
         mockMvc.perform(post("/api/v1/coupon/issue")
                         .contentType(MediaType.APPLICATION_JSON)

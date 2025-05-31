@@ -19,11 +19,11 @@
 
 ## 문제 해결
 기존의 아키텍쳐는 다음과 같다.
-![img](./issue-coupon-architecture-rdb.png)
+![img](../images/issue-coupon-architecture-rdb.png)
 - 분산 락 제어를 통해 RDB 바로 읽고 쓰는 구조
 
 개선한 아키텍쳐는 다음과 같다.
-![img](./issue-coupon-architecture-redis.png)
+![img](../images/issue-coupon-architecture-redis.png)
 1. 쿠폰 정보를 캐시에 저장
 2. Redis Sorted Set을 활용하여 쿠폰 발급 요청을 시간 순서대로 저장 (대기열, ttl: 5분)
 3. 스케줄러(1초 마다 수행)를 통해 캐시의 쿠폰 정보에서의 수량을 확인하여 대기열에서 수량만큼 꺼내서 DB에 저장
@@ -32,10 +32,10 @@
 선착순 쿠폰을 1000개를 발행하였을때 개선 전/후의 요약결과는 아래와 같다.
 
 기존의 아키텍쳐의 부하테스트는 다음과 같다.
-![img](./issue-coupon-test-rdb.png)
+![img](../images/issue-coupon-test-rdb.png)
 
 개선한 아키텍쳐의 부하테스트는 다음과 같다.
-![img](./issue-coupon-test-redis.png)
+![img](../images/issue-coupon-test-redis.png)
 
 ### 부하 테스트 결과 성능 비교
 |        성능 지표        |  개선 전 (RDB + 분산락)  |  개선 후 (Redis + 대기열)  |    개선율    |       비고       |

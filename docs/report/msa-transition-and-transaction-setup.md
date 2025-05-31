@@ -30,7 +30,7 @@ E-Commerce 시스템은 단일 애플리케이션으로 구성된 모놀리식 �
 
 ## 3. 트랜잭션 처리의 한계
 ### 3.1 기존 모놀리식 트랜잭션
-![Facade 패턴 아키텍처](./architecture-order-facade.png)
+![Facade 패턴 아키텍처](../images/architecture-order-facade.png)
 
 현재 OrderFacade에서 주문 처리 시 하나의 트랜잭션으로 처리한다.
 ```java
@@ -59,7 +59,7 @@ MSA로 분리 시 각 서비스가 독립적인 데이터베이스를 가지므�
 
 ## 4. 해결방안
 ### 4.1 이벤트 기반 아키텍처 도입
-![이벤트 기반 아키텍처](./architecture-order-event.png)
+![이벤트 기반 아키텍처](../images/architecture-order-event.png)
 
 분산 트랜잭션 문제를 해결하기 위해 이벤트 기반의 Saga 패턴을 적용한다. 기존 Facade 패턴에서 각 서비스가 이벤트를 통해 느슨하게 결합되는 구조로 전환한다.
 

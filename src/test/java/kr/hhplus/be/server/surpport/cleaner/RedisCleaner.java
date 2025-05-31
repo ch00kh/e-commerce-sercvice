@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.surpport.database;
+package kr.hhplus.be.server.surpport.cleaner;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;

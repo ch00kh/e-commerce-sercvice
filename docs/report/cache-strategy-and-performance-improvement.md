@@ -41,9 +41,9 @@ Redis는 in-memory 데이터 저장소로 빠른 읽기/쓰기와 TTL 기능 등
 
 ### 상품 정보 조회 캐시 적용 전후 비교
 #### 캐시 적용 전
-![img](test-findProduct-cache-not-apply.png)
+![img](../images/test-findProduct-cache-not-apply.png)
 #### 캐시 적용 후
-![img](test-findProduct-cache-apply.png)
+![img](../images/test-findProduct-cache-apply.png)
 
 #### 비교분석
 |   측정 지표    | 캐시 적용 전  | 캐시 적용 후  |    성능개선     |
@@ -56,10 +56,10 @@ Redis는 in-memory 데이터 저장소로 빠른 읽기/쓰기와 TTL 기능 등
 
 ### 인기 판매 상품 조회 캐시 적용 비교
 #### 캐시 적용 전
-![img](./test-findBest-cache-not-apply.png)
+![img](../images/test-findBest-cache-not-apply.png)
 
 #### 캐시 적용 후
-![img](./test-findBest-cache-apply.png)
+![img](../images/test-findBest-cache-apply.png)
 
 #### 비교분석
 |     측정 지표      | 캐시 적용 전  | 캐시 적용 후  |    성능개선    |

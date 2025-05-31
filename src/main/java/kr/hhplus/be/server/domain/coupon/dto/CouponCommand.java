@@ -14,7 +14,7 @@ public record CouponCommand() {
             Long orderId
     ) {}
 
-    public record Issue(
+    public record Apply(
             Long userId,
             Long couponId
     ) {
@@ -25,10 +25,10 @@ public record CouponCommand() {
             Long couponId
     ) {}
 
-    public record ChangeExpiredAt
-    (
+    public record ChangeExpiredAt(
             Long userId,
             Long couponId,
             LocalDateTime expiredAt
     ) {}
+
 }

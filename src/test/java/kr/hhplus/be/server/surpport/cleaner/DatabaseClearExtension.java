@@ -1,13 +1,13 @@
-package kr.hhplus.be.server.surpport.database;
+package kr.hhplus.be.server.surpport.cleaner;
 
-import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-public class DatabaseClearExtension implements BeforeEachCallback {
+public class DatabaseClearExtension implements AfterEachCallback {
 
     @Override
-    public void beforeEach(ExtensionContext context) {
+    public void afterEach(ExtensionContext context) {
         DatabaseCleaner databaseCleaner = getDataCleaner(context);
         databaseCleaner.clear();
     }

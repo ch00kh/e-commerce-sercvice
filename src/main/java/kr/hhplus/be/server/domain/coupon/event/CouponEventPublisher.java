@@ -1,19 +1,9 @@
 package kr.hhplus.be.server.domain.coupon.event;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
+public interface CouponEventPublisher {
 
-@Component
-@RequiredArgsConstructor
-@Slf4j
-public class CouponEventPublisher {
+    void publish(CouponEvent.Apply event);
 
-    private final ApplicationEventPublisher publisher;
+    void publish(CouponEvent.Use event);
 
-    public void publishUseCouponEvent(CouponEvent.UseCoupon event) {
-        log.info("쿠폰 사용 이벤트 발행 : {}", event);
-        publisher.publishEvent(event);
-    }
 }

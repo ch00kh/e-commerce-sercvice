@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.surpport.database;
+package kr.hhplus.be.server.surpport.cleaner;
 
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;

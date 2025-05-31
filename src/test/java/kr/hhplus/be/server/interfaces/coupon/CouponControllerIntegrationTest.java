@@ -10,8 +10,8 @@ import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
 import kr.hhplus.be.server.interfaces.coupon.controller.CouponController;
 import kr.hhplus.be.server.interfaces.coupon.dto.CouponRequest;
 import kr.hhplus.be.server.interfaces.coupon.dto.CouponResponse;
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
-import kr.hhplus.be.server.surpport.database.RedisClearExtension;
+import kr.hhplus.be.server.surpport.cleaner.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.cleaner.RedisClearExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -60,15 +60,12 @@ class CouponControllerIntegrationTest {
 
         // Arrange
         UserResult.Create userResult = userFacade.createUser(new UserCriteria.Create("추경현"));
-        CouponRequest.Enqueue request = new CouponRequest.Enqueue(userResult.id(), COUPON.getId());
+        CouponRequest.Apply request = new CouponRequest.Apply(userResult.id(), COUPON.getId());
 
         // Act
         ResponseEntity<CouponResponse> response = couponController.issue(request);
 
         // Assert
-        Long couponQueueSize = couponRepository.getCouponQueueSize(COUPON.getId());
-        assertThat(couponQueueSize).isEqualTo(1L);
-
         String actual = objectMapper.writeValueAsString(response.getBody());
         String responseBody = """
             {

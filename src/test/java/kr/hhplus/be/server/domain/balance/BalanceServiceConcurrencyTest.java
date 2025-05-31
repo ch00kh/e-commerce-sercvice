@@ -1,6 +1,5 @@
 package kr.hhplus.be.server.domain.balance;
 
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.balance.dto.BalanceCommand;
 import kr.hhplus.be.server.domain.balance.entity.Balance;
 import kr.hhplus.be.server.domain.balance.entity.BalanceHistory;
@@ -8,6 +7,8 @@ import kr.hhplus.be.server.domain.balance.repository.BalanceHistoryRepository;
 import kr.hhplus.be.server.domain.balance.repository.BalanceRepository;
 import kr.hhplus.be.server.domain.user.entity.User;
 import kr.hhplus.be.server.domain.user.repository.UserRepository;
+import kr.hhplus.be.server.surpport.cleaner.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.cleaner.KafkaClearExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @SpringBootTest
 @ExtendWith(DatabaseClearExtension.class)
+@ExtendWith(KafkaClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[동시성 테스트] BalanceService")
 class BalanceServiceConcurrencyTest {

@@ -16,7 +16,7 @@ import kr.hhplus.be.server.domain.product.repository.ProductOptionRepository;
 import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.cleaner.DatabaseClearExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -132,7 +132,7 @@ class OrderServiceIntegrationTest {
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(orderInfo.orderId(), couponInfo.couponId(), couponInfo.discountPrice());
 
             // Act
-            OrderInfo.Create actualInfo = orderService.applyCoupon(command);
+            OrderInfo.Create actualInfo = orderService.useCoupon(command);
 
             // Assert
             assertThat(actualInfo.issuedCouponId()).isNull();
@@ -147,7 +147,7 @@ class OrderServiceIntegrationTest {
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(orderInfo.orderId(), COUPON_ID, 3000L);
 
             // Act
-            orderInfo = orderService.applyCoupon(command);
+            orderInfo = orderService.useCoupon(command);
 
             // Assert
             Order actual = orderRepository.findById(orderInfo.orderId());
@@ -166,7 +166,7 @@ class OrderServiceIntegrationTest {
             OrderCommand.UseCoupon command = new OrderCommand.UseCoupon(orderInfo.orderId(), COUPON_ID, 30000L);
 
             // Act
-            orderInfo = orderService.applyCoupon(command);
+            orderInfo = orderService.useCoupon(command);
 
             // Assert
             Order actual = orderRepository.findById(orderInfo.orderId());

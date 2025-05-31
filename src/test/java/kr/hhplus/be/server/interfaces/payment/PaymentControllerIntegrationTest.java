@@ -18,7 +18,8 @@ import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import kr.hhplus.be.server.interfaces.payment.controller.PaymentController;
 import kr.hhplus.be.server.interfaces.payment.dto.PaymentRequest;
 import kr.hhplus.be.server.interfaces.payment.dto.PaymentResponse;
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.cleaner.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.cleaner.KafkaClearExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @SpringBootTest
 @ExtendWith(DatabaseClearExtension.class)
+@ExtendWith(KafkaClearExtension.class)
 @ActiveProfiles("test")
 @DisplayName("[통합테스트] PaymentController")
 class PaymentControllerIntegrationTest {
@@ -74,10 +76,8 @@ class PaymentControllerIntegrationTest {
     private ProductOption PRODUCT_OPTION1;
     private ProductOption PRODUCT_OPTION2;
 
-
-
     @BeforeEach
-    void setUp() {
+    void setUp() throws InterruptedException {
         USER_RESULT = userFacade.createUser(new UserCriteria.Create("추경현"));
         balanceFacade.charge(new BalanceCriteria.Charge(USER_RESULT.id(), 20000L));
 
@@ -91,6 +91,7 @@ class PaymentControllerIntegrationTest {
         );
 
         ORDER_INFO = orderService.createOrder(new OrderCommand.Create(USER_RESULT.id(), null, items));
+        Thread.sleep(10 * 1000);
     }
 
 

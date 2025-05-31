@@ -41,17 +41,21 @@ public class LoggingFilter implements Filter {
 
         ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper((HttpServletRequest) request);
         ContentCachingResponseWrapper wrappedResponse = new ContentCachingResponseWrapper((HttpServletResponse) response);
+        String path = wrappedRequest.getRequestURI();
 
         try {
             chain.doFilter(wrappedRequest, wrappedResponse);
 
         } finally {
-            loggingRequest(wrappedRequest);
+            if (!path.startsWith("/actuator")) {
 
-            byte[] responseBody = wrappedResponse.getContentAsByteArray();
-            wrappedResponse.copyBodyToResponse();
+                loggingRequest(wrappedRequest);
 
-            loggingResponse(wrappedResponse, responseBody);
+                byte[] responseBody = wrappedResponse.getContentAsByteArray();
+                wrappedResponse.copyBodyToResponse();
+
+                loggingResponse(wrappedResponse, responseBody);
+            }
         }
     }
 

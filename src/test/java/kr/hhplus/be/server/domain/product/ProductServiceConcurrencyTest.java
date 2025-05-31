@@ -1,6 +1,6 @@
 package kr.hhplus.be.server.domain.product;
 
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.cleaner.DatabaseClearExtension;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.product.dto.ProductInfo;
 import kr.hhplus.be.server.domain.product.entity.Product;

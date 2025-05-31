@@ -8,7 +8,7 @@ import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
 import kr.hhplus.be.server.domain.order.entity.Order;
 import kr.hhplus.be.server.domain.order.repository.OrderRepository;
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.cleaner.DatabaseClearExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -79,7 +79,7 @@ class CouponServiceIntegrationTest {
         Coupon newCoupon = couponRepository.save(new Coupon(1000L, 100L));
 
         // Act
-        couponService.issue(new CouponCommand.Issue(USER_ID, newCoupon.getId()));
+        couponService.issue(new CouponCommand.Apply(USER_ID, newCoupon.getId()));
 
         // Assert
         IssuedCoupon actual = issuedCouponRepository.findByUserIdAndCouponId(USER_ID, newCoupon.getId());

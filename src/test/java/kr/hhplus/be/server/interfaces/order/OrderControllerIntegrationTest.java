@@ -17,8 +17,8 @@ import kr.hhplus.be.server.domain.product.repository.ProductRepository;
 import kr.hhplus.be.server.interfaces.order.controller.OrderController;
 import kr.hhplus.be.server.interfaces.order.dto.OrderRequest;
 import kr.hhplus.be.server.interfaces.order.dto.OrderResponse;
-import kr.hhplus.be.server.surpport.database.DatabaseClearExtension;
-import kr.hhplus.be.server.surpport.database.RedisClearExtension;
+import kr.hhplus.be.server.surpport.cleaner.DatabaseClearExtension;
+import kr.hhplus.be.server.surpport.cleaner.RedisClearExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -137,7 +137,7 @@ class OrderControllerIntegrationTest {
         """;
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
         IssuedCoupon issuedCoupon = issuedCouponRepository.findByUserIdAndCouponId(USER_RESULT.id(), ISSUED_COUPON.getCouponId());
-        assertThat(issuedCoupon.getStatus()).isEqualTo(CouponStatus.USED);
+        assertThat(issuedCoupon.getStatus()).isEqualTo(CouponStatus.ISSUED);
         assertThat(actual).isEqualToIgnoringWhitespace(responseBody);
 
     }
