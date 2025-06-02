@@ -20,7 +20,7 @@ public class PaymentEventListener {
     /**
      * 주문 생성 이벤트 수신 - 결제 정보 생성
      */
-    @KafkaListener(topics = EventType.Topic.ORDER_CREATE, groupId = EventType.GroupId.PAYMENT, concurrency = "4")
+    @KafkaListener(topics = EventType.Topic.ORDER_CREATE, groupId = EventType.GroupId.PAYMENT_SERVICE, concurrency = "4")
     public void handleOrderCreateEvent(OrderEvent.OrderCreate event, Acknowledgment ack) {
         paymentService.paymentCreate(
                 new PaymentCommand.Create(

@@ -19,7 +19,7 @@ public class OrderEventListener {
     /**
      * 주문 완료 이벤트 수신
      */
-    @KafkaListener(topics = EventType.Topic.ORDER_COMPLETE, groupId = EventType.GroupId.ORDER, concurrency = "4")
+    @KafkaListener(topics = EventType.Topic.ORDER_COMPLETE, groupId = EventType.GroupId.ORDER_SERVICE, concurrency = "4")
     public void handleOrderCompleteEvent(OrderEvent.OrderComplete event) {
         orderService.sendOrder(OrderCommand.Send.of(event));
     }
@@ -27,7 +27,7 @@ public class OrderEventListener {
     /**
      * 주문 상태 변경 이벤트 수신
      */
-    @KafkaListener(topics = EventType.Topic.ORDER_STATE, groupId = EventType.GroupId.ORDER, concurrency = "4")
+    @KafkaListener(topics = EventType.Topic.ORDER_STATE, groupId = EventType.GroupId.ORDER_SERVICE, concurrency = "4")
     public void handleHoldOrderEvent(ProductEvent.ReduceStock event) {
         orderService.changeOrderState(
                 new OrderCommand.handleOrders(
