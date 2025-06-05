@@ -5,11 +5,12 @@ import kr.hhplus.be.server.domain.coupon.dto.CouponInfo;
 import kr.hhplus.be.server.domain.coupon.entity.Coupon;
 import kr.hhplus.be.server.domain.coupon.entity.CouponStatus;
 import kr.hhplus.be.server.domain.coupon.entity.IssuedCoupon;
-import kr.hhplus.be.server.domain.coupon.event.CouponEventPublisher;
+import kr.hhplus.be.server.domain.coupon.event.CouponEvent;
 import kr.hhplus.be.server.domain.coupon.repository.CouponRepository;
 import kr.hhplus.be.server.domain.coupon.repository.IssuedCouponRepository;
 import kr.hhplus.be.server.global.exception.ErrorCode;
 import kr.hhplus.be.server.global.exception.GlobalException;
+import kr.hhplus.be.server.infra.event.coupon.CouponEventPublisherImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -36,7 +37,7 @@ class CouponServiceTest {
     private IssuedCouponRepository issuedCouponRepository;
 
     @Mock
-    private CouponEventPublisher eventPublisher;
+    private CouponEventPublisherImpl eventPublisher;
 
     @InjectMocks
     private CouponService couponService;
@@ -88,7 +89,7 @@ class CouponServiceTest {
             // Arrange
             when(couponRepository.findById(COUPON_ID)).thenReturn(COUPON);
             when(issuedCouponRepository.findByUserIdAndCouponId(USER_ID, COUPON_ID)).thenReturn(ISSUED_COUPON);
-            doNothing().when(eventPublisher).publishUseCouponEvent(any());
+            doNothing().when(eventPublisher).publish(any(CouponEvent.Use.class));
             // Act
             CouponInfo.CouponAggregate actualInfo = couponService.use(new CouponCommand.Use(USER_ID, COUPON_ID, ORDER_ID));
 
@@ -163,7 +164,7 @@ class CouponServiceTest {
             when(issuedCouponRepository.save(any(IssuedCoupon.class))).thenReturn(new IssuedCoupon(USER_ID, COUPON_ID));
 
             // Act
-            couponService.issue(new CouponCommand.Issue(USER_ID, COUPON_ID));
+            couponService.issue(new CouponCommand.Apply(USER_ID, COUPON_ID));
 
             // Assert
             verify(couponRepository,times(1)).findByIdWithOptimisticLock(COUPON_ID);
@@ -180,7 +181,7 @@ class CouponServiceTest {
 
             // Act
             GlobalException exception = assertThrows(GlobalException.class,
-                    () -> couponService.issue(new CouponCommand.Issue(USER_ID, COUPON_ID)));
+                    () -> couponService.issue(new CouponCommand.Apply(USER_ID, COUPON_ID)));
 
             // Assert
             verify(couponRepository, times(1)).findByIdWithOptimisticLock(COUPON_ID);

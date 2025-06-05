@@ -126,7 +126,7 @@ class OrderServiceTest {
             when(orderRepository.findById(anyLong())).thenReturn(order);
 
             // Act
-            OrderInfo.Create actualInfo = orderService.applyCoupon(command);
+            OrderInfo.Create actualInfo = orderService.useCoupon(command);
 
             // Assert
             assertThat(actualInfo.issuedCouponId()).isNull();
@@ -144,7 +144,7 @@ class OrderServiceTest {
             when(orderRepository.findById(anyLong())).thenReturn(order);
 
             // Act
-            OrderInfo.Create actualInfo = orderService.applyCoupon(command);
+            OrderInfo.Create actualInfo = orderService.useCoupon(command);
 
             // Assert
             assertThat(actualInfo.issuedCouponId()).isEqualTo(COUPON_ID);
@@ -165,7 +165,7 @@ class OrderServiceTest {
             when(orderRepository.findById(anyLong())).thenReturn(order);
 
             // Act
-            OrderInfo.Create actualInfo = orderService.applyCoupon(command);
+            OrderInfo.Create actualInfo = orderService.useCoupon(command);
 
             // Assert
             assertThat(actualInfo.issuedCouponId()).isEqualTo(COUPON_ID);
@@ -186,7 +186,7 @@ class OrderServiceTest {
             when(orderRepository.findById(anyLong())).thenReturn(order);
 
             // Act
-            OrderInfo.Create actualInfo = orderService.applyCoupon(command);
+            OrderInfo.Create actualInfo = orderService.useCoupon(command);
 
             // Assert
             assertThat(actualInfo.issuedCouponId()).isEqualTo(COUPON_ID);
@@ -265,7 +265,7 @@ class OrderServiceTest {
         verify(orderRepository).findById(ORDER_ID);
         verify(mockOrder).pay();
 
-        verify(eventPublisher).publishOrderCompleteEvent(any(OrderEvent.OrderComplete.class));
+        verify(eventPublisher).publish(any(OrderEvent.OrderComplete.class));
     }
 
     @Test

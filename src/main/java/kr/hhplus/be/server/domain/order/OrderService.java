@@ -49,7 +49,7 @@ public class OrderService {
                                 ))
                 ).toList();
 
-        eventPublisher.publishOrderCreateEvent(
+        eventPublisher.publish(
                 new OrderEvent.OrderCreate(
                         order.getId(),
                         order.getUserId(),
@@ -73,7 +73,7 @@ public class OrderService {
      * 주문 상품 보류 (CREATED -> PENDING)
      */
     @Transactional
-    public void holdOrders(OrderCommand.handleOrders command) {
+    public void changeOrderState(OrderCommand.handleOrders command) {
         command.stockDetails().forEach(stock -> {
             if (!stock.canPurchase()) {
                 OrderItem orderItem = orderItemRepository.findByOrderIdAndProductOptionId(command.orderId(), stock.optionId());
@@ -86,7 +86,7 @@ public class OrderService {
      * 쿠폰 적용
      */
     @Transactional
-    public OrderInfo.Create applyCoupon(OrderCommand.UseCoupon command) {
+    public OrderInfo.Create useCoupon(OrderCommand.UseCoupon command) {
 
         Order order = orderRepository.findById(command.orderId());
 
@@ -114,19 +114,6 @@ public class OrderService {
                 order.getPaymentAmount()
         );
 
-        eventPublisher.publishCouponApplyEvent(
-                new OrderEvent.OrderCouponApply(
-                        order.getId(),
-                        order.getUserId(),
-                        command.couponId(),
-                        order.getIssuedCouponId(),
-                        order.getStatus(),
-                        order.getTotalAmount(),
-                        order.getDiscountAmount(),
-                        order.getPaymentAmount()
-                )
-        );
-
         return orderInfo;
     }
 
@@ -146,7 +133,7 @@ public class OrderService {
 
         Order order = orderRepository.findById(command.orderId());
 
-        eventPublisher.publishOrderCompleteEvent(
+        eventPublisher.publish(
                 new OrderEvent.OrderComplete(
                         order.getId(),
                         order.getUserId(),

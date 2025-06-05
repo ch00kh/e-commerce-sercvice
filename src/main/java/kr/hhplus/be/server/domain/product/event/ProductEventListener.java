@@ -3,11 +3,12 @@ package kr.hhplus.be.server.domain.product.event;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.order.event.OrderEvent;
 import kr.hhplus.be.server.domain.product.ProductService;
+import kr.hhplus.be.server.global.event.EventType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
@@ -17,10 +18,10 @@ public class ProductEventListener {
     private final ProductService productService;
 
     /**
-     * 쿠폰 적용 이벤트 수신
+     * 주문 생성 이벤트 수신 - 재고 차감
      */
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-    public void handleOrderCreateEvent(OrderEvent.OrderCreate event) {
+    @KafkaListener(topics = EventType.Topic.ORDER_CREATE, groupId = EventType.GroupId.ORDER, concurrency = "4")
+    public void handleOrderCreateEvent(OrderEvent.OrderCreate event, Acknowledgment ack) {
         productService.reduceStock(new OrderCommand.Reduce(
                 event.orderId(),
                 event.orderItems().stream()
@@ -32,5 +33,6 @@ public class ProductEventListener {
                         ).toList()
                 )
         );
+        ack.acknowledge();
     }
 }

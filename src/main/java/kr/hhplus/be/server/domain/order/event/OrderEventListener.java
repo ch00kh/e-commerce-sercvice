@@ -1,15 +1,13 @@
 package kr.hhplus.be.server.domain.order.event;
 
-import kr.hhplus.be.server.domain.coupon.event.CouponEvent;
 import kr.hhplus.be.server.domain.order.OrderService;
 import kr.hhplus.be.server.domain.order.dto.OrderCommand;
 import kr.hhplus.be.server.domain.product.event.ProductEvent;
+import kr.hhplus.be.server.global.event.EventType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
@@ -21,26 +19,17 @@ public class OrderEventListener {
     /**
      * 주문 완료 이벤트 수신
      */
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @KafkaListener(topics = EventType.Topic.ORDER_COMPLETE, groupId = EventType.GroupId.ORDER, concurrency = "4")
     public void handleOrderCompleteEvent(OrderEvent.OrderComplete event) {
         orderService.sendOrder(OrderCommand.Send.of(event));
     }
 
     /**
-     * 쿠폰 적용 이벤트 수신
+     * 주문 상태 변경 이벤트 수신
      */
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-    public void handleUseCouponEvent(CouponEvent.UseCoupon event) {
-        orderService.applyCoupon(new OrderCommand.UseCoupon(event.orderId(), event.issuedCouponId(), event.userId()));
-    }
-
-    /**
-     * 주문 보류 이벤트 수신
-     */
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    @KafkaListener(topics = EventType.Topic.ORDER_STATE, groupId = EventType.GroupId.ORDER, concurrency = "4")
     public void handleHoldOrderEvent(ProductEvent.ReduceStock event) {
-        orderService.holdOrders(
+        orderService.changeOrderState(
                 new OrderCommand.handleOrders(
                         event.orderId(),
                         event.optionDetails()
