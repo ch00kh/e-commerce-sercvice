@@ -1,21 +1,17 @@
 import http from 'k6/http';
-import { check } from 'k6';
-import { sleep } from 'k6';
+import { check, sleep } from 'k6';
 
-const count = 1000;
-
-export const options = {
+export let options = {
     stages: [
-        { duration: '10s', target: 100 },
-        { duration: '1m', target: 100 },
-        { duration: '10s', target: 0 }
-    ],
+        { duration: '1m', target: 1000 }, // 30초 동안 500명까지 증가
+        { duration: '5m', target: 1000 }, // 5분 동안 500명 유지
+        { duration: '1m', target: 0 },   // 30초 동안 0명까지 감소
+    ]
 };
 
 export default function () {
 
     const res = http.get('http://host.docker.internal:8080/api/v1/products/best');
-    // console.log(`응답 - 상태: ${res.status}, 본문: ${res.body}`);
 
     check(res, {
         'status is 200': (r) => r.status === 200,
@@ -28,5 +24,6 @@ export default function () {
         console.error(`Error: Got status ${res.status}`);
     }
 
-    sleep(1);
+    sleep(Math.random() * 2 + 1); // 1-3초 대기
 }
+

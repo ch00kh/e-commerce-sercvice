@@ -27,10 +27,7 @@ public class PaymentService {
      */
     @Transactional(readOnly = true)
     public Payment findPayment(PaymentCommand.FindOrder command) {
-
-        Payment payment = paymentRepository.findByOrderId(command.orderId());
-
-        return payment;
+        return paymentRepository.findByOrderId(command.orderId());
     }
 
     /**
@@ -38,9 +35,7 @@ public class PaymentService {
      */
     @Transactional
     public Payment pay(PaymentCommand.Pay command) {
-
         Payment payment = paymentRepository.findByIdWithOptimisticLock(command.paymentId());
-
         return payment.pay(command.paymentAmount());
     }
 }

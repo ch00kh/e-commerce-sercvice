@@ -20,7 +20,7 @@ public class ProductEventListener {
     /**
      * 주문 생성 이벤트 수신 - 재고 차감
      */
-    @KafkaListener(topics = EventType.Topic.ORDER_CREATE, groupId = EventType.GroupId.ORDER, concurrency = "4")
+    @KafkaListener(topics = EventType.Topic.ORDER_CREATE, groupId = EventType.GroupId.ORDER_SERVICE, concurrency = "4")
     public void handleOrderCreateEvent(OrderEvent.OrderCreate event, Acknowledgment ack) {
         productService.reduceStock(new OrderCommand.Reduce(
                 event.orderId(),

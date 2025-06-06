@@ -46,9 +46,6 @@ class CouponControllerTest {
             }
             """;
 
-        when(couponService.apply(new CouponCommand.Apply(1L, 100L)))
-                .thenReturn(new Coupon(100L, 10000L, 100L, 1L));
-
         mockMvc.perform(post("/api/v1/coupon/issue")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))

@@ -2,8 +2,7 @@ package kr.hhplus.be.server.domain.payment.dto;
 
 public record PaymentCommand() {
 
-    
-    public record Save(
+    public record Create(
             Long orderId,
             Long amount
     ) {}
@@ -11,7 +10,6 @@ public record PaymentCommand() {
     public record FindOrder(
             Long orderId
     ) {}
-
 
     public record Pay(
             Long paymentId,
