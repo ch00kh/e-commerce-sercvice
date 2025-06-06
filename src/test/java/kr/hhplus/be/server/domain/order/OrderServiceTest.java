@@ -104,7 +104,7 @@ class OrderServiceTest {
         when(orderItemRepository.findByOrderIdAndProductOptionId(1L, productOptionId)).thenReturn(orderItem);
 
         // Act
-        orderService.holdOrders(command);
+        orderService.changeOrderState(command);
 
         // Assert
         verify(orderItemRepository, times(1)).findByOrderIdAndProductOptionId(1L, productOptionId);

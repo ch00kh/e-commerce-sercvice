@@ -74,7 +74,7 @@ public class CouponService {
         }
 
         // 잔여 쿠폰 조회 및 쿠폰 수량 차감
-        Coupon coupon = couponRepository.findByIdWithOptimisticLock(command.couponId());
+        Coupon coupon = couponRepository.findById(command.couponId());
         log.info("Coupon : {}", coupon);
         coupon.issue();
 
@@ -112,10 +112,8 @@ public class CouponService {
     /**
      * 쿠폰 발급 대기열 등록
      */
-    public Coupon apply(CouponCommand.Apply command) {
-        Coupon coupon = couponRepository.findById(command.couponId());
+    public void apply(CouponCommand.Apply command) {
         eventPublisher.publish(new CouponEvent.Apply(command.couponId(), command.userId()));
-        return coupon;
     }
 
     /**
