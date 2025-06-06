@@ -1,14 +1,16 @@
 import http from 'k6/http';
-import { sleep } from 'k6';
+import { check, sleep } from 'k6';
 
-const couponId = 14;
 
 export const options = {
     stages: [
-        { duration: '5s', target: 50 },
-        { duration: '20s', target: 50 },
-        { duration: '5s', target: 0 }
+        { duration: '10s', target: 100 },   // 10초 동안 100명까지 증가
+        { duration: '10s', target: 100 },   // 10초 동안 100명까지 증가
+        { duration: '20s', target: 500 },   // 15초 동안 500명까지 급증 (스파이크)
+        { duration: '10s', target: 100 },    // 5초 동안 100명 유지
+        { duration: '10s', target: 0 }       // 5초 동안 0명으로 감소
     ]
+
 };
 
 export default function () {
@@ -17,7 +19,7 @@ export default function () {
 
     const payload = JSON.stringify({
         userId: userId,
-        couponId: couponId
+        couponId: 11
     });
 
     // 요청 헤더
@@ -27,10 +29,13 @@ export default function () {
         timeout: '60s'
     };
 
-    // 거의 동시에 요청하기 위해 약간의 지연만 추가
-    sleep(Math.random() * 0.1);
-
     const res = http.post('http://host.docker.internal:8080/api/v1/coupon/issue', payload, params);
 
-    console.log(`사용자 ${userId} 응답 - 상태: ${res.status}, 본문: ${res.body}`);
+    check(res, {
+        'status is 200': (r) => r.status === 200,
+        'response time < 300ms': (r) => r.timings.duration < 300,
+        'response time < 500ms': (r) => r.timings.duration < 500,
+    });
+
+    sleep(Math.random() * 2 + 1);
 }
