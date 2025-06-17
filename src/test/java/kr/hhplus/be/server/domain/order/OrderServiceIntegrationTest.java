@@ -110,7 +110,7 @@ class OrderServiceIntegrationTest {
         OrderCommand.handleOrders command = new OrderCommand.handleOrders(orderInfo.orderId(), List.of(optionDetail));
 
         // Act
-        orderService.holdOrders(command);
+        orderService.changeOrderState(command);
 
         // Assert
         OrderItem actual = orderItemRepository.findByOrderIdAndProductOptionId(orderInfo.orderId(), productOptionId);

@@ -21,9 +21,8 @@ public class CouponController implements ICouponController {
     public ResponseEntity<CouponResponse> issue(
             @RequestBody CouponRequest.Apply request
     ) {
-        return ResponseEntity.ok()
-                .body(CouponResponse.from(couponService.apply(request.toCommand())));
+        couponService.apply(request.toCommand());
+        return ResponseEntity.ok().body(new CouponResponse(request.couponId()));
     }
-
 
 }
